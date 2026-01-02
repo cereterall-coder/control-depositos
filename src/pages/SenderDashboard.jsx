@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
 import { depositService } from '../services/depositService';
 import { useAuth } from '../context/AuthContext';
-import { Upload, DollarSign, Calendar, Eye, Activity, UserPlus, Star, Save, Trash2 } from 'lucide-react';
+import { Upload, DollarSign, Calendar, Eye, Activity, UserPlus, Star, Save, Trash2, FileText, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';
+import { generateDepositReport } from '../utils/pdfGenerator';
 
 const SenderDashboard = () => {
     const { user } = useAuth();
@@ -21,6 +22,13 @@ const SenderDashboard = () => {
 
     // UI Helper for autocomplete
     const [showSuggestions, setShowSuggestions] = useState(false);
+
+    // Report Logic
+    const [showReportModal, setShowReportModal] = useState(false);
+    const [reportStart, setReportStart] = useState('');
+    const [reportEnd, setReportEnd] = useState('');
+    const [reportWithVoucher, setReportWithVoucher] = useState(false);
+    const [generatingPdf, setGeneratingPdf] = useState(false);
 
     const refreshData = async () => {
         if (!user) return;
@@ -45,7 +53,7 @@ const SenderDashboard = () => {
             toast.success("Eliminado");
             refreshData();
         } catch (e) {
-            toast.error("No se pudo eliminar. ¿Quizás ya pasó el tiempo permitido?");
+            toast.error("No se pudo eliminar. ¿ quizás ya pasó el tiempo permitido?");
         }
     };
 
@@ -129,6 +137,38 @@ const SenderDashboard = () => {
         toast.dismiss(toastId);
         if (url) window.open(url, '_blank');
         else toast.error("No se pudo cargar la imagen", { id: toastId });
+    };
+
+    const handleGenerateReport = async () => {
+        setGeneratingPdf(true);
+        const toastId = toast.loading('Generando PDF...');
+        try {
+            // Filter Data
+            const filteredDeposits = deposits.filter(d => {
+                const dDate = new Date(d.deposit_date);
+                const start = reportStart ? new Date(reportStart) : new Date('2000-01-01');
+                const end = reportEnd ? new Date(reportEnd) : new Date();
+                return dDate >= start && dDate <= end;
+            });
+
+            if (filteredDeposits.length === 0) throw new Error("No hay datos en ese rango de fechas");
+
+            await generateDepositReport({
+                deposits: filteredDeposits,
+                startDate: reportStart,
+                endDate: reportEnd,
+                includeImages: reportWithVoucher,
+                user: user,
+                engineerCredits: "Desarrollado por Ing. Amaro A. Vilela V. | amalviva@gmail.com | 944499069"
+            });
+
+            toast.success("PDF Descargado", { id: toastId });
+            setShowReportModal(false);
+        } catch (e) {
+            toast.error(e.message, { id: toastId });
+        } finally {
+            setGeneratingPdf(false);
+        }
     };
 
     return (
@@ -259,7 +299,16 @@ const SenderDashboard = () => {
 
                 <div className="glass-panel" style={{ padding: '2rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                        <h3 className="text-h2" style={{ fontSize: '1.5rem', marginBottom: 0 }}>Historial</h3>
+                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                            <h3 className="text-h2" style={{ fontSize: '1.5rem', marginBottom: 0 }}>Historial</h3>
+                            <button
+                                onClick={() => setShowReportModal(true)}
+                                className="btn btn-secondary"
+                                style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', display: 'flex', gap: '0.5rem' }}
+                            >
+                                <FileText size={16} /> Reporte PDF
+                            </button>
+                        </div>
                         <span className="badge badge-warning" style={{ color: 'var(--text-secondary)' }}>
                             {deposits.length} Registros
                         </span>
@@ -319,6 +368,12 @@ const SenderDashboard = () => {
                                                     </button>
                                                 )}
                                             </div>
+                                            {dep.status === 'read' && dep.read_at && (
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', justifyContent: 'flex-end', marginTop: '0.2rem' }}>
+                                                    <Eye size={12} color="var(--color-success)" />
+                                                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{new Date(dep.read_at).toLocaleTimeString()}</span>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 );
@@ -328,6 +383,46 @@ const SenderDashboard = () => {
                 </div>
 
             </div>
+
+            {/* Report Modal */}
+            {showReportModal && (
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
+                    <div className="glass-panel" style={{ padding: '2rem', maxWidth: '400px', width: '90%', animation: 'slideUp 0.3s ease' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+                            <h3 className="text-h2" style={{ fontSize: '1.2rem', margin: 0 }}>Generar Reporte PDF</h3>
+                            <button onClick={() => setShowReportModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><X /></button>
+                        </div>
+
+                        <div className="form-group">
+                            <label className="text-label">Fecha Inicio</label>
+                            <input type="date" className="input-field" value={reportStart} onChange={e => setReportStart(e.target.value)} />
+                        </div>
+                        <div className="form-group" style={{ marginTop: '1rem' }}>
+                            <label className="text-label">Fecha Fin</label>
+                            <input type="date" className="input-field" value={reportEnd} onChange={e => setReportEnd(e.target.value)} />
+                        </div>
+
+                        <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }} onClick={() => setReportWithVoucher(!reportWithVoucher)}>
+                            <div style={{ width: '20px', height: '20px', border: '1px solid var(--border-subtle)', borderRadius: '4px', background: reportWithVoucher ? 'var(--color-primary)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                {reportWithVoucher && <div style={{ width: '10px', height: '10px', background: 'white', borderRadius: '2px' }} />}
+                            </div>
+                            <span style={{ fontSize: '0.9rem' }}>Incluir Imágenes (Vouchers)</span>
+                        </div>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+                            * Incluir imágenes puede hacer que el reporte tarde más en generarse.
+                        </p>
+
+                        <button
+                            onClick={handleGenerateReport}
+                            disabled={generatingPdf}
+                            className="btn btn-primary"
+                            style={{ width: '100%', marginTop: '2rem' }}
+                        >
+                            {generatingPdf ? 'Generando...' : 'Descargar PDF'}
+                        </button>
+                    </div>
+                </div>
+            )}
         </DashboardLayout>
     );
 };
