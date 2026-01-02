@@ -97,6 +97,7 @@ const SenderDashboard = () => {
     const [showReportModal, setShowReportModal] = useState(false);
     const [reportStart, setReportStart] = useState('');
     const [reportEnd, setReportEnd] = useState('');
+    const [reportRecipient, setReportRecipient] = useState(''); // New filter
     const [reportWithVoucher, setReportWithVoucher] = useState(false);
     const [generatingPdf, setGeneratingPdf] = useState(false);
 
@@ -218,10 +219,17 @@ const SenderDashboard = () => {
                 const dDate = new Date(d.deposit_date);
                 const start = reportStart ? new Date(reportStart) : new Date('2000-01-01');
                 const end = reportEnd ? new Date(reportEnd) : new Date();
-                return dDate >= start && dDate <= end;
+
+                // Date Filter
+                const dateMatch = dDate >= start && dDate <= end;
+
+                // Recipient Filter
+                const recipientMatch = reportRecipient === '' || d.recipient_email === reportRecipient;
+
+                return dateMatch && recipientMatch;
             });
 
-            if (filteredDeposits.length === 0) throw new Error("No hay datos en ese rango de fechas");
+            if (filteredDeposits.length === 0) throw new Error("No hay datos con esos filtros");
 
             await generateDepositReport({
                 deposits: filteredDeposits,
@@ -445,6 +453,22 @@ const SenderDashboard = () => {
                         <div className="form-group" style={{ marginTop: '1rem' }}>
                             <label className="text-label">Fecha Fin</label>
                             <input type="date" className="input-field" value={reportEnd} onChange={e => setReportEnd(e.target.value)} />
+                        </div>
+
+                        <div className="form-group" style={{ marginTop: '1rem' }}>
+                            <label className="text-label">Filtrar por Destinatario (Opcional)</label>
+                            <select
+                                className="input-field"
+                                value={reportRecipient}
+                                onChange={e => setReportRecipient(e.target.value)}
+                            >
+                                <option value="">-- Todos --</option>
+                                {contacts.map(c => (
+                                    <option key={c.id} value={c.contact_email}>
+                                        {c.contact_name || c.contact_email}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
 
                         <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }} onClick={() => setReportWithVoucher(!reportWithVoucher)}>
