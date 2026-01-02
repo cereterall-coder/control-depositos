@@ -14,7 +14,8 @@ const SenderDashboard = () => {
     const [submitting, setSubmitting] = useState(false);
 
     const [amount, setAmount] = useState('');
-    const [date, setDate] = useState('');
+    // Automatically set today's date
+    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [recipientEmail, setRecipientEmail] = useState('');
     const [file, setFile] = useState(null);
 
@@ -59,7 +60,8 @@ const SenderDashboard = () => {
 
             toast.success('Enviado correctamente', { id: toastId });
             setAmount('');
-            setDate('');
+            // Keep today's date
+            setDate(new Date().toISOString().split('T')[0]);
             setFile(null);
 
             // Check if is favorite
@@ -104,6 +106,14 @@ const SenderDashboard = () => {
         } catch (e) {
             toast.error("No se pudo guardar");
         }
+    };
+
+    const handleViewVoucher = async (path) => {
+        const toastId = toast.loading('Cargando imagen...');
+        const url = await depositService.getVoucherUrl(path);
+        toast.dismiss(toastId);
+        if (url) window.open(url, '_blank');
+        else toast.error("No se pudo cargar la imagen", { id: toastId });
     };
 
     return (
@@ -250,6 +260,21 @@ const SenderDashboard = () => {
                                         </div>
                                     </div>
                                     <p className="text-label" style={{ fontSize: '0.8rem' }}>{new Date(dep.deposit_date).toLocaleDateString()}</p>
+
+                                    {/* View Voucher Button */}
+                                    {dep.voucher_url && (
+                                        <button
+                                            onClick={() => handleViewVoucher(dep.voucher_url)}
+                                            style={{
+                                                background: 'none', border: 'none',
+                                                color: 'var(--color-primary)', fontSize: '0.8rem',
+                                                cursor: 'pointer', display: 'flex', alignItems: 'center',
+                                                gap: '0.25rem', marginTop: '0.5rem', padding: 0
+                                            }}
+                                        >
+                                            <Eye size={12} /> Ver Voucher
+                                        </button>
+                                    )}
                                 </div>
 
                                 <div style={{ textAlign: 'right' }}>
