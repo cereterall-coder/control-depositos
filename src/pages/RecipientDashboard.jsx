@@ -4,8 +4,8 @@ import { depositService } from '../services/depositService';
 import { useAuth } from '../context/AuthContext';
 import { Download, AlertCircle, Check } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import toast from 'react-hot-toast';
 
-// Independent Recipient Dashboard if they navigate here
 const RecipientDashboard = () => {
     const { user } = useAuth();
     const [deposits, setDeposits] = useState([]);
@@ -14,8 +14,6 @@ const RecipientDashboard = () => {
     const refreshData = async () => {
         if (!user) return;
         const data = await depositService.getDeposits(user.email, user.id);
-        // Filter only received? 
-        // The service returns both sent/received. Let's filter client side for specific view
         const received = data.filter(d => d.recipient_email === user.email);
         setDeposits(received);
         setLoading(false);
@@ -25,7 +23,17 @@ const RecipientDashboard = () => {
         refreshData();
         const subscription = supabase
             .channel('recipient_channel')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'deposits' }, () => refreshData())
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'deposits' }, (payload) => {
+                if (payload.new.recipient_email === user.email) {
+                    toast('¡Has recibido un nuevo depósito!', {
+                        icon: '💸',
+                        duration: 6000,
+                        style: { background: 'var(--color-success)', color: 'white' }
+                    });
+                    refreshData();
+                }
+            })
+            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'deposits' }, () => refreshData())
             .subscribe();
 
         return () => { supabase.removeChannel(subscription); }
@@ -33,21 +41,25 @@ const RecipientDashboard = () => {
 
     const handleMarkAsRead = async (id, currentStatus) => {
         if (currentStatus === 'read') return;
-        await depositService.markAsRead(id);
-        refreshData();
+        try {
+            await depositService.markAsRead(id);
+            toast.success("Confirmado como Recibido");
+            refreshData();
+        } catch (e) {
+            toast.error("Error al confirmar");
+        }
     };
 
     const handleViewVoucher = async (path) => {
         const url = await depositService.getVoucherUrl(path);
         if (url) window.open(url, '_blank');
+        else toast.error("No se pudo cargar la imagen");
     };
 
     const unreadCount = deposits.filter(d => d.status === 'sent').length;
 
     return (
         <DashboardLayout title="Billetera (Destino)" notificationCount={unreadCount}>
-            {/* Simplified View Logic similar to previous mock but connected to real data */}
-            {/* ... (Logic is identical to previous RecipientDashboard but calling handleViewVoucher) ... */}
             {unreadCount > 0 && (
                 <div className="animate-fade-in" style={{ padding: '1rem', background: 'var(--color-danger)', borderRadius: 'var(--radius-md)', marginBottom: '1rem', color: 'white' }}>
                     <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>

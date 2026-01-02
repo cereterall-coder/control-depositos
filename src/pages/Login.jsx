@@ -1,36 +1,35 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { ShieldCheck, Mail, Lock, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Mail, Lock, ArrowRight, User } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const Login = () => {
-    const { signIn, signUp } = useAuth(); // Added signUp for registration
+    const { signIn, signUp } = useAuth();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [isRegistering, setIsRegistering] = useState(false);
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [errorMsg, setErrorMsg] = useState('');
+    const [fullName, setFullName] = useState('');
 
     const handleAuth = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setErrorMsg('');
 
         try {
             if (isRegistering) {
-                await signUp(email, password);
-                alert('Registro exitoso. Por favor revisa tu correo para confirmar.');
+                if (!fullName) throw new Error("Por favor ingresa tu nombre completo");
+                await signUp(email, password, fullName);
+                toast.success('¡Registro exitoso! Confirma tu email.', { duration: 5000 });
                 setIsRegistering(false);
             } else {
                 await signIn(email, password);
-                // Navigation is handled by the App wrapper reacting to user state, 
-                // but we can force redirect if needed based on email or metadata
-                // For now, let the ProtectedRoute redirect simple logic
+                toast.success('Bienvenido de vuelta');
             }
         } catch (err) {
-            setErrorMsg(err.message);
+            toast.error(err.message);
         } finally {
             setLoading(false);
         }
@@ -48,15 +47,24 @@ const Login = () => {
                 <h1 className="text-h2" style={{ marginBottom: '0.5rem' }}>
                     {isRegistering ? 'Crear Cuenta' : 'Acceso Seguro'}
                 </h1>
-                <p className="text-label" style={{ marginBottom: '2rem', textTransform: 'none' }}>Control de Depósitos y Vouchers</p>
-
-                {errorMsg && (
-                    <div style={{ background: 'rgba(239, 68, 68, 0.2)', color: '#fca5a5', padding: '0.5rem', borderRadius: 'var(--radius-sm)', marginBottom: '1rem', fontSize: '0.9rem' }}>
-                        {errorMsg}
-                    </div>
-                )}
+                <p className="text-label" style={{ marginBottom: '2rem', textTransform: 'none' }}>Control de Depósitos v2.0</p>
 
                 <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {isRegistering && (
+                        <div style={{ position: 'relative' }} className="animate-fade-in">
+                            <User size={18} style={{ position: 'absolute', left: '1rem', top: '0.85rem', color: 'var(--text-muted)' }} />
+                            <input
+                                type="text"
+                                placeholder="Nombre Completo"
+                                required={isRegistering}
+                                className="input-field"
+                                style={{ paddingLeft: '2.8rem' }}
+                                value={fullName}
+                                onChange={e => setFullName(e.target.value)}
+                            />
+                        </div>
+                    )}
+
                     <div style={{ position: 'relative' }}>
                         <Mail size={18} style={{ position: 'absolute', left: '1rem', top: '0.85rem', color: 'var(--text-muted)' }} />
                         <input
@@ -99,7 +107,7 @@ const Login = () => {
                         onClick={() => setIsRegistering(!isRegistering)}
                         style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '0.9rem', cursor: 'pointer', textDecoration: 'underline' }}
                     >
-                        {isRegistering ? '¿Ya tienes cuenta? Ingresa aquí' : '¿No tienes cuenta? Regístrate'}
+                        {isRegistering ? '¿Ya tienes cuenta? Ingresa aquí' : '¿Nuevo usuario? Regístrate'}
                     </button>
                 </div>
             </div>

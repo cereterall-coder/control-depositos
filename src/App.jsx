@@ -40,6 +40,8 @@ function ConfigError() {
     );
 }
 
+import { Toaster } from 'react-hot-toast';
+
 function App() {
     if (supabase.isMock) {
         return <ConfigError />;
@@ -48,6 +50,15 @@ function App() {
     return (
         <AuthProvider>
             <AppRoutes />
+            <Toaster
+                position="top-center"
+                toastOptions={{
+                    style: {
+                        background: '#333',
+                        color: '#fff',
+                    },
+                }}
+            />
         </AuthProvider>
     );
 }

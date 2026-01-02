@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
-import { depositService } from '../services/depositService'; // UPDATED
+import { depositService } from '../services/depositService';
 import { useAuth } from '../context/AuthContext';
 import { Upload, DollarSign, Calendar, Eye, Activity, UserPlus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import toast from 'react-hot-toast';
 
 const SenderDashboard = () => {
     const { user } = useAuth();
@@ -11,10 +12,9 @@ const SenderDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
 
-    // Form State
     const [amount, setAmount] = useState('');
     const [date, setDate] = useState('');
-    const [recipientEmail, setRecipientEmail] = useState(''); // NEW
+    const [recipientEmail, setRecipientEmail] = useState('');
     const [file, setFile] = useState(null);
 
     const refreshData = async () => {
@@ -24,6 +24,7 @@ const SenderDashboard = () => {
             setDeposits(data);
         } catch (e) {
             console.error("Error fetching", e);
+            toast.error("Error al cargar historial");
         } finally {
             setLoading(false);
         }
@@ -31,22 +32,24 @@ const SenderDashboard = () => {
 
     useEffect(() => {
         refreshData();
-        // Realtime Subscription
         const subscription = supabase
             .channel('deposits_channel')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'deposits' }, payload => {
+                if (payload.eventType === 'UPDATE' && payload.new.status === 'read' && payload.new.sender_id === user.id) {
+                    toast.success('¡Han visto tu depósito!', { icon: '👀' });
+                }
                 refreshData();
             })
             .subscribe();
 
-        return () => {
-            supabase.removeChannel(subscription);
-        }
+        return () => { supabase.removeChannel(subscription); }
     }, [user]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitting(true);
+        const toastId = toast.loading('Procesando envío seguro...');
+
         try {
             await depositService.addDeposit({
                 amount: parseFloat(amount),
@@ -59,9 +62,9 @@ const SenderDashboard = () => {
             setAmount('');
             setDate('');
             setFile(null);
-            alert('Depósito enviado seguro.');
+            toast.success('Depósito registrado correctamente', { id: toastId });
         } catch (err) {
-            alert('Error: ' + err.message);
+            toast.error('Error: ' + err.message, { id: toastId });
         } finally {
             setSubmitting(false);
         }
@@ -69,17 +72,8 @@ const SenderDashboard = () => {
 
     return (
         <DashboardLayout title="Control de Depósitos">
-            {/* 
-         Combined Dashboard Logic:
-         If I am the sender, show the form.
-         If I just want to see history, show history.
-         To make it "2 apps in one", let's include the "Recipient View" button or logic 
-         if the user uses this same interface. 
-      */}
-
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 1fr) 2fr', gap: '2rem' }}>
 
-                {/* Form Section */}
                 <div className="glass-panel" style={{ padding: '2rem', height: 'fit-content' }}>
                     <h3 className="text-h2" style={{ fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <Activity color="var(--color-primary)" /> Nuevo Envío
@@ -164,7 +158,6 @@ const SenderDashboard = () => {
                     </form>
                 </div>
 
-                {/* History Section - Unified View */}
                 <div className="glass-panel" style={{ padding: '2rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                         <h3 className="text-h2" style={{ fontSize: '1.5rem', marginBottom: 0 }}>Historial</h3>
