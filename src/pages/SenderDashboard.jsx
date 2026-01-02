@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
 import { depositService } from '../services/depositService';
 import { useAuth } from '../context/AuthContext';
-import { Upload, DollarSign, Calendar, Eye, Activity, UserPlus, Star, Save } from 'lucide-react';
+import { Upload, DollarSign, Calendar, Eye, Activity, UserPlus, Star, Save, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';
 
@@ -35,6 +35,17 @@ const SenderDashboard = () => {
             toast.error("Error cargando datos");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (!confirm('¿Estás seguro de eliminar este depósito?')) return;
+        try {
+            await depositService.deleteDeposit(id);
+            toast.success("Eliminado");
+            refreshData();
+        } catch (e) {
+            toast.error("No se pudo eliminar. ¿Quizás ya pasó el tiempo permitido?");
         }
     };
 
@@ -173,7 +184,7 @@ const SenderDashboard = () => {
                         </div>
 
                         <div className="form-group">
-                            <label className="text-label">Monto (USD)</label>
+                            <label className="text-label">Monto (S/.)</label>
                             <div style={{ position: 'relative', marginTop: '0.5rem' }}>
                                 <DollarSign size={16} style={{ position: 'absolute', left: '1rem', top: '1rem', color: 'var(--text-muted)' }} />
                                 <input
@@ -248,7 +259,7 @@ const SenderDashboard = () => {
                             <div key={dep.id} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div>
                                     <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                                        <p style={{ fontWeight: 600, fontSize: '1.1rem' }}>${dep.amount}</p>
+                                        <p style={{ fontWeight: 600, fontSize: '1.1rem' }}>S/. {dep.amount}</p>
                                         <div>
                                             <span className="text-label" style={{ fontSize: '0.7rem', display: 'block' }}>
                                                 {dep.sender_id === user.id ? `Para: ${dep.recipient_email}` : `De: ${dep.sender_id.slice(0, 5)}...`}
@@ -278,9 +289,23 @@ const SenderDashboard = () => {
                                 </div>
 
                                 <div style={{ textAlign: 'right' }}>
-                                    <span className={`badge ${dep.status === 'read' ? 'badge-success' : 'badge-warning'}`}>
-                                        {dep.status === 'read' ? 'Leído' : 'Enviado'}
-                                    </span>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'flex-end', marginBottom: '0.5rem' }}>
+                                        <span className={`badge ${dep.status === 'read' ? 'badge-success' : 'badge-warning'}`}>
+                                            {dep.status === 'read' ? 'Leído' : 'Enviado'}
+                                        </span>
+                                        {/* Delete Button (Only if created today) */}
+                                        {new Date(dep.created_at).toDateString() === new Date().toDateString() && (
+                                            <button
+                                                onClick={() => handleDelete(dep.id)}
+                                                className="btn-icon"
+                                                style={{ background: 'rgba(239, 68, 68, 0.2)', color: 'var(--color-danger)', cursor: 'pointer', border: 'none', padding: '0.25rem' }}
+                                                title="Eliminar (Solo hoy)"
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
+                                        )}
+                                    </div>
+
                                     {dep.status === 'read' && dep.read_at && (
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', justifyContent: 'flex-end', marginTop: '0.2rem' }}>
                                             <Eye size={12} color="var(--color-success)" />
