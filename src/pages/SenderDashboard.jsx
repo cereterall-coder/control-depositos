@@ -91,28 +91,32 @@ const SenderDashboard = () => {
 
     const askToSaveFavorite = (email) => {
         toast((t) => (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <span>¿Guardar <b>{email}</b> en favoritos?</span>
-                <button
-                    onClick={() => {
-                        toast.dismiss(t.id);
-                        saveFavorite(email);
-                    }}
-                    style={{ background: 'var(--color-primary)', border: 'none', color: 'white', padding: '0.25rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}
-                >
-                    Guardar
-                </button>
-                <button onClick={() => toast.dismiss(t.id)} style={{ background: 'transparent', border: '1px solid #555', color: '#ccc', padding: '0.25rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}>
-                    No
-                </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <span>¿Guardar en favoritos?</span>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button
+                        onClick={() => {
+                            toast.dismiss(t.id);
+                            // Simple prompt for now
+                            const name = prompt("Nombre para este contacto (ej. Juan):", email.split('@')[0]);
+                            if (name) saveFavorite(email, name);
+                        }}
+                        style={{ background: 'var(--color-primary)', border: 'none', color: 'white', padding: '0.25rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}
+                    >
+                        Sí, guardar
+                    </button>
+                    <button onClick={() => toast.dismiss(t.id)} style={{ background: 'transparent', border: '1px solid #555', color: '#ccc', padding: '0.25rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}>
+                        No
+                    </button>
+                </div>
             </div>
         ), { duration: 8000, icon: '⭐' });
     };
 
-    const saveFavorite = async (email) => {
+    const saveFavorite = async (email, name) => {
         try {
-            await depositService.addContact(user.id, email);
-            toast.success("¡Guardado en Favoritos!");
+            await depositService.addContact(user.id, email, name);
+            toast.success(`¡${name} guardado/a!`);
             refreshData(); // Reload contacts
         } catch (e) {
             toast.error("No se pudo guardar");
@@ -137,13 +141,13 @@ const SenderDashboard = () => {
                     </h3>
                     <form onSubmit={handleSubmit}>
                         <div className="form-group" style={{ position: 'relative' }}>
-                            <label className="text-label">Email Destinatario</label>
+                            <label className="text-label">Email o Nombre Destinatario</label>
                             <div style={{ position: 'relative', marginTop: '0.5rem' }}>
                                 <UserPlus size={16} style={{ position: 'absolute', left: '1rem', top: '1rem', color: 'var(--text-muted)' }} />
                                 <input
-                                    type="email"
+                                    type="text"
                                     required
-                                    placeholder="Buscar o escribir..."
+                                    placeholder="Escribe nombre o correo..."
                                     className="input-field"
                                     style={{ paddingLeft: '2.5rem' }}
                                     value={recipientEmail}
@@ -152,7 +156,7 @@ const SenderDashboard = () => {
                                         setShowSuggestions(true);
                                     }}
                                     onFocus={() => setShowSuggestions(true)}
-                                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)} // Delay to allow click
+                                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                                     autoComplete="off"
                                 />
 
@@ -161,21 +165,28 @@ const SenderDashboard = () => {
                                     <div style={{
                                         position: 'absolute', top: '100%', left: 0, right: 0,
                                         background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)',
-                                        borderRadius: '0 0 8px 8px', zIndex: 50, maxHeight: '200px', overflowY: 'auto'
+                                        borderRadius: '0 0 8px 8px', zIndex: 50, maxHeight: '200px', overflowY: 'auto',
+                                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                                     }}>
                                         {contacts
-                                            .filter(c => c.contact_email.toLowerCase().includes(recipientEmail.toLowerCase()))
+                                            .filter(c =>
+                                                c.contact_email.toLowerCase().includes(recipientEmail.toLowerCase()) ||
+                                                c.contact_name?.toLowerCase().includes(recipientEmail.toLowerCase())
+                                            )
                                             .map(c => (
                                                 <div
                                                     key={c.id}
                                                     onClick={() => {
-                                                        setRecipientEmail(c.contact_email);
+                                                        setRecipientEmail(c.contact_email); // Fill with email for submission
                                                         setShowSuggestions(false);
                                                     }}
                                                     style={{ padding: '0.75rem', cursor: 'pointer', borderBottom: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                                                 >
                                                     <Star size={12} fill="gold" color="gold" />
-                                                    <span>{c.contact_email}</span>
+                                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                        <span style={{ fontWeight: 500 }}>{c.contact_name || 'Sin nombre'}</span>
+                                                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{c.contact_email}</span>
+                                                    </div>
                                                 </div>
                                             ))}
                                     </div>
@@ -255,68 +266,64 @@ const SenderDashboard = () => {
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {loading ? <p>Cargando datos...</p> : deposits.map(dep => (
-                            <div key={dep.id} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <div>
-                                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                                        <p style={{ fontWeight: 600, fontSize: '1.1rem' }}>S/. {dep.amount}</p>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {loading ? <p>Cargando datos...</p> : deposits.map(dep => {
+                                const contactName = contacts.find(c => c.contact_email === dep.recipient_email)?.contact_name || dep.recipient_email;
+                                const isToday = new Date(dep.created_at).toDateString() === new Date().toDateString();
+
+                                return (
+                                    <div key={dep.id} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <div>
-                                            <span className="text-label" style={{ fontSize: '0.7rem', display: 'block' }}>
-                                                {dep.sender_id === user.id ? `Para: ${dep.recipient_email}` : `De: ${dep.sender_id.slice(0, 5)}...`}
-                                            </span>
-                                            {/* Star indicator if favorite */}
-                                            {contacts.some(c => c.contact_email === dep.recipient_email) && (
-                                                <span style={{ fontSize: '0.6rem', color: 'gold' }}>★ Favorito</span>
+                                            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                                                <p style={{ fontWeight: 600, fontSize: '1.1rem' }}>S/. {dep.amount}</p>
+                                                <div>
+                                                    <span className="text-label" style={{ fontSize: '0.8rem', display: 'block', fontWeight: 500, color: 'var(--text-primary)' }}>
+                                                        {dep.sender_id === user.id ? `Para: ${contactName}` : `De: ${dep.sender_id.slice(0, 5)}...`}
+                                                    </span>
+                                                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                                                        {new Date(dep.deposit_date).toLocaleDateString()}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            {/* View Voucher Button */}
+                                            {dep.voucher_url && (
+                                                <button
+                                                    onClick={() => handleViewVoucher(dep.voucher_url)}
+                                                    style={{
+                                                        background: 'none', border: 'none',
+                                                        color: 'var(--color-primary)', fontSize: '0.8rem',
+                                                        cursor: 'pointer', display: 'flex', alignItems: 'center',
+                                                        gap: '0.25rem', marginTop: '0.5rem', padding: 0
+                                                    }}
+                                                >
+                                                    <Eye size={12} /> Ver Voucher
+                                                </button>
                                             )}
                                         </div>
-                                    </div>
-                                    <p className="text-label" style={{ fontSize: '0.8rem' }}>{new Date(dep.deposit_date).toLocaleDateString()}</p>
 
-                                    {/* View Voucher Button */}
-                                    {dep.voucher_url && (
-                                        <button
-                                            onClick={() => handleViewVoucher(dep.voucher_url)}
-                                            style={{
-                                                background: 'none', border: 'none',
-                                                color: 'var(--color-primary)', fontSize: '0.8rem',
-                                                cursor: 'pointer', display: 'flex', alignItems: 'center',
-                                                gap: '0.25rem', marginTop: '0.5rem', padding: 0
-                                            }}
-                                        >
-                                            <Eye size={12} /> Ver Voucher
-                                        </button>
-                                    )}
-                                </div>
-
-                                <div style={{ textAlign: 'right' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'flex-end', marginBottom: '0.5rem' }}>
-                                        <span className={`badge ${dep.status === 'read' ? 'badge-success' : 'badge-warning'}`}>
-                                            {dep.status === 'read' ? 'Leído' : 'Enviado'}
-                                        </span>
-                                        {/* Delete Button (Only if created today) */}
-                                        {new Date(dep.created_at).toDateString() === new Date().toDateString() && (
-                                            <button
-                                                onClick={() => handleDelete(dep.id)}
-                                                className="btn-icon"
-                                                style={{ background: 'rgba(239, 68, 68, 0.2)', color: 'var(--color-danger)', cursor: 'pointer', border: 'none', padding: '0.25rem' }}
-                                                title="Eliminar (Solo hoy)"
-                                            >
-                                                <Trash2 size={14} />
-                                            </button>
-                                        )}
-                                    </div>
-
-                                    {dep.status === 'read' && dep.read_at && (
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', justifyContent: 'flex-end', marginTop: '0.2rem' }}>
-                                            <Eye size={12} color="var(--color-success)" />
-                                            <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>
-                                                {new Date(dep.read_at).toLocaleTimeString()}
-                                            </span>
+                                        <div style={{ textAlign: 'right' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'flex-end', marginBottom: '0.5rem' }}>
+                                                <span className={`badge ${dep.status === 'read' ? 'badge-success' : 'badge-warning'}`}>
+                                                    {dep.status === 'read' ? 'Leído' : 'Enviado'}
+                                                </span>
+                                                {/* Delete Button (Only if created today) */}
+                                                {isToday && (
+                                                    <button
+                                                        onClick={() => handleDelete(dep.id)}
+                                                        className="btn-icon"
+                                                        style={{ background: 'rgba(239, 68, 68, 0.2)', color: 'var(--color-danger)', cursor: 'pointer', border: 'none', padding: '0.25rem' }}
+                                                        title="Eliminar (Solo hoy)"
+                                                    >
+                                                        <Trash2 size={14} />
+                                                    </button>
+                                                )}
+                                            </div>
                                         </div>
-                                    )}
-                                </div>
-                            </div>
-                        ))}
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
 
