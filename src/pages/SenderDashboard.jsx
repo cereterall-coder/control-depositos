@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
 import { depositService } from '../services/depositService';
 import { useAuth } from '../context/AuthContext';
-import { Upload, DollarSign, Calendar, Eye, Activity, UserPlus } from 'lucide-react';
+import { Upload, DollarSign, Calendar, Eye, Activity, UserPlus, Star, Save } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';
 
 const SenderDashboard = () => {
     const { user } = useAuth();
     const [deposits, setDeposits] = useState([]);
+    const [contacts, setContacts] = useState([]); // Favorites list
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
 
@@ -17,14 +18,20 @@ const SenderDashboard = () => {
     const [recipientEmail, setRecipientEmail] = useState('');
     const [file, setFile] = useState(null);
 
+    // UI Helper for autocomplete
+    const [showSuggestions, setShowSuggestions] = useState(false);
+
     const refreshData = async () => {
         if (!user) return;
         try {
-            const data = await depositService.getDeposits(user.email, user.id);
-            setDeposits(data);
+            const [history, savedContacts] = await Promise.all([
+                depositService.getDeposits(user.email, user.id),
+                depositService.getContacts(user.id)
+            ]);
+            setDeposits(history);
+            setContacts(savedContacts || []);
         } catch (e) {
-            console.error("Error fetching", e);
-            toast.error("Error al cargar historial");
+            toast.error("Error cargando datos");
         } finally {
             setLoading(false);
         }
@@ -32,23 +39,14 @@ const SenderDashboard = () => {
 
     useEffect(() => {
         refreshData();
-        const subscription = supabase
-            .channel('deposits_channel')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'deposits' }, payload => {
-                if (payload.eventType === 'UPDATE' && payload.new.status === 'read' && payload.new.sender_id === user.id) {
-                    toast.success('¡Han visto tu depósito!', { icon: '👀' });
-                }
-                refreshData();
-            })
-            .subscribe();
-
-        return () => { supabase.removeChannel(subscription); }
+        const subHistory = supabase.channel('deposits_sub').on('postgres_changes', { event: '*', schema: 'public', table: 'deposits' }, refreshData).subscribe();
+        return () => { supabase.removeChannel(subHistory); }
     }, [user]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitting(true);
-        const toastId = toast.loading('Procesando envío seguro...');
+        const toastId = toast.loading('Enviando...');
 
         try {
             await depositService.addDeposit({
@@ -59,14 +57,52 @@ const SenderDashboard = () => {
                 senderId: user.id
             });
 
+            toast.success('Enviado correctamente', { id: toastId });
             setAmount('');
             setDate('');
             setFile(null);
-            toast.success('Depósito registrado correctamente', { id: toastId });
+
+            // Check if is favorite
+            const isFav = contacts.some(c => c.contact_email === recipientEmail);
+            if (!isFav) {
+                askToSaveFavorite(recipientEmail);
+            }
+            setRecipientEmail('');
+
         } catch (err) {
             toast.error('Error: ' + err.message, { id: toastId });
         } finally {
             setSubmitting(false);
+        }
+    };
+
+    const askToSaveFavorite = (email) => {
+        toast((t) => (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <span>¿Guardar <b>{email}</b> en favoritos?</span>
+                <button
+                    onClick={() => {
+                        toast.dismiss(t.id);
+                        saveFavorite(email);
+                    }}
+                    style={{ background: 'var(--color-primary)', border: 'none', color: 'white', padding: '0.25rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}
+                >
+                    Guardar
+                </button>
+                <button onClick={() => toast.dismiss(t.id)} style={{ background: 'transparent', border: '1px solid #555', color: '#ccc', padding: '0.25rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}>
+                    No
+                </button>
+            </div>
+        ), { duration: 8000, icon: '⭐' });
+    };
+
+    const saveFavorite = async (email) => {
+        try {
+            await depositService.addContact(user.id, email);
+            toast.success("¡Guardado en Favoritos!");
+            refreshData(); // Reload contacts
+        } catch (e) {
+            toast.error("No se pudo guardar");
         }
     };
 
@@ -79,19 +115,50 @@ const SenderDashboard = () => {
                         <Activity color="var(--color-primary)" /> Nuevo Envío
                     </h3>
                     <form onSubmit={handleSubmit}>
-                        <div className="form-group">
+                        <div className="form-group" style={{ position: 'relative' }}>
                             <label className="text-label">Email Destinatario</label>
                             <div style={{ position: 'relative', marginTop: '0.5rem' }}>
                                 <UserPlus size={16} style={{ position: 'absolute', left: '1rem', top: '1rem', color: 'var(--text-muted)' }} />
                                 <input
                                     type="email"
                                     required
-                                    placeholder="ej. esposa@email.com"
+                                    placeholder="Buscar o escribir..."
                                     className="input-field"
                                     style={{ paddingLeft: '2.5rem' }}
                                     value={recipientEmail}
-                                    onChange={e => setRecipientEmail(e.target.value)}
+                                    onChange={e => {
+                                        setRecipientEmail(e.target.value);
+                                        setShowSuggestions(true);
+                                    }}
+                                    onFocus={() => setShowSuggestions(true)}
+                                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)} // Delay to allow click
+                                    autoComplete="off"
                                 />
+
+                                {/* Suggestions Dropdown */}
+                                {showSuggestions && contacts.length > 0 && (
+                                    <div style={{
+                                        position: 'absolute', top: '100%', left: 0, right: 0,
+                                        background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)',
+                                        borderRadius: '0 0 8px 8px', zIndex: 50, maxHeight: '200px', overflowY: 'auto'
+                                    }}>
+                                        {contacts
+                                            .filter(c => c.contact_email.toLowerCase().includes(recipientEmail.toLowerCase()))
+                                            .map(c => (
+                                                <div
+                                                    key={c.id}
+                                                    onClick={() => {
+                                                        setRecipientEmail(c.contact_email);
+                                                        setShowSuggestions(false);
+                                                    }}
+                                                    style={{ padding: '0.75rem', cursor: 'pointer', borderBottom: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                                                >
+                                                    <Star size={12} fill="gold" color="gold" />
+                                                    <span>{c.contact_email}</span>
+                                                </div>
+                                            ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -172,9 +239,15 @@ const SenderDashboard = () => {
                                 <div>
                                     <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                                         <p style={{ fontWeight: 600, fontSize: '1.1rem' }}>${dep.amount}</p>
-                                        <span className="text-label" style={{ fontSize: '0.7rem' }}>
-                                            {dep.sender_id === user.id ? `Para: ${dep.recipient_email}` : `De: ${dep.sender_id.slice(0, 5)}...`}
-                                        </span>
+                                        <div>
+                                            <span className="text-label" style={{ fontSize: '0.7rem', display: 'block' }}>
+                                                {dep.sender_id === user.id ? `Para: ${dep.recipient_email}` : `De: ${dep.sender_id.slice(0, 5)}...`}
+                                            </span>
+                                            {/* Star indicator if favorite */}
+                                            {contacts.some(c => c.contact_email === dep.recipient_email) && (
+                                                <span style={{ fontSize: '0.6rem', color: 'gold' }}>★ Favorito</span>
+                                            )}
+                                        </div>
                                     </div>
                                     <p className="text-label" style={{ fontSize: '0.8rem' }}>{new Date(dep.deposit_date).toLocaleDateString()}</p>
                                 </div>
@@ -194,12 +267,6 @@ const SenderDashboard = () => {
                                 </div>
                             </div>
                         ))}
-
-                        {deposits.length === 0 && !loading && (
-                            <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem' }}>
-                                No hay depósitos registrados aún.
-                            </div>
-                        )}
                     </div>
                 </div>
 
