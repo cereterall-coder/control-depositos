@@ -54,6 +54,18 @@ const DashboardLayout = ({ children, title, notificationCount = 0 }) => {
             <main className="main-content">
                 {children}
             </main>
+
+            <footer style={{
+                textAlign: 'center',
+                padding: '1.5rem',
+                opacity: 0.4,
+                fontSize: '0.7rem',
+                color: 'var(--text-muted)',
+                marginTop: 'auto'
+            }}>
+                <p>Desarrollado por Ing. Amaro A. Vilela V.</p>
+                <p>Email: amalviva@gmail.com | Tel: 944499069</p>
+            </footer>
         </div>
     );
 };

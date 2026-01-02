@@ -111,6 +111,21 @@ const Login = () => {
                     </button>
                 </div>
             </div>
+
+            <footer style={{
+                textAlign: 'center',
+                padding: '1rem',
+                opacity: 0.6,
+                fontSize: '0.75rem',
+                color: 'var(--text-muted)',
+                position: 'fixed',
+                bottom: 0,
+                width: '100%',
+                background: 'linear-gradient(to top, var(--bg-app) 20%, transparent)'
+            }}>
+                <p>Desarrollado por Ing. Amaro A. Vilela V.</p>
+                <p>Email: amalviva@gmail.com | Tel: 944499069</p>
+            </footer>
         </div>
     );
 };
