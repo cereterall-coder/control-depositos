@@ -11,74 +11,7 @@ const SenderDashboard = () => {
     const { user } = useAuth();
     // ... (keep lines until line 230 approx)
 
-    <div className="form-group">
-        <label className="text-label">Voucher (Foto)</label>
-        <div
-            style={{
-                border: '2px dashed var(--border-subtle)',
-                padding: '1.5rem',
-                borderRadius: 'var(--radius-sm)',
-                marginTop: '0.5rem',
-                background: file ? 'rgba(16, 185, 129, 0.1)' : 'transparent'
-            }}
-        >
-            {file ? (
-                <div style={{ textAlign: 'center' }}>
-                    <p style={{ fontSize: '0.9rem', color: 'var(--color-success)', fontWeight: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                        <FileText size={16} /> {file.name}
-                    </p>
-                    <button
-                        type="button"
-                        onClick={() => setFile(null)}
-                        style={{ marginTop: '0.5rem', background: 'none', border: 'none', color: 'var(--color-danger)', fontSize: '0.8rem', cursor: 'pointer', textDecoration: 'underline' }}
-                    >
-                        Quitar imagen
-                    </button>
-                </div>
-            ) : (
-                <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center' }}>
-                    {/* Gallery Option */}
-                    <div
-                        onClick={() => document.getElementById('fileUpload').click()}
-                        style={{ cursor: 'pointer', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}
-                        className="hover-scale"
-                    >
-                        <div style={{ background: 'var(--bg-surface)', padding: '0.8rem', borderRadius: '50%', boxShadow: 'var(--shadow-sm)' }}>
-                            <Upload size={24} color="var(--color-primary)" />
-                        </div>
-                        <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Galería</span>
-                        <input
-                            id="fileUpload"
-                            type="file"
-                            accept="image/*"
-                            style={{ display: 'none' }}
-                            onChange={e => setFile(e.target.files[0])}
-                        />
-                    </div>
 
-                    {/* Camera Option */}
-                    <div
-                        onClick={() => document.getElementById('cameraUpload').click()}
-                        style={{ cursor: 'pointer', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}
-                        className="hover-scale"
-                    >
-                        <div style={{ background: 'var(--bg-surface)', padding: '0.8rem', borderRadius: '50%', boxShadow: 'var(--shadow-sm)' }}>
-                            <Camera size={24} color="var(--color-primary)" />
-                        </div>
-                        <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Cámara</span>
-                        <input
-                            id="cameraUpload"
-                            type="file"
-                            accept="image/*"
-                            capture="environment"
-                            style={{ display: 'none' }}
-                            onChange={e => setFile(e.target.files[0])}
-                        />
-                    </div>
-                </div>
-            )}
-        </div>
-    </div>
     const [deposits, setDeposits] = useState([]);
     const [contacts, setContacts] = useState([]); // Favorites list
     const [loading, setLoading] = useState(true);
@@ -343,6 +276,74 @@ const SenderDashboard = () => {
                             </div>
                         </div>
 
+                        <div className="form-group">
+                            <label className="text-label">Voucher (Foto)</label>
+                            <div
+                                style={{
+                                    border: '2px dashed var(--border-subtle)',
+                                    padding: '1.5rem',
+                                    borderRadius: 'var(--radius-sm)',
+                                    marginTop: '0.5rem',
+                                    background: file ? 'rgba(16, 185, 129, 0.1)' : 'transparent'
+                                }}
+                            >
+                                {file ? (
+                                    <div style={{ textAlign: 'center' }}>
+                                        <p style={{ fontSize: '0.9rem', color: 'var(--color-success)', fontWeight: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                                            <FileText size={16} /> {file.name}
+                                        </p>
+                                        <button
+                                            type="button"
+                                            onClick={() => setFile(null)}
+                                            style={{ marginTop: '0.5rem', background: 'none', border: 'none', color: 'var(--color-danger)', fontSize: '0.8rem', cursor: 'pointer', textDecoration: 'underline' }}
+                                        >
+                                            Quitar imagen
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center' }}>
+                                        {/* Gallery Option */}
+                                        <div
+                                            onClick={() => document.getElementById('fileUpload').click()}
+                                            style={{ cursor: 'pointer', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}
+                                            className="hover-scale"
+                                        >
+                                            <div style={{ background: 'var(--bg-surface)', padding: '0.8rem', borderRadius: '50%', boxShadow: 'var(--shadow-sm)' }}>
+                                                <Upload size={24} color="var(--color-primary)" />
+                                            </div>
+                                            <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Galería</span>
+                                            <input
+                                                id="fileUpload"
+                                                type="file"
+                                                accept="image/*"
+                                                style={{ display: 'none' }}
+                                                onChange={e => setFile(e.target.files[0])}
+                                            />
+                                        </div>
+
+                                        {/* Camera Option */}
+                                        <div
+                                            onClick={() => document.getElementById('cameraUpload').click()}
+                                            style={{ cursor: 'pointer', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}
+                                            className="hover-scale"
+                                        >
+                                            <div style={{ background: 'var(--bg-surface)', padding: '0.8rem', borderRadius: '50%', boxShadow: 'var(--shadow-sm)' }}>
+                                                <Camera size={24} color="var(--color-primary)" />
+                                            </div>
+                                            <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Cámara</span>
+                                            <input
+                                                id="cameraUpload"
+                                                type="file"
+                                                accept="image/*"
+                                                capture="environment"
+                                                style={{ display: 'none' }}
+                                                onChange={e => setFile(e.target.files[0])}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
 
                         <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={submitting}>
                             {submitting ? 'Subiendo...' : 'Registrar Depósito'}
