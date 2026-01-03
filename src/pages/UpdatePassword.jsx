@@ -89,6 +89,18 @@ const UpdatePassword = () => {
                     >
                         {loading ? 'Guardando...' : 'Actualizar Contraseña'}
                     </button>
+
+                    <button
+                        type="button"
+                        onClick={() => navigate('/')}
+                        style={{
+                            width: '100%', marginTop: '0.5rem', height: '40px',
+                            background: 'transparent', border: 'none', color: 'var(--text-secondary)',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Cancelar
+                    </button>
                 </form>
             </div>
         </div>
