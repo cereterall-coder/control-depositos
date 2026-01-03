@@ -9,8 +9,6 @@ import { generateDepositReport } from '../utils/pdfGenerator';
 
 const SenderDashboard = () => {
     const { user } = useAuth();
-    // ... (keep lines until line 230 approx)
-
 
     const [deposits, setDeposits] = useState([]);
     const [contacts, setContacts] = useState([]); // Favorites list
@@ -90,7 +88,6 @@ const SenderDashboard = () => {
             });
 
             toast.success('Enviado correctamente', { id: toastId });
-            setAmount('');
             setAmount('');
             // Keep today's date (Peru)
             setDate(new Date().toLocaleDateString('en-CA', { timeZone: 'America/Lima' }));
@@ -197,7 +194,6 @@ const SenderDashboard = () => {
             <div className="dashboard-grid">
 
                 <div className="glass-panel card-padding" style={{ height: 'fit-content' }}>
-
                     {user?.status && user.status !== 'active' ? (
                         <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
                             <div style={{ background: 'rgba(245, 158, 11, 0.1)', width: '60px', height: '60px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
@@ -237,7 +233,6 @@ const SenderDashboard = () => {
                                             autoComplete="off"
                                         />
 
-                                        {/* Suggestions Dropdown */}
                                         {showSuggestions && contacts.length > 0 && (
                                             <div style={{
                                                 position: 'absolute', top: '100%', left: 0, right: 0,
@@ -254,7 +249,7 @@ const SenderDashboard = () => {
                                                         <div
                                                             key={c.id}
                                                             onClick={() => {
-                                                                setRecipientEmail(c.contact_email); // Fill with email for submission
+                                                                setRecipientEmail(c.contact_email);
                                                                 setShowSuggestions(false);
                                                             }}
                                                             style={{ padding: '0.75rem', cursor: 'pointer', borderBottom: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
@@ -344,7 +339,6 @@ const SenderDashboard = () => {
                                             </div>
                                         ) : (
                                             <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center' }}>
-                                                {/* Gallery Option */}
                                                 <div
                                                     onClick={() => document.getElementById('fileUpload').click()}
                                                     style={{ cursor: 'pointer', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}
@@ -363,7 +357,6 @@ const SenderDashboard = () => {
                                                     />
                                                 </div>
 
-                                                {/* Camera Option */}
                                                 <div
                                                     onClick={() => document.getElementById('cameraUpload').click()}
                                                     style={{ cursor: 'pointer', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}
@@ -391,167 +384,165 @@ const SenderDashboard = () => {
                                     {submitting ? 'Subiendo...' : 'Registrar Depósito'}
                                 </button>
                             </form>
-                        </div>
+                        </>
+                    )}
+                </div>
 
-                    <div className="glass-panel card-padding">
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-                            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                                <h3 className="text-h2" style={{ fontSize: '1.5rem', marginBottom: 0 }}>Historial</h3>
-                                <button
-                                    onClick={() => setShowReportModal(true)}
-                                    className="btn btn-secondary"
-                                    style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', display: 'flex', gap: '0.5rem' }}
-                                >
-                                    <FileText size={16} /> Reporte PDF
-                                </button>
-                            </div>
-                            <span className="badge badge-warning" style={{ color: 'var(--text-secondary)' }}>
-                                {deposits.length} Registros
-                            </span>
+                <div className="glass-panel card-padding">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                            <h3 className="text-h2" style={{ fontSize: '1.5rem', marginBottom: 0 }}>Historial</h3>
+                            <button
+                                onClick={() => setShowReportModal(true)}
+                                className="btn btn-secondary"
+                                style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', display: 'flex', gap: '0.5rem' }}
+                            >
+                                <FileText size={16} /> Reporte PDF
+                            </button>
                         </div>
+                        <span className="badge badge-warning" style={{ color: 'var(--text-secondary)' }}>
+                            {deposits.length} Registros
+                        </span>
+                    </div>
 
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                {loading ? <p>Cargando datos...</p> : deposits.map(dep => {
-                                    const contactName = contacts.find(c => c.contact_email === dep.recipient_email)?.contact_name || dep.recipient_email;
-                                    const isToday = new Date(dep.created_at).toDateString() === new Date().toDateString();
+                            {loading ? <p>Cargando datos...</p> : deposits.map(dep => {
+                                const contactName = contacts.find(c => c.contact_email === dep.recipient_email)?.contact_name || dep.recipient_email;
+                                const isToday = new Date(dep.created_at).toDateString() === new Date().toDateString();
 
-                                    return (
-                                        <div
-                                            key={dep.id}
-                                            className="glass-panel hover-scale card-item-padding"
-                                        >
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1, minWidth: 0 }}>
-                                                <div style={{
-                                                    padding: '0.4rem',
-                                                    background: 'var(--bg-app)',
-                                                    borderRadius: '50%',
-                                                    display: 'flex',
-                                                    flexShrink: 0
-                                                }}>
-                                                    <FileText size={16} color="var(--color-primary)" />
-                                                </div>
-                                                <div style={{ minWidth: 0, flex: 1 }}>
-                                                    <p className="text-truncate" style={{ fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>
-                                                        {dep.sender_id === user.id ? `Para: ${contactName}` : `De: ${dep.sender_id.slice(0, 5)}...`}
-                                                    </p>
-                                                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                                                        {new Date(dep.deposit_date).toLocaleDateString()}
-                                                    </span>
-                                                    {dep.observation && (
-                                                        <p className="text-truncate" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.2rem', fontStyle: 'italic' }}>
-                                                            "{dep.observation}"
-                                                        </p>
-                                                    )}
-
-                                                    {dep.voucher_url && (
-                                                        <button
-                                                            onClick={() => handleViewVoucher(dep.voucher_url)}
-                                                            style={{
-                                                                background: 'none', border: 'none',
-                                                                color: 'var(--color-primary)', fontSize: '0.8rem',
-                                                                cursor: 'pointer', display: 'flex', alignItems: 'center',
-                                                                gap: '0.25rem', marginTop: '0.5rem', padding: 0
-                                                            }}
-                                                        >
-                                                            <Eye size={12} /> Ver Voucher
-                                                        </button>
-                                                    )}
-                                                </div>
+                                return (
+                                    <div
+                                        key={dep.id}
+                                        className="glass-panel hover-scale card-item-padding"
+                                    >
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1, minWidth: 0 }}>
+                                            <div style={{
+                                                padding: '0.4rem',
+                                                background: 'var(--bg-app)',
+                                                borderRadius: '50%',
+                                                display: 'flex',
+                                                flexShrink: 0
+                                            }}>
+                                                <FileText size={16} color="var(--color-primary)" />
                                             </div>
+                                            <div style={{ minWidth: 0, flex: 1 }}>
+                                                <p className="text-truncate" style={{ fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>
+                                                    {dep.sender_id === user.id ? `Para: ${contactName}` : `De: ${dep.sender_id.slice(0, 5)}...`}
+                                                </p>
+                                                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                                                    {new Date(dep.deposit_date).toLocaleDateString()}
+                                                </span>
+                                                {dep.observation && (
+                                                    <p className="text-truncate" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.2rem', fontStyle: 'italic' }}>
+                                                        "{dep.observation}"
+                                                    </p>
+                                                )}
 
-                                            <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                                                <p className="price-text">S/. {dep.amount}</p>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', justifyContent: 'flex-end', marginBottom: '0.3rem' }}>
-                                                    <span className={`badge ${dep.status === 'read' ? 'badge-success' : 'badge-warning'}`}>
-                                                        {dep.status === 'read' ? 'Leído' : 'Enviado'}
-                                                    </span>
-                                                    {isToday && dep.sender_id === user.id && (
-                                                        <button
-                                                            onClick={() => handleDelete(dep.id)}
-                                                            className="btn-icon"
-                                                            style={{ background: 'rgba(239, 68, 68, 0.2)', color: 'var(--color-danger)', cursor: 'pointer', border: 'none', padding: '0.15rem', display: 'flex' }}
-                                                            title="Eliminar (Solo hoy)"
-                                                        >
-                                                            <Trash2 size={13} />
-                                                        </button>
-                                                    )}
-                                                </div>
-                                                {dep.status === 'read' && dep.read_at && (
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', justifyContent: 'flex-end', marginTop: '0.2rem' }}>
-                                                        <Eye size={12} color="var(--color-success)" />
-                                                        <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{new Date(dep.read_at).toLocaleTimeString()}</span>
-                                                    </div>
+                                                {dep.voucher_url && (
+                                                    <button
+                                                        onClick={() => handleViewVoucher(dep.voucher_url)}
+                                                        style={{
+                                                            background: 'none', border: 'none',
+                                                            color: 'var(--color-primary)', fontSize: '0.8rem',
+                                                            cursor: 'pointer', display: 'flex', alignItems: 'center',
+                                                            gap: '0.25rem', marginTop: '0.5rem', padding: 0
+                                                        }}
+                                                    >
+                                                        <Eye size={12} /> Ver Voucher
+                                                    </button>
                                                 )}
                                             </div>
                                         </div>
-                                    );
-                                })}
-                            </div>
+
+                                        <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                                            <p className="price-text">S/. {dep.amount}</p>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', justifyContent: 'flex-end', marginBottom: '0.3rem' }}>
+                                                <span className={`badge ${dep.status === 'read' ? 'badge-success' : 'badge-warning'}`}>
+                                                    {dep.status === 'read' ? 'Leído' : 'Enviado'}
+                                                </span>
+                                                {isToday && dep.sender_id === user.id && (
+                                                    <button
+                                                        onClick={() => handleDelete(dep.id)}
+                                                        className="btn-icon"
+                                                        style={{ background: 'rgba(239, 68, 68, 0.2)', color: 'var(--color-danger)', cursor: 'pointer', border: 'none', padding: '0.15rem', display: 'flex' }}
+                                                        title="Eliminar (Solo hoy)"
+                                                    >
+                                                        <Trash2 size={13} />
+                                                    </button>
+                                                )}
+                                            </div>
+                                            {dep.status === 'read' && dep.read_at && (
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', justifyContent: 'flex-end', marginTop: '0.2rem' }}>
+                                                    <Eye size={12} color="var(--color-success)" />
+                                                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{new Date(dep.read_at).toLocaleTimeString()}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
-                </div>
-            </form>
-        </>
-
-                {/* Report Modal */ }
-    {
-        showReportModal && (
-            <div className="modal-overlay">
-                <div className="modal-content">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', alignItems: 'center' }}>
-                        <h3 className="text-h2" style={{ fontSize: '1.2rem', margin: 0 }}>Generar Reporte PDF</h3>
-                        <button onClick={() => setShowReportModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><X /></button>
-                    </div>
-
-                    <div className="form-group">
-                        <label className="text-label">Fecha Inicio</label>
-                        <input type="date" className="input-field" value={reportStart} onChange={e => setReportStart(e.target.value)} />
-                    </div>
-                    <div className="form-group" style={{ marginTop: '1rem' }}>
-                        <label className="text-label">Fecha Fin</label>
-                        <input type="date" className="input-field" value={reportEnd} onChange={e => setReportEnd(e.target.value)} />
-                    </div>
-
-                    <div className="form-group" style={{ marginTop: '1rem' }}>
-                        <label className="text-label">Filtrar por Destinatario (Opcional)</label>
-                        <select
-                            className="input-field"
-                            value={reportRecipient}
-                            onChange={e => setReportRecipient(e.target.value)}
-                        >
-                            <option value="">-- Todos --</option>
-                            {contacts.map(c => (
-                                <option key={c.id} value={c.contact_email}>
-                                    {c.contact_name || c.contact_email}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }} onClick={() => setReportWithVoucher(!reportWithVoucher)}>
-                        <div style={{ width: '20px', height: '20px', border: '1px solid var(--border-subtle)', borderRadius: '4px', background: reportWithVoucher ? 'var(--color-primary)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            {reportWithVoucher && <div style={{ width: '10px', height: '10px', background: 'white', borderRadius: '2px' }} />}
-                        </div>
-                        <span style={{ fontSize: '0.9rem' }}>Incluir Imágenes (Vouchers)</span>
-                    </div>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-                        * Incluir imágenes puede hacer que el reporte tarde más en generarse.
-                    </p>
-
-                    <button
-                        onClick={handleGenerateReport}
-                        disabled={generatingPdf}
-                        className="btn btn-primary"
-                        style={{ width: '100%', marginTop: '2rem' }}
-                    >
-                        {generatingPdf ? 'Generando...' : 'Descargar PDF'}
-                    </button>
                 </div>
             </div>
-        )
-    }
-        </DashboardLayout >
+
+            {/* Report Modal */}
+            {showReportModal && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', alignItems: 'center' }}>
+                            <h3 className="text-h2" style={{ fontSize: '1.2rem', margin: 0 }}>Generar Reporte PDF</h3>
+                            <button onClick={() => setShowReportModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><X /></button>
+                        </div>
+
+                        <div className="form-group">
+                            <label className="text-label">Fecha Inicio</label>
+                            <input type="date" className="input-field" value={reportStart} onChange={e => setReportStart(e.target.value)} />
+                        </div>
+                        <div className="form-group" style={{ marginTop: '1rem' }}>
+                            <label className="text-label">Fecha Fin</label>
+                            <input type="date" className="input-field" value={reportEnd} onChange={e => setReportEnd(e.target.value)} />
+                        </div>
+
+                        <div className="form-group" style={{ marginTop: '1rem' }}>
+                            <label className="text-label">Filtrar por Destinatario (Opcional)</label>
+                            <select
+                                className="input-field"
+                                value={reportRecipient}
+                                onChange={e => setReportRecipient(e.target.value)}
+                            >
+                                <option value="">-- Todos --</option>
+                                {contacts.map(c => (
+                                    <option key={c.id} value={c.contact_email}>
+                                        {c.contact_name || c.contact_email}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }} onClick={() => setReportWithVoucher(!reportWithVoucher)}>
+                            <div style={{ width: '20px', height: '20px', border: '1px solid var(--border-subtle)', borderRadius: '4px', background: reportWithVoucher ? 'var(--color-primary)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                {reportWithVoucher && <div style={{ width: '10px', height: '10px', background: 'white', borderRadius: '2px' }} />}
+                            </div>
+                            <span style={{ fontSize: '0.9rem' }}>Incluir Imágenes (Vouchers)</span>
+                        </div>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+                            * Incluir imágenes puede hacer que el reporte tarde más en generarse.
+                        </p>
+
+                        <button
+                            onClick={handleGenerateReport}
+                            disabled={generatingPdf}
+                            className="btn btn-primary"
+                            style={{ width: '100%', marginTop: '2rem' }}
+                        >
+                            {generatingPdf ? 'Generando...' : 'Descargar PDF'}
+                        </button>
+                    </div>
+                </div>
+            )}
+        </DashboardLayout>
     );
 };
 
