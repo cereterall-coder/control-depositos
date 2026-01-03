@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
 import { useAuth } from '../context/AuthContext';
 import { depositService } from '../services/depositService';
-import { Trash2, UserCog, Shield, Users, Save, X } from 'lucide-react';
+import { Trash2, UserCog, Shield, Users, Save, X, Lock, Activity, Ban, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,10 +12,12 @@ const AdminUsers = () => {
     const [profiles, setProfiles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [editingId, setEditingId] = useState(null);
+
+    // Edit States
     const [editRole, setEditRole] = useState('');
+    const [editStatus, setEditStatus] = useState('');
 
     useEffect(() => {
-        // Basic protection handled by ProtectedRoute, but double check role
         if (user && user.role !== 'admin') {
             toast.error("Acceso denegado. Requiere permisos de Administrador.");
             navigate('/');
@@ -35,14 +37,25 @@ const AdminUsers = () => {
         }
     };
 
-    const handleSaveRole = async (id) => {
+    const handleSave = async (id) => {
         try {
             await depositService.updateProfileRole(id, editRole);
-            toast.success("Rol actualizado correctamente");
+            await depositService.updateProfileStatus(id, editStatus);
+            toast.success("Perfil actualizado correctamente");
             setEditingId(null);
             loadProfiles();
         } catch (e) {
             toast.error("Error al actualizar: " + e.message);
+        }
+    };
+
+    const handleResetPassword = async (email) => {
+        if (!confirm(`¿Enviar correo de restablecimiento de contraseña a ${email}?`)) return;
+        try {
+            await depositService.triggerPasswordReset(email);
+            toast.success(`Correo enviado a ${email}`);
+        } catch (e) {
+            toast.error("Error al enviar correo: " + e.message);
         }
     };
 
@@ -75,7 +88,7 @@ const AdminUsers = () => {
                                     <th style={{ padding: '1rem' }}>Usuario</th>
                                     <th style={{ padding: '1rem' }}>Email</th>
                                     <th style={{ padding: '1rem' }}>Rol</th>
-                                    <th style={{ padding: '1rem' }}>Registro</th>
+                                    <th style={{ padding: '1rem' }}>Estado</th>
                                     <th style={{ padding: '1rem', textAlign: 'right' }}>Acciones</th>
                                 </tr>
                             </thead>
@@ -87,20 +100,25 @@ const AdminUsers = () => {
                                                 <div style={{ padding: '0.4rem', borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }}>
                                                     <Users size={16} />
                                                 </div>
-                                                <span style={{ fontWeight: 500 }}>{profile.full_name || 'Sin nombre'}</span>
+                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                    <span style={{ fontWeight: 500 }}>{profile.full_name || 'Sin nombre'}</span>
+                                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Reg: {new Date(profile.created_at).toLocaleDateString()}</span>
+                                                </div>
                                             </div>
                                         </td>
                                         <td style={{ padding: '1rem', fontSize: '0.9rem' }}>{profile.email}</td>
+
+                                        {/* ROLE COLUMN */}
                                         <td style={{ padding: '1rem' }}>
                                             {editingId === profile.id ? (
                                                 <select
                                                     value={editRole}
                                                     onChange={e => setEditRole(e.target.value)}
                                                     className="input-field"
-                                                    style={{ padding: '0.25rem' }}
+                                                    style={{ padding: '0.25rem', fontSize: '0.8rem' }}
                                                 >
-                                                    <option value="sender">Usuario (Sender)</option>
-                                                    <option value="admin">Administrador</option>
+                                                    <option value="sender">Usuario</option>
+                                                    <option value="admin">Admin</option>
                                                 </select>
                                             ) : (
                                                 <span className={`badge ${profile.role === 'admin' ? 'badge-success' : 'badge-warning'}`}>
@@ -108,28 +126,61 @@ const AdminUsers = () => {
                                                 </span>
                                             )}
                                         </td>
-                                        <td style={{ padding: '1rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                                            {new Date(profile.created_at).toLocaleDateString()}
+
+                                        {/* STATUS COLUMN */}
+                                        <td style={{ padding: '1rem' }}>
+                                            {editingId === profile.id ? (
+                                                <select
+                                                    value={editStatus}
+                                                    onChange={e => setEditStatus(e.target.value)}
+                                                    className="input-field"
+                                                    style={{ padding: '0.25rem', fontSize: '0.8rem' }}
+                                                >
+                                                    <option value="active">Activo</option>
+                                                    <option value="pending">Pendiente</option>
+                                                    <option value="blocked">Bloqueado</option>
+                                                </select>
+                                            ) : (
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                                    {(profile.status === 'active' || !profile.status) && <CheckCircle size={14} color="var(--color-success)" />}
+                                                    {profile.status === 'pending' && <Activity size={14} color="orange" />}
+                                                    {profile.status === 'blocked' && <Ban size={14} color="red" />}
+                                                    <span style={{ fontSize: '0.9rem', textTransform: 'capitalize' }}>
+                                                        {profile.status === 'active' || !profile.status ? 'Activo' :
+                                                            profile.status === 'pending' ? 'Pendiente' : 'Bloqueado'}
+                                                    </span>
+                                                </div>
+                                            )}
                                         </td>
+
                                         <td style={{ padding: '1rem', textAlign: 'right' }}>
                                             {editingId === profile.id ? (
                                                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
-                                                    <button onClick={() => handleSaveRole(profile.id)} className="btn-icon" style={{ color: 'var(--color-success)' }}>
+                                                    <button onClick={() => handleSave(profile.id)} className="btn-icon" style={{ color: 'var(--color-success)' }} title="Guardar">
                                                         <Save size={18} />
                                                     </button>
-                                                    <button onClick={() => setEditingId(null)} className="btn-icon" style={{ color: 'var(--text-muted)' }}>
+                                                    <button onClick={() => setEditingId(null)} className="btn-icon" style={{ color: 'var(--text-muted)' }} title="Cancelar">
                                                         <X size={18} />
                                                     </button>
                                                 </div>
                                             ) : (
                                                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
                                                     <button
+                                                        onClick={() => handleResetPassword(profile.email)}
+                                                        className="btn-icon"
+                                                        title="Enviar Correo Reset Password"
+                                                        style={{ color: '#3b82f6' }}
+                                                    >
+                                                        <Lock size={18} />
+                                                    </button>
+                                                    <button
                                                         onClick={() => {
                                                             setEditingId(profile.id);
                                                             setEditRole(profile.role || 'sender');
+                                                            setEditStatus(profile.status || 'active');
                                                         }}
                                                         className="btn-icon"
-                                                        title="Editar Rol"
+                                                        title="Editar Usuario"
                                                         style={{ color: 'var(--color-primary)' }}
                                                     >
                                                         <UserCog size={18} />
