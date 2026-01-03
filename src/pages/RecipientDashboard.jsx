@@ -13,10 +13,15 @@ const RecipientDashboard = () => {
 
     const refreshData = async () => {
         if (!user) return;
-        const data = await depositService.getDeposits(user.email, user.id);
-        const received = data.filter(d => d.recipient_email === user.email);
-        setDeposits(received);
-        setLoading(false);
+        try {
+            const data = await depositService.getDeposits(user.email, user.id);
+            const received = data.filter(d => d.recipient_email === user.email);
+            setDeposits(received);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -76,7 +81,9 @@ const RecipientDashboard = () => {
                         <div key={dep.id} className="card" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto auto', gap: '1rem', alignItems: 'center' }}>
                             <div style={{ display: 'flex', flexDirection: 'column' }}>
                                 <span style={{ fontWeight: 'bold', fontSize: '1.2rem', color: 'var(--color-success)' }}>S/. {dep.amount}</span>
-                                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>De: {dep.sender_email || dep.sender_id?.slice(0, 8)}</span>
+                                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                                    De: <strong style={{ color: 'white' }}>{dep.sender_email || 'Cargando...'}</strong>
+                                </span>
                             </div>
                             <span>{new Date(dep.deposit_date).toLocaleDateString()}</span>
 
