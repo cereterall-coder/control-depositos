@@ -192,7 +192,7 @@ const SenderDashboard = () => {
                     </h3>
                     <form onSubmit={handleSubmit}>
                         <div className="form-group" style={{ position: 'relative' }}>
-                            <label className="text-label">Email o Nombre Destinatario</label>
+                            <label className="text-label">E-mail o Nombre Destinatario</label>
                             <div style={{ position: 'relative', marginTop: '0.5rem' }}>
                                 <UserPlus size={16} style={{ position: 'absolute', left: '1rem', top: '1rem', color: 'var(--text-muted)' }} />
                                 <input

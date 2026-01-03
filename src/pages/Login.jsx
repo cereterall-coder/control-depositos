@@ -22,7 +22,7 @@ const Login = () => {
             if (isRegistering) {
                 if (!fullName) throw new Error("Por favor ingresa tu nombre completo");
                 await signUp(email, password, fullName);
-                toast.success('¡Registro exitoso! Confirma tu email.', { duration: 5000 });
+                toast.success('¡Registro exitoso! Confirma tu e-mail.', { duration: 5000 });
                 setIsRegistering(false);
             } else {
                 await signIn(email, password);
@@ -124,7 +124,7 @@ const Login = () => {
                 background: 'linear-gradient(to top, var(--bg-app) 20%, transparent)'
             }}>
                 <p>Desarrollado por Ing. Amaro A. Vilela V.</p>
-                <p>Email: amalviva@gmail.com | Tel: 944499069</p>
+                <p>E-mail: amalviva@gmail.com | Tel: 944499069</p>
             </footer>
         </div>
     );
