@@ -1,9 +1,8 @@
-import { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { LogOut, Bell, Shield } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const DashboardLayout = ({ children, title, notificationCount = 0 }) => {
     const { user, logout } = useAuth();
+    const navigate = useNavigate();
     const [showProfile, setShowProfile] = useState(false);
 
     return (
@@ -47,7 +46,7 @@ const DashboardLayout = ({ children, title, notificationCount = 0 }) => {
                             <div style={{ marginTop: '1rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
                                 {user?.role === 'admin' && (
                                     <button
-                                        onClick={() => { setShowProfile(false); window.location.href = '/admin'; }}
+                                        onClick={() => { setShowProfile(false); navigate('/admin'); }}
                                         style={{
                                             width: '100%',
                                             display: 'flex', alignItems: 'center', gap: '0.5rem',
