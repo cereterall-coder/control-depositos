@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { supabase } from './lib/supabase';
 import Login from './pages/Login';
 import SenderDashboard from './pages/SenderDashboard';
 import RecipientDashboard from './pages/RecipientDashboard';
