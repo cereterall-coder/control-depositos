@@ -2,9 +2,9 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import SenderDashboard from './pages/SenderDashboard';
 import RecipientDashboard from './pages/RecipientDashboard';
+import AdminUsers from './pages/AdminUsers';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import { supabase } from './lib/supabase';
 
 function AppRoutes() {
     const { user } = useAuth();
@@ -19,6 +19,7 @@ function AppRoutes() {
             } />
             <Route path="/sender" element={<ProtectedRoute><SenderDashboard /></ProtectedRoute>} />
             <Route path="/recipient" element={<ProtectedRoute><RecipientDashboard /></ProtectedRoute>} />
+            <Route path="/admin" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
             <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
     );
