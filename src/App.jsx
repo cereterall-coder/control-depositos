@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import SenderDashboard from './pages/SenderDashboard';
 import RecipientDashboard from './pages/RecipientDashboard';
 import AdminUsers from './pages/AdminUsers';
+import UpdatePassword from './pages/UpdatePassword';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -12,7 +13,8 @@ function AppRoutes() {
 
     return (
         <Routes>
-            <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/update-password" element={<UpdatePassword />} />
             <Route path="/" element={
                 <ProtectedRoute>
                     <SenderDashboard />
