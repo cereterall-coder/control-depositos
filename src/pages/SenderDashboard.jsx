@@ -395,13 +395,13 @@ const SenderDashboard = () => {
                                     >
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1, minWidth: 0 }}>
                                             <div style={{
-                                                padding: '0.5rem',
+                                                padding: '0.4rem',
                                                 background: 'var(--bg-app)',
                                                 borderRadius: '50%',
                                                 display: 'flex',
                                                 flexShrink: 0
                                             }}>
-                                                <FileText size={18} color="var(--color-primary)" />
+                                                <FileText size={16} color="var(--color-primary)" />
                                             </div>
                                             <div style={{ minWidth: 0, flex: 1 }}>
                                                 <p className="text-truncate" style={{ fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>
@@ -433,8 +433,8 @@ const SenderDashboard = () => {
                                         </div>
 
                                         <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                                            <p style={{ fontWeight: 600, fontSize: '1.1rem', margin: 0 }}>S/. {dep.amount}</p>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'flex-end', marginBottom: '0.5rem' }}>
+                                            <p className="price-text">S/. {dep.amount}</p>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', justifyContent: 'flex-end', marginBottom: '0.3rem' }}>
                                                 <span className={`badge ${dep.status === 'read' ? 'badge-success' : 'badge-warning'}`}>
                                                     {dep.status === 'read' ? 'Leído' : 'Enviado'}
                                                 </span>
@@ -442,10 +442,10 @@ const SenderDashboard = () => {
                                                     <button
                                                         onClick={() => handleDelete(dep.id)}
                                                         className="btn-icon"
-                                                        style={{ background: 'rgba(239, 68, 68, 0.2)', color: 'var(--color-danger)', cursor: 'pointer', border: 'none', padding: '0.25rem' }}
+                                                        style={{ background: 'rgba(239, 68, 68, 0.2)', color: 'var(--color-danger)', cursor: 'pointer', border: 'none', padding: '0.15rem', display: 'flex' }}
                                                         title="Eliminar (Solo hoy)"
                                                     >
-                                                        <Trash2 size={14} />
+                                                        <Trash2 size={13} />
                                                     </button>
                                                 )}
                                             </div>

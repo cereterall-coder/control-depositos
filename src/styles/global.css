@@ -321,9 +321,17 @@ body {
     }
 
     .card-item-padding {
-        padding: 0.75rem !important;
-        gap: 0.5rem !important;
-        /* Reduce gap on mobile */
+        padding: 0.5rem !important;
+        gap: 0.25rem !important;
+    }
+
+    .price-text {
+        font-size: 0.9rem !important;
+    }
+
+    .badge {
+        padding: 0.15rem 0.4rem !important;
+        font-size: 0.65rem !important;
     }
 }
 
@@ -339,4 +347,10 @@ body {
     gap: 1rem;
     cursor: 'pointer';
     overflow: 'hidden';
+}
+
+.price-text {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin: 0;
 }
