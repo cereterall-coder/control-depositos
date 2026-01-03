@@ -411,7 +411,7 @@ const SenderDashboard = () => {
                                                     {dep.status === 'read' ? 'Leído' : 'Enviado'}
                                                 </span>
                                                 {/* Delete Button (Only if created today) */}
-                                                {isToday && (
+                                                {isToday && dep.sender_id === user.id && (
                                                     <button
                                                         onClick={() => handleDelete(dep.id)}
                                                         className="btn-icon"
