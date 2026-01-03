@@ -469,76 +469,69 @@ const SenderDashboard = () => {
                                 );
                             })}
                         </div>
-                                                                    )}
                     </div>
                 </div>
-                );
-                            })}
             </div>
-        </div>
-                                            </div >
 
-                                        </div >
+            {/* Report Modal */}
+            {
+                showReportModal && (
+                    <div className="modal-overlay">
+                        <div className="modal-content">
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', alignItems: 'center' }}>
+                                <h3 className="text-h2" style={{ fontSize: '1.2rem', margin: 0 }}>Generar Reporte PDF</h3>
+                                <button onClick={() => setShowReportModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><X /></button>
+                            </div>
 
-    {/* Report Modal */ }
-{
-    showReportModal && (
-        <div className="modal-overlay">
-            <div className="modal-content">
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', alignItems: 'center' }}>
-                    <h3 className="text-h2" style={{ fontSize: '1.2rem', margin: 0 }}>Generar Reporte PDF</h3>
-                    <button onClick={() => setShowReportModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><X /></button>
-                </div>
+                            <div className="form-group">
+                                <label className="text-label">Fecha Inicio</label>
+                                <input type="date" className="input-field" value={reportStart} onChange={e => setReportStart(e.target.value)} />
+                            </div>
+                            <div className="form-group" style={{ marginTop: '1rem' }}>
+                                <label className="text-label">Fecha Fin</label>
+                                <input type="date" className="input-field" value={reportEnd} onChange={e => setReportEnd(e.target.value)} />
+                            </div>
 
-                <div className="form-group">
-                    <label className="text-label">Fecha Inicio</label>
-                    <input type="date" className="input-field" value={reportStart} onChange={e => setReportStart(e.target.value)} />
-                </div>
-                <div className="form-group" style={{ marginTop: '1rem' }}>
-                    <label className="text-label">Fecha Fin</label>
-                    <input type="date" className="input-field" value={reportEnd} onChange={e => setReportEnd(e.target.value)} />
-                </div>
+                            <div className="form-group" style={{ marginTop: '1rem' }}>
+                                <label className="text-label">Filtrar por Destinatario (Opcional)</label>
+                                <select
+                                    className="input-field"
+                                    value={reportRecipient}
+                                    onChange={e => setReportRecipient(e.target.value)}
+                                >
+                                    <option value="">-- Todos --</option>
+                                    {contacts.map(c => (
+                                        <option key={c.id} value={c.contact_email}>
+                                            {c.contact_name || c.contact_email}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
 
-                <div className="form-group" style={{ marginTop: '1rem' }}>
-                    <label className="text-label">Filtrar por Destinatario (Opcional)</label>
-                    <select
-                        className="input-field"
-                        value={reportRecipient}
-                        onChange={e => setReportRecipient(e.target.value)}
-                    >
-                        <option value="">-- Todos --</option>
-                        {contacts.map(c => (
-                            <option key={c.id} value={c.contact_email}>
-                                {c.contact_name || c.contact_email}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                            <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }} onClick={() => setReportWithVoucher(!reportWithVoucher)}>
+                                <div style={{ width: '20px', height: '20px', border: '1px solid var(--border-subtle)', borderRadius: '4px', background: reportWithVoucher ? 'var(--color-primary)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    {reportWithVoucher && <div style={{ width: '10px', height: '10px', background: 'white', borderRadius: '2px' }} />}
+                                </div>
+                                <span style={{ fontSize: '0.9rem' }}>Incluir Imágenes (Vouchers)</span>
+                            </div>
+                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+                                * Incluir imágenes puede hacer que el reporte tarde más en generarse.
+                            </p>
 
-                <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }} onClick={() => setReportWithVoucher(!reportWithVoucher)}>
-                    <div style={{ width: '20px', height: '20px', border: '1px solid var(--border-subtle)', borderRadius: '4px', background: reportWithVoucher ? 'var(--color-primary)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        {reportWithVoucher && <div style={{ width: '10px', height: '10px', background: 'white', borderRadius: '2px' }} />}
+                            <button
+                                onClick={handleGenerateReport}
+                                disabled={generatingPdf}
+                                className="btn btn-primary"
+                                style={{ width: '100%', marginTop: '2rem' }}
+                            >
+                                {generatingPdf ? 'Generando...' : 'Descargar PDF'}
+                            </button>
+                        </div>
                     </div>
-                    <span style={{ fontSize: '0.9rem' }}>Incluir Imágenes (Vouchers)</span>
-                </div>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-                    * Incluir imágenes puede hacer que el reporte tarde más en generarse.
-                </p>
-
-                <button
-                    onClick={handleGenerateReport}
-                    disabled={generatingPdf}
-                    className="btn btn-primary"
-                    style={{ width: '100%', marginTop: '2rem' }}
-                >
-                    {generatingPdf ? 'Generando...' : 'Descargar PDF'}
-                </button>
-            </div>
-        </div>
-    )
-}
-                                    </DashboardLayout >
-                                );
-                            };
+                )
+            }
+        </DashboardLayout >
+    );
+};
 
 export default SenderDashboard;
