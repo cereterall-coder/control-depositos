@@ -7,96 +7,81 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // 1. Initial Session Check
     useEffect(() => {
-        // If supabase is mock (error state), stop loading immediately
         if (supabase.isMock) {
             setLoading(false);
             return;
         }
 
-        supabase.auth.getSession().then(async ({ data: { session } }) => {
+        const initSession = async () => {
             try {
-                let currentUser = session?.user ?? null;
-                if (currentUser) {
-                    const { data: profile } = await supabase
-                        .from('profiles')
-                        .select('*')
-                        .eq('id', currentUser.id)
-                        .maybeSingle();
+                // Get Session FAST (No DB calls yet)
+                const { data: { session }, error } = await supabase.auth.getSession();
+                if (error) throw error;
 
-                    if (profile) {
-                        currentUser = {
-                            ...currentUser,
-                            role: profile.role,
-                            profile_name: profile.full_name,
-                            status: profile.status || 'active'
-                        };
-                    }
+                if (session?.user) {
+                    console.log("Session found:", session.user.id);
+                    setUser(session.user);
                 }
-                setUser(currentUser);
             } catch (e) {
                 console.error("Session Init Error:", e);
-                setUser(session?.user ?? null);
             } finally {
                 setLoading(false);
             }
-        }).catch(err => {
-            console.error("Critical Auth Error:", err);
-            setLoading(false);
-        });
-
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-            try {
-                let currentUser = session?.user ?? null;
-                if (currentUser) {
-                    const { data: profile } = await supabase
-                        .from('profiles')
-                        .select('*')
-                        .eq('id', currentUser.id)
-                        .maybeSingle();
-
-                    if (profile) {
-                        currentUser = {
-                            ...currentUser,
-                            role: profile.role,
-                            profile_name: profile.full_name,
-                            status: profile.status || 'active'
-                        };
-                    }
-                }
-                setUser(currentUser);
-            } catch (e) {
-                console.error("Auth State Change Error:", e);
-                setUser(session?.user ?? null);
-            }
-        });
-
-        // Safety timeout in case getSession hangs
-        const timer = setTimeout(() => {
-            console.warn("Auth check timed out, forcing load");
-            setLoading(false);
-        }, 5000);
-
-        return () => {
-            subscription.unsubscribe();
-            clearTimeout(timer);
         };
+
+        initSession();
+
+        // 2. Listen for Auth Changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+            console.log("Auth State Change:", _event);
+            if (session?.user) {
+                setUser(session.user);
+            } else {
+                setUser(null);
+            }
+            setLoading(false);
+        });
+
+        return () => subscription.unsubscribe();
     }, []);
 
-    const withTimeout = (promise, ms = 30000) => {
-        return Promise.race([
-            promise,
-            new Promise((_, reject) => setTimeout(() => reject(new Error("El servidor tardó demasiado en responder. Verifica tu conexión.")), ms))
-        ]);
-    };
+    // 3. Fetch Profile SEPARATELY (Side Effect)
+    useEffect(() => {
+        const fetchProfile = async () => {
+            if (!user) return;
+            // If we already have the extended data, skip
+            if (user.role && user.status) return;
+
+            try {
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', user.id)
+                    .maybeSingle();
+
+                if (profile) {
+                    console.log("Profile loaded:", profile);
+                    setUser(prev => ({
+                        ...prev,
+                        role: profile.role,
+                        profile_name: profile.full_name,
+                        status: profile.status || 'active'
+                    }));
+                }
+            } catch (e) {
+                console.error("Profile Load Error:", e);
+            }
+        };
+
+        fetchProfile();
+    }, [user?.id]); // Run when user ID changes
 
     const signIn = async (email, password) => {
         if (supabase.isMock) throw new Error("Supabase no configurado");
-
-        const { data, error } = await withTimeout(
-            supabase.auth.signInWithPassword({ email, password })
-        );
-
+        // Remove custom timeout wrapper, rely on Supabase
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         return data;
     };
@@ -104,20 +89,18 @@ export const AuthProvider = ({ children }) => {
     const signUp = async (email, password, fullName, alias, phone) => {
         if (supabase.isMock) throw new Error("Supabase no configurado");
 
-        const { data, error } = await withTimeout(
-            supabase.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: {
-                        full_name: fullName,
-                        alias: alias,
-                        phone: phone,
-                        role: 'Miembro'
-                    }
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    full_name: fullName,
+                    alias: alias,
+                    phone: phone,
+                    role: 'Miembro'
                 }
-            })
-        );
+            }
+        });
 
         if (error) throw error;
         return data;
@@ -126,6 +109,7 @@ export const AuthProvider = ({ children }) => {
     const logout = async () => {
         if (supabase.isMock) return;
         await supabase.auth.signOut();
+        setUser(null);
     };
 
     if (loading) {
