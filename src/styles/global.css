@@ -315,4 +315,12 @@ body {
         font-size: 1rem;
         margin: 0;
     }
+
+    .card-padding {
+        padding: 1rem !important;
+    }
+}
+
+.card-padding {
+    padding: 2rem;
 }

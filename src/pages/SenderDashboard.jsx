@@ -189,7 +189,7 @@ const SenderDashboard = () => {
         <DashboardLayout title="Control de Depósitos">
             <div className="dashboard-grid">
 
-                <div className="glass-panel" style={{ padding: '2rem', height: 'fit-content' }}>
+                <div className="glass-panel card-padding" style={{ height: 'fit-content' }}>
                     <h3 className="text-h2" style={{ fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <Activity color="var(--color-primary)" /> Nuevo Envío
                     </h3>
@@ -365,8 +365,8 @@ const SenderDashboard = () => {
                     </form>
                 </div>
 
-                <div className="glass-panel" style={{ padding: '2rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <div className="glass-panel card-padding">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
                         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                             <h3 className="text-h2" style={{ fontSize: '1.5rem', marginBottom: 0 }}>Historial</h3>
                             <button
