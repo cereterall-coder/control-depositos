@@ -15,25 +15,30 @@ export const AuthProvider = ({ children }) => {
         }
 
         supabase.auth.getSession().then(async ({ data: { session } }) => {
-            let currentUser = session?.user ?? null;
-            if (currentUser) {
-                // Fetch latest role from profiles table
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('role, full_name')
-                    .eq('id', currentUser.id)
-                    .single();
+            try {
+                let currentUser = session?.user ?? null;
+                if (currentUser) {
+                    const { data: profile } = await supabase
+                        .from('profiles')
+                        .select('role, full_name')
+                        .eq('id', currentUser.id)
+                        .maybeSingle();
 
-                if (profile) {
-                    currentUser = {
-                        ...currentUser,
-                        role: profile.role, // Top-level access
-                        profile_name: profile.full_name
-                    };
+                    if (profile) {
+                        currentUser = {
+                            ...currentUser,
+                            role: profile.role,
+                            profile_name: profile.full_name
+                        };
+                    }
                 }
+                setUser(currentUser);
+            } catch (e) {
+                console.error("Session Init Error:", e);
+                setUser(session?.user ?? null);
+            } finally {
+                setLoading(false);
             }
-            setUser(currentUser);
-            setLoading(false);
         });
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
