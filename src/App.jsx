@@ -6,6 +6,7 @@ import RecipientDashboard from './pages/RecipientDashboard';
 import AdminUsers from './pages/AdminUsers';
 import UpdatePassword from './pages/UpdatePassword';
 import ConnectionTest from './pages/ConnectionTest';
+import SimpleLogin from './pages/SimpleLogin';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -17,6 +18,7 @@ function AppRoutes() {
             <Route path="/login" element={<Login />} />
             <Route path="/update-password" element={<UpdatePassword />} />
             <Route path="/test" element={<ConnectionTest />} />
+            <Route path="/simple" element={<SimpleLogin />} />
             <Route path="/" element={
                 <ProtectedRoute>
                     <SenderDashboard />
