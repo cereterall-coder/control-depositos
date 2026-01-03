@@ -274,6 +274,13 @@ body {
     transform: scale(0.95);
 }
 
+.text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
 .dashboard-header {
     background: rgba(255, 255, 255, 0.03);
     border-bottom: 1px solid var(--border-subtle);
