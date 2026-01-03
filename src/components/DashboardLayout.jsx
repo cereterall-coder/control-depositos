@@ -121,7 +121,7 @@ const DashboardLayout = ({ children, title, notificationCount = 0 }) => {
                 color: 'var(--text-muted)',
                 marginTop: 'auto'
             }}>
-                <p>Desarrollado por Ing. Amaro A. Vilela V.</p>
+                <p>Desarrollado por Ing. Amaro A. Vilela V. (v1.6 - Name Fix)</p>
                 <p>E-mail: amalviva@gmail.com | Tel: 944499069</p>
             </footer>
         </div>

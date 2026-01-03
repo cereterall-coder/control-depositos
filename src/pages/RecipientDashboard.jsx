@@ -81,8 +81,11 @@ const RecipientDashboard = () => {
                         <div key={dep.id} className="card" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto auto', gap: '1rem', alignItems: 'center' }}>
                             <div style={{ display: 'flex', flexDirection: 'column' }}>
                                 <span style={{ fontWeight: 'bold', fontSize: '1.2rem', color: 'var(--color-success)' }}>S/. {dep.amount}</span>
-                                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                                    De: <span style={{ color: 'white' }}>{dep.sender_email || 'Desconocido'}</span>
+                                <span style={{ fontSize: '0.9rem', color: 'white', fontWeight: 'bold' }}>
+                                    {dep.sender_name || 'Sin Nombre'}
+                                </span>
+                                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                                    {dep.sender_email}
                                 </span>
                             </div>
                             <span>{new Date(dep.deposit_date).toLocaleDateString()}</span>
