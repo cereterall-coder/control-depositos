@@ -81,30 +81,42 @@ export const AuthProvider = ({ children }) => {
         };
     }, []);
 
+    const withTimeout = (promise, ms = 10000) => {
+        return Promise.race([
+            promise,
+            new Promise((_, reject) => setTimeout(() => reject(new Error("El servidor tardó demasiado en responder. Verifica tu conexión.")), ms))
+        ]);
+    };
+
     const signIn = async (email, password) => {
         if (supabase.isMock) throw new Error("Supabase no configurado");
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
+
+        const { data, error } = await withTimeout(
+            supabase.auth.signInWithPassword({ email, password })
+        );
+
         if (error) throw error;
         return data;
     };
 
     const signUp = async (email, password, fullName, alias, phone) => {
         if (supabase.isMock) throw new Error("Supabase no configurado");
-        const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-                data: {
-                    full_name: fullName,
-                    alias: alias,
-                    phone: phone,
-                    role: 'Miembro' // Default role
+
+        const { data, error } = await withTimeout(
+            supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        full_name: fullName,
+                        alias: alias,
+                        phone: phone,
+                        role: 'Miembro'
+                    }
                 }
-            }
-        });
+            })
+        );
+
         if (error) throw error;
         return data;
     };
