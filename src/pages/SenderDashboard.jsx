@@ -80,7 +80,8 @@ const SenderDashboard = () => {
         try {
             await depositService.addDeposit({
                 amount: parseFloat(amount),
-                date: date || new Date().toISOString(),
+                // Fix timezone issue: append T12:00:00 so it's noon, avoiding midnight shift
+                date: (date ? `${date}T12:00:00` : new Date().toISOString()),
                 voucherFile: file,
                 recipientEmail,
                 senderId: user.id,
