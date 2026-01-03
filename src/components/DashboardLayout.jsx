@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, Bell, Shield } from 'lucide-react';
+import { LogOut, Bell, Shield, Lock } from 'lucide-react';
 
 const DashboardLayout = ({ children, title, notificationCount = 0 }) => {
     const { user, logout } = useAuth();
@@ -61,6 +61,18 @@ const DashboardLayout = ({ children, title, notificationCount = 0 }) => {
                                         <Shield size={16} /> Administrar
                                     </button>
                                 )}
+                                <button
+                                    onClick={() => { setShowProfile(false); navigate('/update-password'); }}
+                                    style={{
+                                        width: '100%',
+                                        display: 'flex', alignItems: 'center', gap: '0.5rem',
+                                        background: 'none', border: 'none',
+                                        color: '#3b82f6',
+                                        cursor: 'pointer', fontSize: '0.9rem', padding: '0.5rem 0'
+                                    }}
+                                >
+                                    <Lock size={16} /> Cambiar Clave
+                                </button>
                                 <button
                                     onClick={logout}
                                     style={{
