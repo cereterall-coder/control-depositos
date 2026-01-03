@@ -82,8 +82,9 @@ const RecipientDashboard = () => {
                             <div style={{ display: 'flex', flexDirection: 'column' }}>
                                 <span style={{ fontWeight: 'bold', fontSize: '1.2rem', color: 'var(--color-success)' }}>S/. {dep.amount}</span>
                                 <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                                    De: <strong style={{ color: 'white' }}>{dep.sender_email || 'Cargando...'}</strong>
+                                    MAIL: <strong style={{ color: 'white' }}>{dep.sender_email || 'VACIO'}</strong>
                                 </span>
+                                <span style={{ fontSize: '0.6rem' }}>DEBUG: {JSON.stringify(dep).slice(0, 50)}</span>
                             </div>
                             <span>{new Date(dep.deposit_date).toLocaleDateString()}</span>
 
