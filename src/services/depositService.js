@@ -4,14 +4,33 @@ import { supabase } from '../lib/supabase';
 export const depositService = {
     // Get deposits sent by me OR received by me
     getDeposits: async (userEmail, userId) => {
-        const { data, error } = await supabase
+        const { data: deposits, error } = await supabase
             .from('deposits')
             .select('*')
             .or(`sender_id.eq.${userId},recipient_email.eq.${userEmail}`)
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-        return data;
+
+        // Enrich with sender profiles (Client-side join to be safe against missing FKs)
+        if (deposits && deposits.length > 0) {
+            const senderIds = [...new Set(deposits.map(d => d.sender_id))];
+            const { data: profiles } = await supabase
+                .from('profiles')
+                .select('id, email, full_name')
+                .in('id', senderIds);
+
+            if (profiles) {
+                const profileMap = new Map(profiles.map(p => [p.id, p]));
+                return deposits.map(d => ({
+                    ...d,
+                    sender_email: profileMap.get(d.sender_id)?.email || 'Desconocido',
+                    sender_name: profileMap.get(d.sender_id)?.full_name || 'Usuario'
+                }));
+            }
+        }
+
+        return deposits;
     },
 
     addDeposit: async ({ amount, date, voucherFile, recipientEmail, senderId, observation }) => {
