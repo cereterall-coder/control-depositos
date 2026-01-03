@@ -81,7 +81,7 @@ export const AuthProvider = ({ children }) => {
         };
     }, []);
 
-    const withTimeout = (promise, ms = 10000) => {
+    const withTimeout = (promise, ms = 30000) => {
         return Promise.race([
             promise,
             new Promise((_, reject) => setTimeout(() => reject(new Error("El servidor tardó demasiado en responder. Verifica tu conexión.")), ms))
