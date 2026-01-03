@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, Bell } from 'lucide-react';
+import { LogOut, Bell, Shield } from 'lucide-react';
 
 const DashboardLayout = ({ children, title, notificationCount = 0 }) => {
     const { user, logout } = useAuth();
@@ -37,26 +37,36 @@ const DashboardLayout = ({ children, title, notificationCount = 0 }) => {
                         }}>
                             <p style={{ fontWeight: 'bold', color: '#fff', marginBottom: '0.2rem' }}>{user?.user_metadata?.full_name || user?.name || 'Usuario'}</p>
                             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', wordBreak: 'break-all' }}>{user?.email}</p>
-                            {user?.user_metadata?.role && (
-                                <span className="badge badge-success" style={{ marginTop: '0.5rem', display: 'inline-block' }}>
-                                    {user.user_metadata.role}
+                            {/* Display Role from DB (top-level) or Metadata */}
+                            {(user?.role || user?.user_metadata?.role) && (
+                                <span className={`badge ${user?.role === 'admin' ? 'badge-success' : 'badge-warning'}`} style={{ marginTop: '0.5rem', display: 'inline-block' }}>
+                                    {user?.role === 'admin' ? 'Administrador' : (user?.user_metadata?.role || 'Usuario')}
                                 </span>
                             )}
 
                             <div style={{ marginTop: '1rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                                {user?.role === 'admin' && (
+                                    <button
+                                        onClick={() => { setShowProfile(false); window.location.href = '/admin'; }}
+                                        style={{
+                                            width: '100%',
+                                            display: 'flex', alignItems: 'center', gap: '0.5rem',
+                                            background: 'none', border: 'none',
+                                            color: 'var(--color-primary)',
+                                            cursor: 'pointer', fontSize: '0.9rem', padding: '0.5rem 0'
+                                        }}
+                                    >
+                                        <Shield size={16} /> Administrar
+                                    </button>
+                                )}
                                 <button
                                     onClick={logout}
                                     style={{
                                         width: '100%',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem',
-                                        background: 'none',
-                                        border: 'none',
+                                        display: 'flex', alignItems: 'center', gap: '0.5rem',
+                                        background: 'none', border: 'none',
                                         color: 'var(--color-danger)',
-                                        cursor: 'pointer',
-                                        fontSize: '0.9rem',
-                                        padding: '0.5rem 0'
+                                        cursor: 'pointer', fontSize: '0.9rem', padding: '0.5rem 0'
                                     }}
                                 >
                                     <LogOut size={16} /> Cerrar Sesión
