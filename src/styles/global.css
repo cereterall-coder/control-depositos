@@ -303,11 +303,10 @@ body {
     }
 
     .app-container .main-content {
-        padding: 0.75rem;
-        /* Reduce main padding */
+        padding: 1rem;
+        /* Restore safety spacing */
         width: 100%;
-        overflow-x: hidden;
-        /* Prevent internal overflow */
+        /* overflow-x: hidden; REMOVED to prevent clipping borders/shadows */
     }
 
     /* Adjust Title Size on Mobile */
