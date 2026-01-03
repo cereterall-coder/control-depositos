@@ -62,6 +62,22 @@ const ConnectionTest = () => {
                 <p><strong>Status:</strong> {status}</p>
                 <p><strong>URL Check:</strong> {envInfo.url}</p>
                 <button onClick={runTest} style={{ padding: '0.5rem 1rem', cursor: 'pointer', marginTop: '1rem' }}>Re-Run Rest</button>
+                <button
+                    onClick={() => {
+                        localStorage.clear();
+                        sessionStorage.clear();
+                        // Also clear supabase keys specifically if needed
+                        for (let i = 0; i < localStorage.length; i++) {
+                            const key = localStorage.key(i);
+                            if (key.includes('supabase')) localStorage.removeItem(key);
+                        }
+                        alert('Datos borrados. Ahora intenta entrar.');
+                        window.location.href = '/login';
+                    }}
+                    style={{ padding: '0.5rem 1rem', cursor: 'pointer', marginTop: '1rem', marginLeft: '1rem', background: 'red', color: 'white', border: 'none' }}
+                >
+                    🧨 RESETEAR APP (FIX LOGIN)
+                </button>
             </div>
             <pre style={{ background: '#222', padding: '1rem', marginTop: '1rem', whiteSpace: 'pre-wrap' }}>
                 {details}
