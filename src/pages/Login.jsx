@@ -13,6 +13,8 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [fullName, setFullName] = useState('');
+    const [alias, setAlias] = useState('');
+    const [phone, setPhone] = useState('');
 
     const handleAuth = async (e) => {
         e.preventDefault();
@@ -21,7 +23,10 @@ const Login = () => {
         try {
             if (isRegistering) {
                 if (!fullName) throw new Error("Por favor ingresa tu nombre completo");
-                await signUp(email, password, fullName);
+                if (!alias) throw new Error("Por favor ingresa un alias");
+                if (!phone) throw new Error("Por favor ingresa tu teléfono");
+
+                await signUp(email, password, fullName, alias, phone);
                 toast.success('¡Registro exitoso! Confirma tu e-mail.', { duration: 5000 });
                 setIsRegistering(false);
             } else {
@@ -55,12 +60,38 @@ const Login = () => {
                             <User size={18} style={{ position: 'absolute', left: '1rem', top: '0.85rem', color: 'var(--text-muted)' }} />
                             <input
                                 type="text"
-                                placeholder="Nombre Completo"
+                                placeholder="Nombre Completo del Usuario"
                                 required={isRegistering}
                                 className="input-field"
                                 style={{ paddingLeft: '2.8rem' }}
                                 value={fullName}
                                 onChange={e => setFullName(e.target.value)}
+                            />
+                        </div>
+
+                        <div style={{ position: 'relative' }} className="animate-fade-in">
+                            <User size={18} style={{ position: 'absolute', left: '1rem', top: '0.85rem', color: 'var(--text-muted)' }} />
+                            <input
+                                type="text"
+                                placeholder="Alias (Nombre Corto)"
+                                required={isRegistering}
+                                className="input-field"
+                                style={{ paddingLeft: '2.8rem' }}
+                                value={alias}
+                                onChange={e => setAlias(e.target.value)}
+                            />
+                        </div>
+
+                        <div style={{ position: 'relative' }} className="animate-fade-in">
+                            <User size={18} style={{ position: 'absolute', left: '1rem', top: '0.85rem', color: 'var(--text-muted)' }} />
+                            <input
+                                type="tel"
+                                placeholder="Número de Teléfono"
+                                required={isRegistering}
+                                className="input-field"
+                                style={{ paddingLeft: '2.8rem' }}
+                                value={phone}
+                                onChange={e => setPhone(e.target.value)}
                             />
                         </div>
                     )}

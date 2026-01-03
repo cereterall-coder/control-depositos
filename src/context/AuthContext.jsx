@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
         return data;
     };
 
-    const signUp = async (email, password, fullName) => {
+    const signUp = async (email, password, fullName, alias, phone) => {
         if (supabase.isMock) throw new Error("Supabase no configurado");
         const { data, error } = await supabase.auth.signUp({
             email,
@@ -44,6 +44,9 @@ export const AuthProvider = ({ children }) => {
             options: {
                 data: {
                     full_name: fullName,
+                    alias: alias,
+                    phone: phone,
+                    role: 'Miembro' // Default role
                 }
             }
         });
