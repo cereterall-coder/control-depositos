@@ -14,13 +14,46 @@ export const AuthProvider = ({ children }) => {
             return;
         }
 
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setUser(session?.user ?? null);
+        supabase.auth.getSession().then(async ({ data: { session } }) => {
+            let currentUser = session?.user ?? null;
+            if (currentUser) {
+                // Fetch latest role from profiles table
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('role, full_name')
+                    .eq('id', currentUser.id)
+                    .single();
+
+                if (profile) {
+                    currentUser = {
+                        ...currentUser,
+                        role: profile.role, // Top-level access
+                        profile_name: profile.full_name
+                    };
+                }
+            }
+            setUser(currentUser);
             setLoading(false);
         });
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user ?? null);
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+            let currentUser = session?.user ?? null;
+            if (currentUser) {
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('role, full_name')
+                    .eq('id', currentUser.id)
+                    .single();
+
+                if (profile) {
+                    currentUser = {
+                        ...currentUser,
+                        role: profile.role,
+                        profile_name: profile.full_name
+                    };
+                }
+            }
+            setUser(currentUser);
         });
 
         return () => subscription.unsubscribe();
