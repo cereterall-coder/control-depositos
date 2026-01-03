@@ -39,6 +39,9 @@ export const AuthProvider = ({ children }) => {
             } finally {
                 setLoading(false);
             }
+        }).catch(err => {
+            console.error("Critical Auth Error:", err);
+            setLoading(false);
         });
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
