@@ -184,7 +184,7 @@ const SenderDashboard = () => {
 
     return (
         <DashboardLayout title="Control de Depósitos">
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 1fr) 2fr', gap: '2rem' }}>
+            <div className="dashboard-grid">
 
                 <div className="glass-panel" style={{ padding: '2rem', height: 'fit-content' }}>
                     <h3 className="text-h2" style={{ fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -440,9 +440,9 @@ const SenderDashboard = () => {
 
             {/* Report Modal */}
             {showReportModal && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
-                    <div className="glass-panel" style={{ padding: '2rem', maxWidth: '400px', width: '90%', animation: 'slideUp 0.3s ease' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', alignItems: 'center' }}>
                             <h3 className="text-h2" style={{ fontSize: '1.2rem', margin: 0 }}>Generar Reporte PDF</h3>
                             <button onClick={() => setShowReportModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><X /></button>
                         </div>
