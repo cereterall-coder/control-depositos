@@ -45,23 +45,28 @@ export const AuthProvider = ({ children }) => {
         });
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-            let currentUser = session?.user ?? null;
-            if (currentUser) {
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('role, full_name')
-                    .eq('id', currentUser.id)
-                    .single();
+            try {
+                let currentUser = session?.user ?? null;
+                if (currentUser) {
+                    const { data: profile } = await supabase
+                        .from('profiles')
+                        .select('role, full_name')
+                        .eq('id', currentUser.id)
+                        .maybeSingle();
 
-                if (profile) {
-                    currentUser = {
-                        ...currentUser,
-                        role: profile.role,
-                        profile_name: profile.full_name
-                    };
+                    if (profile) {
+                        currentUser = {
+                            ...currentUser,
+                            role: profile.role,
+                            profile_name: profile.full_name
+                        };
+                    }
                 }
+                setUser(currentUser);
+            } catch (e) {
+                console.error("Auth State Change Error:", e);
+                setUser(session?.user ?? null);
             }
-            setUser(currentUser);
         });
 
         return () => subscription.unsubscribe();
