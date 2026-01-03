@@ -69,7 +69,16 @@ export const AuthProvider = ({ children }) => {
             }
         });
 
-        return () => subscription.unsubscribe();
+        // Safety timeout in case getSession hangs
+        const timer = setTimeout(() => {
+            console.warn("Auth check timed out, forcing load");
+            setLoading(false);
+        }, 5000);
+
+        return () => {
+            subscription.unsubscribe();
+            clearTimeout(timer);
+        };
     }, []);
 
     const signIn = async (email, password) => {
@@ -105,9 +114,21 @@ export const AuthProvider = ({ children }) => {
         await supabase.auth.signOut();
     };
 
+    if (loading) {
+        return (
+            <div style={{ height: '100vh', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f172a', color: 'white' }}>
+                <div style={{ textAlign: 'center' }}>
+                    <div className="spinner" style={{ border: '4px solid rgba(255,255,255,0.1)', borderLeftColor: '#10b981', borderRadius: '50%', width: '40px', height: '40px', animation: 'spin 1s linear infinite', margin: '0 auto 1rem' }}></div>
+                    <p>Iniciando Sistema...</p>
+                    <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <AuthContext.Provider value={{ user, signIn, signUp, logout, loading }}>
-            {!loading && children}
+            {children}
         </AuthContext.Provider>
     );
 };
