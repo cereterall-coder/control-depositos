@@ -21,6 +21,7 @@ const SenderDashboard = () => {
     // Automatically set today's date
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [recipientEmail, setRecipientEmail] = useState('');
+    const [observation, setObservation] = useState('');
     const [file, setFile] = useState(null);
 
     // UI Helper for autocomplete
@@ -78,7 +79,8 @@ const SenderDashboard = () => {
                 date: date || new Date().toISOString(),
                 voucherFile: file,
                 recipientEmail,
-                senderId: user.id
+                senderId: user.id,
+                observation
             });
 
             toast.success('Enviado correctamente', { id: toastId });
@@ -93,6 +95,7 @@ const SenderDashboard = () => {
                 askToSaveFavorite(recipientEmail);
             }
             setRecipientEmail('');
+            setObservation('');
 
         } catch (err) {
             toast.error('Error: ' + err.message, { id: toastId });
@@ -277,6 +280,17 @@ const SenderDashboard = () => {
                         </div>
 
                         <div className="form-group">
+                            <label className="text-label">Observación (Opcional)</label>
+                            <input
+                                type="text"
+                                className="input-field"
+                                placeholder="Motivo del depósito..."
+                                value={observation}
+                                onChange={e => setObservation(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="form-group">
                             <label className="text-label">Voucher (Foto)</label>
                             <div
                                 style={{
@@ -386,6 +400,11 @@ const SenderDashboard = () => {
                                                     <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
                                                         {new Date(dep.deposit_date).toLocaleDateString()}
                                                     </span>
+                                                    {dep.observation && (
+                                                        <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.2rem', fontStyle: 'italic' }}>
+                                                            "{dep.observation}"
+                                                        </p>
+                                                    )}
                                                 </div>
                                             </div>
 

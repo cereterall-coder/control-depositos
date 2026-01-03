@@ -1,0 +1,1 @@
+ALTER TABLE deposits ADD COLUMN IF NOT EXISTS observation TEXT;

@@ -14,36 +14,42 @@ export const depositService = {
         return data;
     },
 
-    addDeposit: async ({ amount, date, voucherFile, recipientEmail, senderId }) => {
-        let voucherUrl = null;
+    addDeposit: async ({ amount, date, voucherFile, recipientEmail, senderId, observation }) => {
+        try {
+            let voucherUrl = null;
 
-        if (voucherFile) {
-            const fileExt = voucherFile.name.split('.').pop();
-            const fileName = `${Math.random()}.${fileExt}`;
-            const filePath = `${senderId}/${fileName}`;
+            if (voucherFile) {
+                const fileExt = voucherFile.name.split('.').pop();
+                const fileName = `${Math.random()}.${fileExt}`;
+                const filePath = `${senderId}/${fileName}`;
 
-            const { error: uploadError } = await supabase.storage
-                .from('vouchers')
-                .upload(filePath, voucherFile);
+                const { error: uploadError } = await supabase.storage
+                    .from('vouchers')
+                    .upload(filePath, voucherFile);
 
-            if (uploadError) throw uploadError;
-            voucherUrl = filePath;
+                if (uploadError) throw uploadError;
+                voucherUrl = filePath;
+            }
+
+            const { data, error } = await supabase
+                .from('deposits')
+                .insert([{
+                    amount: amount,
+                    deposit_date: date,
+                    recipient_email: recipientEmail,
+                    sender_id: senderId,
+                    voucher_url: voucherUrl,
+                    status: 'sent',
+                    observation: observation
+                }])
+                .select();
+
+            if (error) throw error;
+            return data[0];
+        } catch (error) {
+            console.error("Error adding deposit:", error);
+            throw error;
         }
-
-        const { data, error } = await supabase
-            .from('deposits')
-            .insert([{
-                amount,
-                deposit_date: date,
-                recipient_email: recipientEmail,
-                sender_id: senderId,
-                voucher_url: voucherUrl,
-                status: 'sent'
-            }])
-            .select();
-
-        if (error) throw error;
-        return data[0];
     },
 
     markAsRead: async (depositId) => {

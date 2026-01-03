@@ -8,17 +8,7 @@ const DashboardLayout = ({ children, title, notificationCount = 0 }) => {
 
     return (
         <div className="app-container">
-            <header style={{
-                background: 'var(--bg-card)',
-                borderBottom: '1px solid var(--border-subtle)',
-                padding: '1rem 2rem',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                position: 'sticky',
-                top: 0,
-                zIndex: 10
-            }}>
+            <header className="dashboard-header">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                     <div
                         style={{ position: 'relative', cursor: 'pointer' }}

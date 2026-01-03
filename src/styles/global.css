@@ -253,3 +253,23 @@
 .hover-scale:active {
     transform: scale(0.95);
 }
+
+.dashboard-header {
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    backdrop-filter: blur(10px);
+}
+
+@media (max-width: 768px) {
+    .dashboard-header {
+        padding: 1rem 1rem;
+        /* Reduce padding on mobile */
+    }
+}
