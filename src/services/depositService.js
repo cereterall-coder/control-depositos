@@ -98,5 +98,36 @@ export const depositService = {
 
         if (error) throw error;
         return data;
+    },
+
+    // --- Admin Features ---
+    getAllProfiles: async () => {
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        return data;
+    },
+
+    updateProfileRole: async (profileId, newRole) => {
+        const { error } = await supabase
+            .from('profiles')
+            .update({ role: newRole })
+            .eq('id', profileId);
+
+        if (error) throw error;
+    },
+
+    deleteProfile: async (profileId) => {
+        // Note: This only deletes the profile record, NOT the auth user (requires Service Key).
+        // However, removing profile might lock them out of some app logic if we rely on it.
+        const { error } = await supabase
+            .from('profiles')
+            .delete()
+            .eq('id', profileId);
+
+        if (error) throw error;
     }
 };
