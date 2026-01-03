@@ -18,8 +18,14 @@ const SenderDashboard = () => {
     const [submitting, setSubmitting] = useState(false);
 
     const [amount, setAmount] = useState('');
-    // Automatically set today's date
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+    // Automatically set today's date (Peru Time)
+    const [date, setDate] = useState(() => {
+        try {
+            return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Lima' });
+        } catch (e) {
+            return new Date().toISOString().split('T')[0];
+        }
+    });
     const [recipientEmail, setRecipientEmail] = useState('');
     const [observation, setObservation] = useState('');
     const [file, setFile] = useState(null);
@@ -85,8 +91,9 @@ const SenderDashboard = () => {
 
             toast.success('Enviado correctamente', { id: toastId });
             setAmount('');
-            // Keep today's date
-            setDate(new Date().toISOString().split('T')[0]);
+            setAmount('');
+            // Keep today's date (Peru)
+            setDate(new Date().toLocaleDateString('en-CA', { timeZone: 'America/Lima' }));
             setFile(null);
 
             // Check if is favorite
@@ -267,8 +274,13 @@ const SenderDashboard = () => {
                         <div className="form-group">
                             <label className="text-label">Fecha</label>
                             <div style={{ position: 'relative', marginTop: '0.5rem' }}>
-                                <Calendar size={16} style={{ position: 'absolute', left: '1rem', top: '1rem', color: 'var(--text-muted)' }} />
+                                <Calendar
+                                    size={16}
+                                    style={{ position: 'absolute', left: '1rem', top: '1rem', color: 'var(--text-muted)', cursor: 'pointer', zIndex: 10 }}
+                                    onClick={() => document.getElementById('deposit-date').showPicker()}
+                                />
                                 <input
+                                    id="deposit-date"
                                     type="date"
                                     required
                                     className="input-field"
