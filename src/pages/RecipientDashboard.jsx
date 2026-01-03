@@ -78,8 +78,9 @@ const RecipientDashboard = () => {
                 <h3>Depósitos Recibidos</h3>
                 <div style={{ display: 'grid', gap: '1rem', marginTop: '1rem' }}>
                     {deposits.map(dep => (
-                        <div key={dep.id} className="card" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto auto', gap: '1rem', alignItems: 'center' }}>
+                        <div key={dep.id} className="card" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto auto', gap: '1rem', alignItems: 'center', border: '1px solid gold' }}>
                             <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                <span style={{ fontSize: '0.5rem', color: 'gold' }}>VERSIÓN 2.0 (DEBUG)</span>
                                 <span style={{ fontWeight: 'bold', fontSize: '1.2rem', color: 'var(--color-success)' }}>S/. {dep.amount}</span>
                                 <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                                     MAIL: <strong style={{ color: 'white' }}>{dep.sender_email || 'VACIO'}</strong>
