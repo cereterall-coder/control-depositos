@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
                 if (currentUser) {
                     const { data: profile } = await supabase
                         .from('profiles')
-                        .select('role, full_name')
+                        .select('role, full_name, status')
                         .eq('id', currentUser.id)
                         .maybeSingle();
 
@@ -28,7 +28,8 @@ export const AuthProvider = ({ children }) => {
                         currentUser = {
                             ...currentUser,
                             role: profile.role,
-                            profile_name: profile.full_name
+                            profile_name: profile.full_name,
+                            status: profile.status || 'active'
                         };
                     }
                 }

@@ -120,6 +120,22 @@ export const depositService = {
         if (error) throw error;
     },
 
+    updateProfileStatus: async (profileId, newStatus) => {
+        const { error } = await supabase
+            .from('profiles')
+            .update({ status: newStatus })
+            .eq('id', profileId);
+
+        if (error) throw error;
+    },
+
+    triggerPasswordReset: async (email) => {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: window.location.origin + '/update-password', // We need a page for this eventually, or just login
+        });
+        if (error) throw error;
+    },
+
     deleteProfile: async (profileId) => {
         // Note: This only deletes the profile record, NOT the auth user (requires Service Key).
         // However, removing profile might lock them out of some app logic if we rely on it.
