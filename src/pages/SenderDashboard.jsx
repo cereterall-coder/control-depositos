@@ -269,7 +269,7 @@ const SenderDashboard = () => {
                                 <div className="form-group">
                                     <label className="text-label">Monto (S/.)</label>
                                     <div style={{ position: 'relative', marginTop: '0.5rem' }}>
-                                        <DollarSign size={16} style={{ position: 'absolute', left: '1rem', top: '1rem', color: 'var(--text-muted)' }} />
+                                        <span style={{ position: 'absolute', left: '1rem', top: '0.8rem', color: 'var(--text-muted)', fontWeight: 'bold', fontSize: '0.9rem' }}>S/.</span>
                                         <input
                                             type="number"
                                             step="0.01"
