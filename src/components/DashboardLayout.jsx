@@ -42,6 +42,26 @@ const DashboardLayout = ({ children, title, notificationCount = 0 }) => {
                                     {user.user_metadata.role}
                                 </span>
                             )}
+
+                            <div style={{ marginTop: '1rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                                <button
+                                    onClick={logout}
+                                    style={{
+                                        width: '100%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem',
+                                        background: 'none',
+                                        border: 'none',
+                                        color: 'var(--color-danger)',
+                                        cursor: 'pointer',
+                                        fontSize: '0.9rem',
+                                        padding: '0.5rem 0'
+                                    }}
+                                >
+                                    <LogOut size={16} /> Cerrar Sesión
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div>
@@ -50,7 +70,7 @@ const DashboardLayout = ({ children, title, notificationCount = 0 }) => {
                     </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     {notificationCount > 0 && (
                         <div className="btn-icon" style={{ position: 'relative', cursor: 'default' }}>
                             <Bell size={20} color="var(--color-danger)" />
@@ -62,9 +82,6 @@ const DashboardLayout = ({ children, title, notificationCount = 0 }) => {
                             }} />
                         </div>
                     )}
-                    <button onClick={logout} className="btn btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem' }}>
-                        <LogOut size={16} /> Cerrar Sesión
-                    </button>
                 </div>
             </header>
 
