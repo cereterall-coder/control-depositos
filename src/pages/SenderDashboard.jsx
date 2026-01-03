@@ -391,26 +391,17 @@ const SenderDashboard = () => {
                                 return (
                                     <div
                                         key={dep.id}
-                                        className="glass-panel hover-scale"
-                                        style={{
-                                            padding: '1rem',
-                                            display: 'flex',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'center',
-                                            gap: '1rem',
-                                            cursor: 'pointer',
-                                            overflow: 'hidden'
-                                        }}
+                                        className="glass-panel hover-scale card-item-padding"
                                     >
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, minWidth: 0 }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1, minWidth: 0 }}>
                                             <div style={{
-                                                padding: '0.6rem',
+                                                padding: '0.5rem',
                                                 background: 'var(--bg-app)',
                                                 borderRadius: '50%',
                                                 display: 'flex',
                                                 flexShrink: 0
                                             }}>
-                                                <FileText size={20} color="var(--color-primary)" />
+                                                <FileText size={18} color="var(--color-primary)" />
                                             </div>
                                             <div style={{ minWidth: 0, flex: 1 }}>
                                                 <p className="text-truncate" style={{ fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>
