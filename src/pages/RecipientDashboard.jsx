@@ -74,7 +74,7 @@ const RecipientDashboard = () => {
                 <div style={{ display: 'grid', gap: '1rem', marginTop: '1rem' }}>
                     {deposits.map(dep => (
                         <div key={dep.id} className="card" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto auto', gap: '1rem', alignItems: 'center' }}>
-                            <span style={{ fontWeight: 'bold', fontSize: '1.2rem', color: 'var(--color-success)' }}>${dep.amount}</span>
+                            <span style={{ fontWeight: 'bold', fontSize: '1.2rem', color: 'var(--color-success)' }}>S/. {dep.amount}</span>
                             <span>{new Date(dep.deposit_date).toLocaleDateString()}</span>
 
                             {dep.voucher_url ? (
