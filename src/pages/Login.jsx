@@ -56,44 +56,46 @@ const Login = () => {
 
                 <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     {isRegistering && (
-                        <div style={{ position: 'relative' }} className="animate-fade-in">
-                            <User size={18} style={{ position: 'absolute', left: '1rem', top: '0.85rem', color: 'var(--text-muted)' }} />
-                            <input
-                                type="text"
-                                placeholder="Nombre Completo del Usuario"
-                                required={isRegistering}
-                                className="input-field"
-                                style={{ paddingLeft: '2.8rem' }}
-                                value={fullName}
-                                onChange={e => setFullName(e.target.value)}
-                            />
-                        </div>
+                        <>
+                            <div style={{ position: 'relative' }} className="animate-fade-in">
+                                <User size={18} style={{ position: 'absolute', left: '1rem', top: '0.85rem', color: 'var(--text-muted)' }} />
+                                <input
+                                    type="text"
+                                    placeholder="Nombre Completo del Usuario"
+                                    required={isRegistering}
+                                    className="input-field"
+                                    style={{ paddingLeft: '2.8rem' }}
+                                    value={fullName}
+                                    onChange={e => setFullName(e.target.value)}
+                                />
+                            </div>
 
-                        <div style={{ position: 'relative' }} className="animate-fade-in">
-                            <User size={18} style={{ position: 'absolute', left: '1rem', top: '0.85rem', color: 'var(--text-muted)' }} />
-                            <input
-                                type="text"
-                                placeholder="Alias (Nombre Corto)"
-                                required={isRegistering}
-                                className="input-field"
-                                style={{ paddingLeft: '2.8rem' }}
-                                value={alias}
-                                onChange={e => setAlias(e.target.value)}
-                            />
-                        </div>
+                            <div style={{ position: 'relative' }} className="animate-fade-in">
+                                <User size={18} style={{ position: 'absolute', left: '1rem', top: '0.85rem', color: 'var(--text-muted)' }} />
+                                <input
+                                    type="text"
+                                    placeholder="Alias (Nombre Corto)"
+                                    required={isRegistering}
+                                    className="input-field"
+                                    style={{ paddingLeft: '2.8rem' }}
+                                    value={alias}
+                                    onChange={e => setAlias(e.target.value)}
+                                />
+                            </div>
 
-                        <div style={{ position: 'relative' }} className="animate-fade-in">
-                            <User size={18} style={{ position: 'absolute', left: '1rem', top: '0.85rem', color: 'var(--text-muted)' }} />
-                            <input
-                                type="tel"
-                                placeholder="Número de Teléfono"
-                                required={isRegistering}
-                                className="input-field"
-                                style={{ paddingLeft: '2.8rem' }}
-                                value={phone}
-                                onChange={e => setPhone(e.target.value)}
-                            />
-                        </div>
+                            <div style={{ position: 'relative' }} className="animate-fade-in">
+                                <User size={18} style={{ position: 'absolute', left: '1rem', top: '0.85rem', color: 'var(--text-muted)' }} />
+                                <input
+                                    type="tel"
+                                    placeholder="Número de Teléfono"
+                                    required={isRegistering}
+                                    className="input-field"
+                                    style={{ paddingLeft: '2.8rem' }}
+                                    value={phone}
+                                    onChange={e => setPhone(e.target.value)}
+                                />
+                            </div>
+                        </>
                     )}
 
                     <div style={{ position: 'relative' }}>
