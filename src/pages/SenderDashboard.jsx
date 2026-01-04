@@ -396,25 +396,89 @@ const SenderDashboard = () => {
                 </div>
 
                 <div className="glass-panel card-padding">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                            <h3 className="text-h2" style={{ fontSize: '1.5rem', marginBottom: 0 }}>Historial</h3>
-                            <button
-                                onClick={() => setShowReportModal(true)}
-                                className="btn btn-secondary"
-                                style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', display: 'flex', gap: '0.5rem' }}
-                            >
-                                <FileText size={16} /> Reporte PDF
-                            </button>
+                    {/* Header + Filters */}
+                    <div style={{ marginBottom: '1.5rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <h3 className="text-h2" style={{ fontSize: '1.5rem', marginBottom: 0 }}>Historial</h3>
+                                {totalAmount > 0 && (
+                                    <span style={{
+                                        background: 'var(--color-success)',
+                                        color: 'white',
+                                        padding: '0.2rem 0.6rem',
+                                        borderRadius: '12px',
+                                        fontSize: '0.9rem',
+                                        fontWeight: 'bold'
+                                    }}>
+                                        S/. {totalAmount}
+                                    </span>
+                                )}
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                <button
+                                    onClick={() => setIncludeVouchersPdf(!includeVouchersPdf)}
+                                    title="Incluir imégenes de vouchers en PDF"
+                                    style={{
+                                        background: includeVouchersPdf ? 'var(--color-primary)' : 'transparent',
+                                        border: '1px solid var(--border-subtle)',
+                                        color: includeVouchersPdf ? 'white' : 'var(--text-muted)',
+                                        padding: '0.4rem',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    <FileText size={16} />
+                                </button>
+                                <button
+                                    onClick={handleGenerateReport}
+                                    className="btn btn-secondary"
+                                    style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', display: 'flex', gap: '0.5rem' }}
+                                    disabled={generatingPdf}
+                                >
+                                    {generatingPdf ? 'Generando...' : 'Descargar PDF'}
+                                </button>
+                            </div>
                         </div>
-                        <span className="badge badge-warning" style={{ color: 'var(--text-secondary)' }}>
-                            {deposits.length} Registros
-                        </span>
+
+                        {/* Filter Controls */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.5rem' }}>
+                            <input
+                                type="date"
+                                className="input-field"
+                                style={{ padding: '0.4rem', fontSize: '0.8rem' }}
+                                value={filterStart}
+                                onChange={e => setFilterStart(e.target.value)}
+                                placeholder="Desde"
+                            />
+                            <input
+                                type="date"
+                                className="input-field"
+                                style={{ padding: '0.4rem', fontSize: '0.8rem' }}
+                                value={filterEnd}
+                                onChange={e => setFilterEnd(e.target.value)}
+                                placeholder="Hasta"
+                            />
+                            <select
+                                className="input-field"
+                                style={{ padding: '0.4rem', fontSize: '0.8rem' }}
+                                value={filterRecipient}
+                                onChange={e => setFilterRecipient(e.target.value)}
+                            >
+                                <option value="">-- Todos --</option>
+                                {/* Combine Contacts + Senders found in history */}
+                                {contacts.map(c => (
+                                    <option key={c.id} value={c.contact_email}>
+                                        {c.contact_name || c.contact_email}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            {loading ? <p>Cargando datos...</p> : deposits.map(dep => {
+                            {loading ? <p>Cargando datos...</p> : visibleDeposits.length === 0 ? <p style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No hay registros con este filtro.</p> : visibleDeposits.map(dep => {
                                 const contactName = contacts.find(c => c.contact_email === dep.recipient_email)?.contact_name || dep.recipient_email;
                                 const isToday = new Date(dep.created_at).toDateString() === new Date().toDateString();
 
@@ -498,64 +562,9 @@ const SenderDashboard = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Report Modal */}
-            {showReportModal && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', alignItems: 'center' }}>
-                            <h3 className="text-h2" style={{ fontSize: '1.2rem', margin: 0 }}>Generar Reporte PDF</h3>
-                            <button onClick={() => setShowReportModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><X /></button>
-                        </div>
-
-                        <div className="form-group">
-                            <label className="text-label">Fecha Inicio</label>
-                            <input type="date" className="input-field" value={reportStart} onChange={e => setReportStart(e.target.value)} />
-                        </div>
-                        <div className="form-group" style={{ marginTop: '1rem' }}>
-                            <label className="text-label">Fecha Fin</label>
-                            <input type="date" className="input-field" value={reportEnd} onChange={e => setReportEnd(e.target.value)} />
-                        </div>
-
-                        <div className="form-group" style={{ marginTop: '1rem' }}>
-                            <label className="text-label">Filtrar por Destinatario (Opcional)</label>
-                            <select
-                                className="input-field"
-                                value={reportRecipient}
-                                onChange={e => setReportRecipient(e.target.value)}
-                            >
-                                <option value="">-- Todos --</option>
-                                {contacts.map(c => (
-                                    <option key={c.id} value={c.contact_email}>
-                                        {c.contact_name || c.contact_email}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }} onClick={() => setReportWithVoucher(!reportWithVoucher)}>
-                            <div style={{ width: '20px', height: '20px', border: '1px solid var(--border-subtle)', borderRadius: '4px', background: reportWithVoucher ? 'var(--color-primary)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                {reportWithVoucher && <div style={{ width: '10px', height: '10px', background: 'white', borderRadius: '2px' }} />}
-                            </div>
-                            <span style={{ fontSize: '0.9rem' }}>Incluir Imágenes (Vouchers)</span>
-                        </div>
-                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-                            * Incluir imágenes puede hacer que el reporte tarde más en generarse.
-                        </p>
-
-                        <button
-                            onClick={handleGenerateReport}
-                            disabled={generatingPdf}
-                            className="btn btn-primary"
-                            style={{ width: '100%', marginTop: '2rem' }}
-                        >
-                            {generatingPdf ? 'Generando...' : 'Descargar PDF'}
-                        </button>
-                    </div>
-                </div>
-            )}
         </DashboardLayout>
     );
 };
 
 export default SenderDashboard;
+```

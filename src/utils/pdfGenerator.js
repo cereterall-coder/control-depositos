@@ -2,7 +2,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { depositService } from '../services/depositService';
 
-export const generateDepositReport = async ({ deposits, startDate, endDate, includeImages, user, engineerCredits }) => {
+export const generateDepositReport = async ({ deposits, startDate, endDate, includeImages, user, totalAmount, engineerCredits }) => {
     const doc = new jsPDF();
 
     // 1. Header
@@ -43,8 +43,14 @@ export const generateDepositReport = async ({ deposits, startDate, endDate, incl
         startY: 45,
         head: [tableColumn],
         body: tableRows,
+        foot: [[
+            { content: 'TOTAL:', colSpan: 2, styles: { halign: 'right', fontStyle: 'bold' } },
+            { content: `S/. ${totalAmount}`, styles: { fontStyle: 'bold' } }, // Total uses passed totalAmount
+            '', ''
+        ]],
         theme: 'grid',
         headStyles: { fillColor: [41, 128, 185], textColor: 255 },
+        footStyles: { fillColor: [41, 128, 185], textColor: 255 },
         alternateRowStyles: { fillColor: [245, 245, 245] },
     });
 
