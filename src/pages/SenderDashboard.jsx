@@ -437,6 +437,11 @@ const SenderDashboard = () => {
                                                 <p className="text-truncate" style={{ fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>
                                                     {dep.sender_id === user.id ? `Para: ${contactName}` : `De: ${dep.sender_name || 'Sin Nombre'}`}
                                                 </p>
+                                                {dep.sender_id !== user.id && (
+                                                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'block' }}>
+                                                        {dep.sender_email} {dep.sender_phone && `• ${dep.sender_phone}`}
+                                                    </span>
+                                                )}
                                                 <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
                                                     {new Date(dep.deposit_date).toLocaleDateString()}
                                                 </span>

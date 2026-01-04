@@ -85,7 +85,7 @@ const RecipientDashboardV2 = () => {
                                     {dep.sender_name || 'Sin Nombre'}
                                 </span>
                                 <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                                    {dep.sender_email}
+                                    {dep.sender_email} {dep.sender_phone && `• ${dep.sender_phone}`}
                                 </span>
                             </div>
                             <span>{new Date(dep.deposit_date).toLocaleDateString()}</span>
