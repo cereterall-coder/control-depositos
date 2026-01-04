@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Reparando Aplicación...</title>
+</head>
+
+<body
+    style="background: #111; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif;">
+    <h1>🛠️ Reparando Sistema...</h1>
+    <p>Estamos eliminando archivos antiguos.</p>
+    <div id="status">Iniciando limpieza...</div>
+
+    <script>
+        async function nukeCache() {
+            const status = document.getElementById('status');
+
+            try {
+                // 1. Unregister Service Workers
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    for (const registration of registrations) {
+                        await registration.unregister();
+                        status.innerHTML += "<br>✅ Service Worker eliminado";
+                    }
+                }
+
+                // 2. Delete Cache Storage
+                if ('caches' in window) {
+                    const keys = await caches.keys();
+                    for (const key of keys) {
+                        await caches.delete(key);
+                        status.innerHTML += `<br>✅ Caché ${key} borrado`;
+                    }
+                }
+
+                status.innerHTML += "<br>✨ Limpieza completa. Redirigiendo...";
+
+                // 3. Force Redirect to Home after 2 seconds
+                setTimeout(() => {
+                    window.location.href = '/login?t=' + new Date().getTime();
+                }, 2000);
+
+            } catch (e) {
+                status.innerHTML += "<br>❌ Error: " + e.message;
+            }
+        }
+
+        nukeCache();
+    </script>
+</body>
+
+</html>
