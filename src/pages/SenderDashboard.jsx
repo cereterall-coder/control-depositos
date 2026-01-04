@@ -35,12 +35,17 @@ const SenderDashboard = () => {
     const [showReportModal, setShowReportModal] = useState(false);
     const [reportStart, setReportStart] = useState('');
     const [reportEnd, setReportEnd] = useState('');
+    const [reportType, setReportType] = useState('sent'); // 'sent' or 'received'
     const [reportRecipient, setReportRecipient] = useState(''); // New filter
     const [reportWithVoucher, setReportWithVoucher] = useState(false);
     const [generatingPdf, setGeneratingPdf] = useState(false);
 
     // Filter Logic Calculation
     const visibleDeposits = deposits.filter(d => {
+        // Type Filter (Sent vs Received)
+        if (reportType === 'sent' && d.sender_id !== user.id) return false;
+        if (reportType === 'received' && d.sender_id === user.id) return false;
+
         if (!reportStart && !reportEnd && !reportRecipient) return true;
 
         const dDate = new Date(d.deposit_date);
@@ -455,6 +460,42 @@ const SenderDashboard = () => {
                                     {generatingPdf ? 'Generando...' : 'Descargar PDF'}
                                 </button>
                             </div>
+                        </div>
+
+                        {/* Type Toggle */}
+                        <div style={{ display: 'flex', background: 'var(--bg-app)', padding: '0.25rem', borderRadius: '8px', marginBottom: '1rem', width: 'fit-content' }}>
+                            <button
+                                onClick={() => setReportType('sent')}
+                                style={{
+                                    padding: '0.4rem 1rem',
+                                    borderRadius: '6px',
+                                    border: 'none',
+                                    background: reportType === 'sent' ? 'var(--color-primary)' : 'transparent',
+                                    color: reportType === 'sent' ? 'white' : 'var(--text-muted)',
+                                    fontWeight: 500,
+                                    fontSize: '0.9rem',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                Enviados
+                            </button>
+                            <button
+                                onClick={() => setReportType('received')}
+                                style={{
+                                    padding: '0.4rem 1rem',
+                                    borderRadius: '6px',
+                                    border: 'none',
+                                    background: reportType === 'received' ? 'var(--color-primary)' : 'transparent',
+                                    color: reportType === 'received' ? 'white' : 'var(--text-muted)',
+                                    fontWeight: 500,
+                                    fontSize: '0.9rem',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                Recibidos
+                            </button>
                         </div>
 
                         {/* Filter Controls */}
