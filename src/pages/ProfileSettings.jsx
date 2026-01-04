@@ -56,6 +56,7 @@ const ProfileSettings = () => {
                 .from('profiles')
                 .upsert({
                     id: user.id,
+                    email: user.email, // Required for new inserts
                     full_name: formData.full_name,
                     alias: formData.alias,
                     phone: formData.phone,
