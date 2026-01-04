@@ -51,15 +51,16 @@ const ProfileSettings = () => {
         setLoading(true);
 
         try {
-            // Update Public Profile
+            // Update Public Profile (Upsert to handle missing rows)
             const { error } = await supabase
                 .from('profiles')
-                .update({
+                .upsert({
+                    id: user.id,
                     full_name: formData.full_name,
                     alias: formData.alias,
-                    phone: formData.phone
-                })
-                .eq('id', user.id);
+                    phone: formData.phone,
+                    updated_at: new Date().toISOString()
+                });
 
             if (error) throw error;
 
