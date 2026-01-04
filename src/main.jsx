@@ -6,6 +6,16 @@ import './styles/global.css'
 
 import ErrorBoundary from './components/ErrorBoundary';
 
+// KILL SERVICE WORKER (Force Update)
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(function (registrations) {
+        for (let registration of registrations) {
+            registration.unregister();
+            console.log("Service Worker Unregistered");
+        }
+    });
+}
+
 createRoot(document.getElementById('root')).render(
     <StrictMode>
         <ErrorBoundary>
