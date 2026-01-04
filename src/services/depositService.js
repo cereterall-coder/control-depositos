@@ -12,19 +12,8 @@ export const depositService = {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-
-        if (profiles) {
-            const profileMap = new Map(profiles.map(p => [p.id, p]));
-            return deposits.map(d => ({
-                ...d,
-                sender_email: profileMap.get(d.sender_id)?.email || 'Desconocido',
-                sender_name: profileMap.get(d.sender_id)?.full_name || 'Usuario'
-            }));
-        }
-    }
-
         return deposits;
-},
+    },
 
     addDeposit: async ({ amount, date, voucherFile, recipientEmail, senderId, observation }) => {
         try {
@@ -64,98 +53,98 @@ export const depositService = {
         }
     },
 
-        markAsRead: async (depositId) => {
-            const { error } = await supabase
-                .from('deposits')
-                .update({ status: 'read', read_at: new Date().toISOString() })
-                .eq('id', depositId);
+    markAsRead: async (depositId) => {
+        const { error } = await supabase
+            .from('deposits')
+            .update({ status: 'read', read_at: new Date().toISOString() })
+            .eq('id', depositId);
 
-            if (error) throw error;
-        },
+        if (error) throw error;
+    },
 
-            getVoucherUrl: async (path) => {
-                if (!path) return null;
-                const { data } = await supabase.storage.from('vouchers').createSignedUrl(path, 3600); // 1 hour link
-                return data?.signedUrl;
-            },
+    getVoucherUrl: async (path) => {
+        if (!path) return null;
+        const { data } = await supabase.storage.from('vouchers').createSignedUrl(path, 3600); // 1 hour link
+        return data?.signedUrl;
+    },
 
-                // --- Contacts / Favorites Features ---
-                getContacts: async (userId) => {
-                    const { data, error } = await supabase
-                        .from('contacts')
-                        .select('*')
-                        .eq('user_id', userId)
-                        .order('contact_name', { ascending: true });
+    // --- Contacts / Favorites Features ---
+    getContacts: async (userId) => {
+        const { data, error } = await supabase
+            .from('contacts')
+            .select('*')
+            .eq('user_id', userId)
+            .order('contact_name', { ascending: true });
 
-                    if (error) throw error;
-                    return data;
-                },
+        if (error) throw error;
+        return data;
+    },
 
-                    addContact: async (userId, email, name = '') => {
-                        // Check duplicate first to avoid error UI
-                        const { data: existing } = await supabase
-                            .from('contacts')
-                            .select('id')
-                            .eq('user_id', userId)
-                            .eq('contact_email', email)
-                            .single();
+    addContact: async (userId, email, name = '') => {
+        // Check duplicate first to avoid error UI
+        const { data: existing } = await supabase
+            .from('contacts')
+            .select('id')
+            .eq('user_id', userId)
+            .eq('contact_email', email)
+            .single();
 
-                        if (existing) return existing;
+        if (existing) return existing;
 
-                        const { data, error } = await supabase
-                            .from('contacts')
-                            .insert([{ user_id: userId, contact_email: email, contact_name: name || email }])
-                            .select()
-                            .single();
+        const { data, error } = await supabase
+            .from('contacts')
+            .insert([{ user_id: userId, contact_email: email, contact_name: name || email }])
+            .select()
+            .single();
 
-                        if (error) throw error;
-                        return data;
-                    },
+        if (error) throw error;
+        return data;
+    },
 
-                        // --- Admin Features ---
-                        getAllProfiles: async () => {
-                            const { data, error } = await supabase
-                                .from('profiles')
-                                .select('*')
-                                .order('created_at', { ascending: false });
+    // --- Admin Features ---
+    getAllProfiles: async () => {
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .order('created_at', { ascending: false });
 
-                            if (error) throw error;
-                            return data;
-                        },
+        if (error) throw error;
+        return data;
+    },
 
-                            updateProfileRole: async (profileId, newRole) => {
-                                const { error } = await supabase
-                                    .from('profiles')
-                                    .update({ role: newRole })
-                                    .eq('id', profileId);
+    updateProfileRole: async (profileId, newRole) => {
+        const { error } = await supabase
+            .from('profiles')
+            .update({ role: newRole })
+            .eq('id', profileId);
 
-                                if (error) throw error;
-                            },
+        if (error) throw error;
+    },
 
-                                updateProfileStatus: async (profileId, newStatus) => {
-                                    const { error } = await supabase
-                                        .from('profiles')
-                                        .update({ status: newStatus })
-                                        .eq('id', profileId);
+    updateProfileStatus: async (profileId, newStatus) => {
+        const { error } = await supabase
+            .from('profiles')
+            .update({ status: newStatus })
+            .eq('id', profileId);
 
-                                    if (error) throw error;
-                                },
+        if (error) throw error;
+    },
 
-                                    triggerPasswordReset: async (email) => {
-                                        const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                                            redirectTo: window.location.origin + '/update-password', // We need a page for this eventually, or just login
-                                        });
-                                        if (error) throw error;
-                                    },
+    triggerPasswordReset: async (email) => {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: window.location.origin + '/update-password', // We need a page for this eventually, or just login
+        });
+        if (error) throw error;
+    },
 
-                                        deleteProfile: async (profileId) => {
-                                            // Note: This only deletes the profile record, NOT the auth user (requires Service Key).
-                                            // However, removing profile might lock them out of some app logic if we rely on it.
-                                            const { error } = await supabase
-                                                .from('profiles')
-                                                .delete()
-                                                .eq('id', profileId);
+    deleteProfile: async (profileId) => {
+        // Note: This only deletes the profile record, NOT the auth user (requires Service Key).
+        // However, removing profile might lock them out of some app logic if we rely on it.
+        const { error } = await supabase
+            .from('profiles')
+            .delete()
+            .eq('id', profileId);
 
-                                            if (error) throw error;
-                                        }
+        if (error) throw error;
+    }
 };
