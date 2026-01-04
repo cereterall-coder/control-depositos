@@ -6,7 +6,7 @@ import { Download, AlertCircle, Check } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';
 
-const RecipientDashboard = () => {
+const RecipientDashboardV2 = () => {
     const { user } = useAuth();
     const [deposits, setDeposits] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -64,7 +64,7 @@ const RecipientDashboard = () => {
     const unreadCount = deposits.filter(d => d.status === 'sent').length;
 
     return (
-        <DashboardLayout title="Billetera (Destino)" notificationCount={unreadCount}>
+        <DashboardLayout title="Billetera (Destino) v2" notificationCount={unreadCount}>
             {unreadCount > 0 && (
                 <div className="animate-fade-in" style={{ padding: '1rem', background: 'var(--color-danger)', borderRadius: 'var(--radius-md)', marginBottom: '1rem', color: 'white' }}>
                     <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
@@ -112,4 +112,4 @@ const RecipientDashboard = () => {
     );
 };
 
-export default RecipientDashboard;
+export default RecipientDashboardV2;
