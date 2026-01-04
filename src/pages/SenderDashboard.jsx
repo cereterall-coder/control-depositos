@@ -216,6 +216,25 @@ const SenderDashboard = () => {
                         </div>
                     ) : (
                         <>
+                            <button
+                                onClick={() => navigate('/billetera-v3')}
+                                style={{
+                                    background: 'var(--color-primary)',
+                                    color: 'white',
+                                    padding: '1rem',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    fontWeight: 'bold',
+                                    width: '100%',
+                                    marginBottom: '1.5rem',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                                    fontSize: '1.1rem',
+                                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                                }}
+                            >
+                                💰 IR A MIS RECEPCIONES (NUEVO)
+                            </button>
+
                             <h3 className="text-h2" style={{ fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <Activity color="var(--color-primary)" /> Nuevo Envío
                             </h3>
