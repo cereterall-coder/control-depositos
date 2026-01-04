@@ -567,4 +567,3 @@ const SenderDashboard = () => {
 };
 
 export default SenderDashboard;
-```
