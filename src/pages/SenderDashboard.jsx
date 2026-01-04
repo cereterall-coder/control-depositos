@@ -112,7 +112,13 @@ const SenderDashboard = () => {
     const askToSaveFavorite = (email) => {
         toast((t) => (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <span>¿Guardar en favoritos?</span>
+                <h2 className="text-h2" style={{ margin: 0 }}>Panel de Envíos</h2>
+                <button
+                    onClick={() => navigate('/billetera-v3')}
+                    style={{ background: 'red', color: 'white', padding: '10px', border: 'none', borderRadius: '5px', fontWeight: 'bold' }}
+                >
+                    🔴 IR A BILLETERA V3
+                </button>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <button
                         onClick={() => {
