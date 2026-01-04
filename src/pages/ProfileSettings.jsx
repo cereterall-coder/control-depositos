@@ -82,6 +82,8 @@ const ProfileSettings = () => {
 
         } catch (error) {
             console.error('Error updating profile:', error);
+            // Show exact error to user for debugging
+            alert(`Error Detallado: ${JSON.stringify(error, null, 2)}`);
             toast.error('Error al actualizar perfil');
         } finally {
             setLoading(false);
