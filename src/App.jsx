@@ -4,15 +4,34 @@ import Login from './pages/Login';
 import SenderDashboard from './pages/SenderDashboard';
 import RecipientDashboardV2 from './pages/RecipientDashboardV2';
 import AdminUsers from './pages/AdminUsers';
-// ...
-// ...
-// (Inside AppRoutes)::
+import UpdatePassword from './pages/UpdatePassword';
+import ConnectionTest from './pages/ConnectionTest';
+import SimpleLogin from './pages/SimpleLogin';
+import ProfileSettings from './pages/ProfileSettings';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import { Toaster } from 'react-hot-toast';
+
+function AppRoutes() {
+    const { user } = useAuth();
+
+    return (
+        <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/update-password" element={<UpdatePassword />} />
+            <Route path="/test" element={<ConnectionTest />} />
+            <Route path="/simple" element={<SimpleLogin />} />
+            <Route path="/profile" element={<ProtectedRoute><ProfileSettings /></ProtectedRoute>} />
+            <Route path="/" element={
+                <ProtectedRoute>
+                    <SenderDashboard />
+                </ProtectedRoute>
+            } />
             <Route path="/sender" element={<ProtectedRoute><SenderDashboard /></ProtectedRoute>} />
             <Route path="/recipient" element={<ProtectedRoute><RecipientDashboardV2 /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
-            <Route path="/admin" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
             <Route path="*" element={<Navigate to="/login" />} />
-        </Routes >
+        </Routes>
     );
 }
 
@@ -31,8 +50,6 @@ function ConfigError() {
         </div>
     );
 }
-
-import { Toaster } from 'react-hot-toast';
 
 function App() {
     if (supabase.isMock) {
