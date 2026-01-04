@@ -74,6 +74,18 @@ const DashboardLayout = ({ children, title, notificationCount = 0 }) => {
                                     <Lock size={16} /> Cambiar Clave
                                 </button>
                                 <button
+                                    onClick={() => { setShowProfile(false); navigate('/profile'); }}
+                                    style={{
+                                        width: '100%',
+                                        display: 'flex', alignItems: 'center', gap: '0.5rem',
+                                        background: 'none', border: 'none',
+                                        color: '#10b981',
+                                        cursor: 'pointer', fontSize: '0.9rem', padding: '0.5rem 0'
+                                    }}
+                                >
+                                    <User size={16} /> Mis Datos
+                                </button>
+                                <button
                                     onClick={logout}
                                     style={{
                                         width: '100%',
