@@ -82,10 +82,10 @@ const RecipientDashboardV2 = () => {
                             <div style={{ display: 'flex', flexDirection: 'column' }}>
                                 <span style={{ fontWeight: 'bold', fontSize: '1.2rem', color: 'var(--color-success)' }}>S/. {dep.amount}</span>
                                 <span style={{ fontSize: '0.9rem', color: 'white', fontWeight: 'bold' }}>
-                                    {dep.sender_name || 'Sin Nombre'}
+                                    NAME_VAR: {dep.sender_name || 'NULL'}
                                 </span>
                                 <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                                    {dep.sender_email}
+                                    EMAIL_VAR: {dep.sender_email || 'NULL'}
                                 </span>
                             </div>
                             <span>{new Date(dep.deposit_date).toLocaleDateString()}</span>
