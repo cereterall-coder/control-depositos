@@ -39,6 +39,36 @@ const SenderDashboard = () => {
     const [reportWithVoucher, setReportWithVoucher] = useState(false);
     const [generatingPdf, setGeneratingPdf] = useState(false);
 
+    // Filter Logic Calculation
+    const visibleDeposits = deposits.filter(d => {
+        if (!reportStart && !reportEnd && !reportRecipient) return true;
+
+        const dDate = new Date(d.deposit_date);
+        dDate.setHours(0, 0, 0, 0);
+
+        let dateMatch = true;
+        if (reportStart) {
+            const start = new Date(reportStart);
+            start.setHours(0, 0, 0, 0);
+            if (dDate < start) dateMatch = false;
+        }
+        if (reportEnd) {
+            const end = new Date(reportEnd);
+            end.setHours(0, 0, 0, 0);
+            if (dDate > end) dateMatch = false;
+        }
+
+        let recipientMatch = true;
+        if (reportRecipient) {
+            const otherParty = d.sender_id === user.id ? d.recipient_email : d.sender_email;
+            recipientMatch = otherParty === reportRecipient;
+        }
+
+        return dateMatch && recipientMatch;
+    });
+
+    const totalAmount = visibleDeposits.reduce((sum, d) => sum + Number(d.amount), 0).toFixed(2);
+
     const refreshData = async () => {
         if (!user) return;
         try {
@@ -161,34 +191,20 @@ const SenderDashboard = () => {
         setGeneratingPdf(true);
         const toastId = toast.loading('Generando PDF...');
         try {
-            // Filter Data
-            const filteredDeposits = deposits.filter(d => {
-                const dDate = new Date(d.deposit_date);
-                const start = reportStart ? new Date(reportStart) : new Date('2000-01-01');
-                const end = reportEnd ? new Date(reportEnd) : new Date();
-
-                // Date Filter
-                const dateMatch = dDate >= start && dDate <= end;
-
-                // Recipient Filter
-                const recipientMatch = reportRecipient === '' || d.recipient_email === reportRecipient;
-
-                return dateMatch && recipientMatch;
-            });
-
-            if (filteredDeposits.length === 0) throw new Error("No hay datos con esos filtros");
+            if (visibleDeposits.length === 0) throw new Error("No hay datos en pantalla para exportar");
 
             await generateDepositReport({
-                deposits: filteredDeposits,
+                deposits: visibleDeposits,
                 startDate: reportStart,
                 endDate: reportEnd,
-                includeImages: reportWithVoucher,
+                includeImages: reportWithVoucher, // Reuse existing state or rename
                 user: user,
+                totalAmount: totalAmount,
                 engineerCredits: "Desarrollado por Ing. Amaro A. Vilela V. | amalviva@gmail.com | 944499069"
             });
 
             toast.success("PDF Descargado", { id: toastId });
-            setShowReportModal(false);
+            setShowReportModal(false); // Just in case
         } catch (e) {
             toast.error(e.message, { id: toastId });
         } finally {
@@ -417,12 +433,12 @@ const SenderDashboard = () => {
 
                             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                                 <button
-                                    onClick={() => setIncludeVouchersPdf(!includeVouchersPdf)}
+                                    onClick={() => setReportWithVoucher(!reportWithVoucher)}
                                     title="Incluir imégenes de vouchers en PDF"
                                     style={{
-                                        background: includeVouchersPdf ? 'var(--color-primary)' : 'transparent',
+                                        background: reportWithVoucher ? 'var(--color-primary)' : 'transparent',
                                         border: '1px solid var(--border-subtle)',
-                                        color: includeVouchersPdf ? 'white' : 'var(--text-muted)',
+                                        color: reportWithVoucher ? 'white' : 'var(--text-muted)',
                                         padding: '0.4rem',
                                         borderRadius: '4px',
                                         cursor: 'pointer'
@@ -447,23 +463,23 @@ const SenderDashboard = () => {
                                 type="date"
                                 className="input-field"
                                 style={{ padding: '0.4rem', fontSize: '0.8rem' }}
-                                value={filterStart}
-                                onChange={e => setFilterStart(e.target.value)}
+                                value={reportStart}
+                                onChange={e => setReportStart(e.target.value)}
                                 placeholder="Desde"
                             />
                             <input
                                 type="date"
                                 className="input-field"
                                 style={{ padding: '0.4rem', fontSize: '0.8rem' }}
-                                value={filterEnd}
-                                onChange={e => setFilterEnd(e.target.value)}
+                                value={reportEnd}
+                                onChange={e => setReportEnd(e.target.value)}
                                 placeholder="Hasta"
                             />
                             <select
                                 className="input-field"
                                 style={{ padding: '0.4rem', fontSize: '0.8rem' }}
-                                value={filterRecipient}
-                                onChange={e => setFilterRecipient(e.target.value)}
+                                value={reportRecipient}
+                                onChange={e => setReportRecipient(e.target.value)}
                             >
                                 <option value="">-- Todos --</option>
                                 {/* Combine Contacts + Senders found in history */}
