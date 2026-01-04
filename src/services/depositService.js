@@ -7,7 +7,7 @@ export const depositService = {
         const { data: deposits, error } = await supabase
             .from('deposits')
             // Select computed columns: sender_email AND sender_name
-            .select('*, sender_email:sender_email(deposits), sender_name:sender_name(deposits), sender_phone:sender_phone(deposits)')
+            .select('*, sender_email, sender_name, sender_phone')
             .or(`sender_id.eq.${userId},recipient_email.eq.${userEmail}`)
             .order('created_at', { ascending: false });
 
