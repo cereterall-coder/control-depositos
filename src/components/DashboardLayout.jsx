@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, Bell, Shield, Lock } from 'lucide-react';
+import { LogOut, Bell, Shield, Lock, User } from 'lucide-react';
 
 const DashboardLayout = ({ children, title, notificationCount = 0 }) => {
     const { user, logout } = useAuth();
