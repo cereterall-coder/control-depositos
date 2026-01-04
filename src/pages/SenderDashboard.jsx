@@ -551,7 +551,10 @@ const SenderDashboard = () => {
                                             <p className="price-text">S/. {dep.amount}</p>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', justifyContent: 'flex-end', marginBottom: '0.3rem' }}>
                                                 <span className={`badge ${dep.status === 'read' ? 'badge-success' : 'badge-warning'}`}>
-                                                    {dep.status === 'read' ? 'Leído' : 'Enviado'}
+                                                    {dep.sender_id === user.id
+                                                        ? (dep.status === 'read' ? 'Leído' : 'Enviado')
+                                                        : (dep.status === 'read' ? 'Confirmado' : 'Recibido')
+                                                    }
                                                 </span>
                                                 {isToday && dep.sender_id === user.id && (
                                                     <button
