@@ -217,7 +217,7 @@ const SenderDashboard = () => {
                     ) : (
                         <>
                             <button
-                                onClick={() => navigate('/billetera-v3')}
+                                onClick={() => window.location.href = '/billetera-v3'}
                                 style={{
                                     background: 'var(--color-primary)',
                                     color: 'white',
