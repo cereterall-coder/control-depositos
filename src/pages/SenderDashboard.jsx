@@ -524,11 +524,33 @@ const SenderDashboard = () => {
                             >
                                 <option value="">-- Todos --</option>
                                 {/* Combine Contacts + Senders found in history */}
-                                {contacts.map(c => (
-                                    <option key={c.id} value={c.contact_email}>
-                                        {c.contact_name || c.contact_email}
-                                    </option>
-                                ))}
+                                {(() => {
+                                    const interactors = new Map();
+
+                                    // 1. Add Saved Contacts
+                                    contacts.forEach(c => interactors.set(c.contact_email, c.contact_name));
+
+                                    // 2. Add from History
+                                    deposits.forEach(d => {
+                                        if (d.sender_id === user.id) {
+                                            // I sent to this person
+                                            if (!interactors.has(d.recipient_email)) {
+                                                interactors.set(d.recipient_email, d.recipient_email);
+                                            }
+                                        } else {
+                                            // I received from this person
+                                            if (!interactors.has(d.sender_email)) {
+                                                interactors.set(d.sender_email, d.sender_name || d.sender_email);
+                                            }
+                                        }
+                                    });
+
+                                    return Array.from(interactors.entries()).map(([email, name]) => (
+                                        <option key={email} value={email}>
+                                            {name || email}
+                                        </option>
+                                    ));
+                                })()}
                             </select>
                         </div>
                     </div>
