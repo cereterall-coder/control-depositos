@@ -146,5 +146,30 @@ export const depositService = {
             .eq('id', profileId);
 
         if (error) throw error;
-    }
+    },
+
+    async deleteDeposit(id) {
+        // PERMANENT DELETE (Only for non-soft delete logic if needed, or Admin)
+        const { error } = await supabase
+            .from('deposits')
+            .delete()
+            .eq('id', id);
+        if (error) throw error;
+    },
+
+    async softDeleteDeposit(id) {
+        const { error } = await supabase
+            .from('deposits')
+            .update({ sender_deleted_at: new Date().toISOString() })
+            .eq('id', id);
+        if (error) throw error;
+    },
+
+    async restoreDeposit(id) {
+        const { error } = await supabase
+            .from('deposits')
+            .update({ sender_deleted_at: null })
+            .eq('id', id);
+        if (error) throw error;
+    },
 };

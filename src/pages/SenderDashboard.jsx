@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
 import { depositService } from '../services/depositService';
 import { useAuth } from '../context/AuthContext';
-import { Upload, DollarSign, Calendar, Eye, Activity, UserPlus, Star, Save, Trash2, FileText, X, Camera, Ban } from 'lucide-react';
+import { Upload, DollarSign, Calendar, Eye, Activity, UserPlus, Star, Trash2, FileText, X, Camera, Ban, Link as LinkIcon, RefreshCw } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';
 import { generateDepositReport } from '../utils/pdfGenerator';
@@ -42,9 +42,18 @@ const SenderDashboard = () => {
 
     // Filter Logic Calculation
     const visibleDeposits = deposits.filter(d => {
-        // Type Filter (Sent vs Received)
-        if (reportType === 'sent' && d.sender_id !== user.id) return false;
-        if (reportType === 'received' && d.sender_id === user.id) return false;
+        // Type Filter (Sent vs Received vs Trash)
+        if (reportType === 'sent') {
+            if (d.sender_id !== user.id) return false;
+            if (d.sender_deleted_at) return false; // Hide deleted
+        }
+        if (reportType === 'received') {
+            if (d.sender_id === user.id) return false;
+        }
+        if (reportType === 'trash') {
+            if (d.sender_id !== user.id) return false; // Only my sent items
+            if (!d.sender_deleted_at) return false; // Only deleted items
+        }
 
         if (!reportStart && !reportEnd && !reportRecipient) return true;
 
@@ -91,13 +100,23 @@ const SenderDashboard = () => {
     };
 
     const handleDelete = async (id) => {
-        if (!confirm('¿Estás seguro de eliminar este depósito?')) return;
+        if (!confirm('¿Mover a la papelera?')) return;
         try {
-            await depositService.deleteDeposit(id);
-            toast.success("Eliminado");
+            await depositService.softDeleteDeposit(id);
+            toast.success("Movido a papelera");
             refreshData();
         } catch (e) {
-            toast.error("No se pudo eliminar. ¿ quizás ya pasó el tiempo permitido?");
+            toast.error("Error al eliminar");
+        }
+    };
+
+    const handleRestore = async (id) => {
+        try {
+            await depositService.restoreDeposit(id);
+            toast.success("Restaurado de papelera");
+            refreshData();
+        } catch (e) {
+            toast.error("Error al restaurar");
         }
     };
 
@@ -496,6 +515,23 @@ const SenderDashboard = () => {
                             >
                                 Recibidos
                             </button>
+                            <button
+                                onClick={() => setReportType('trash')}
+                                style={{
+                                    padding: '0.4rem 1rem',
+                                    borderRadius: '6px',
+                                    border: 'none',
+                                    background: reportType === 'trash' ? 'var(--color-danger)' : 'transparent',
+                                    color: reportType === 'trash' ? 'white' : 'var(--text-muted)',
+                                    fontWeight: 500,
+                                    fontSize: '0.9rem',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    display: 'flex', alignItems: 'center', gap: '0.25rem'
+                                }}
+                            >
+                                <Trash2 size={14} /> Papelera
+                            </button>
                         </div>
 
                         {/* Filter Controls */}
@@ -619,15 +655,34 @@ const SenderDashboard = () => {
                                                         : (dep.status === 'read' ? 'Confirmado' : 'Recibido')
                                                     }
                                                 </span>
-                                                {isToday && dep.sender_id === user.id && (
+
+                                                {/* Actions */}
+                                                {reportType === 'trash' ? (
                                                     <button
-                                                        onClick={() => handleDelete(dep.id)}
+                                                        onClick={() => handleRestore(dep.id)}
                                                         className="btn-icon"
-                                                        style={{ background: 'rgba(239, 68, 68, 0.2)', color: 'var(--color-danger)', cursor: 'pointer', border: 'none', padding: '0.15rem', display: 'flex' }}
-                                                        title="Eliminar (Solo hoy)"
+                                                        style={{ background: 'rgba(16, 185, 129, 0.2)', color: 'var(--color-success)', cursor: 'pointer', border: 'none', padding: '0.15rem', display: 'flex' }}
+                                                        title="Restaurar"
                                                     >
-                                                        <Trash2 size={13} />
+                                                        <RefreshCw size={13} />
                                                     </button>
+                                                ) : (
+                                                    // Delete Button (Only for Sent items created today for now, or relax?)
+                                                    // User said "Eliminar solo para enviados". Keeping isToday check for safety or removing?
+                                                    // Usually Trash logic allows deleting anytime. Let's keep isToday for now to avoid historical modification, OR relax it since it's soft delete.
+                                                    // "Eliminar solo para los depositos enviados".
+                                                    // Let's keep existing isToday logic for now to be safe, or ask?
+                                                    // Let's relax it? Soft delete is safe.
+                                                    (isToday && dep.sender_id === user.id && reportType === 'sent') && (
+                                                        <button
+                                                            onClick={() => handleDelete(dep.id)}
+                                                            className="btn-icon"
+                                                            style={{ background: 'rgba(239, 68, 68, 0.2)', color: 'var(--color-danger)', cursor: 'pointer', border: 'none', padding: '0.15rem', display: 'flex' }}
+                                                            title="Mover a papelera"
+                                                        >
+                                                            <Trash2 size={13} />
+                                                        </button>
+                                                    )
                                                 )}
                                             </div>
                                             {dep.status === 'read' && dep.read_at && (
