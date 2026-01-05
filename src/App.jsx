@@ -30,7 +30,7 @@ function AppRoutes() {
             <Route path="/sender" element={<ProtectedRoute><SenderDashboard /></ProtectedRoute>} />
             <Route path="/billetera-v3" element={<ProtectedRoute><RecipientDashboardV2 /></ProtectedRoute>} />
             <Route path="/recipient" element={<Navigate to="/billetera-v3" />} />
-            <Route path="/admin" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
+            <Route path="/admin/users" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
             <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
     );
