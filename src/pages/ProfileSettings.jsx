@@ -5,12 +5,27 @@ import { useAuth } from '../context/AuthContext';
 import { User, Phone, Tag, Save, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-// DiceBear API (Latest v9.x)
-const AVATAR_API = "https://api.dicebear.com/9.x/avataaars/svg?radius=50&backgroundColor=b6e3f4,c0aede,d1d4f9&seed=";
+// DiceBear API Base (Latest v9.x)
+const BASE_API = "https://api.dicebear.com/9.x/avataaars/svg?radius=50&backgroundColor=b6e3f4,c0aede,d1d4f9";
 
-const ALL_AVATARS = [
-    'Christopher', 'Sophia', 'Jacob', 'Emma', 'Mason', 'Olivia',
-    'Ethan', 'Isabella', 'Alexander', 'Mia', 'Ryan', 'Emily', 'David', 'Abigail'
+// Define curated avatars with strict gender settings
+// Female: STRICTLY NO facial hair (probability 0)
+// Male: Normal settings (can have beards)
+const AVATAR_OPTIONS = [
+    { seed: 'Christopher', gender: 'male' },
+    { seed: 'Sophia', gender: 'female' },
+    { seed: 'Jacob', gender: 'male' },
+    { seed: 'Emma', gender: 'female' },
+    { seed: 'Mason', gender: 'male' },
+    { seed: 'Olivia', gender: 'female' },
+    { seed: 'Ethan', gender: 'male' },
+    { seed: 'Isabella', gender: 'female' },
+    { seed: 'Alexander', gender: 'male' },
+    { seed: 'Mia', gender: 'female' },
+    { seed: 'Ryan', gender: 'male' },
+    { seed: 'Emily', gender: 'female' },
+    { seed: 'David', gender: 'male' },
+    { seed: 'Abigail', gender: 'female' }
 ];
 
 const ProfileSettings = () => {
@@ -54,8 +69,16 @@ const ProfileSettings = () => {
         }
     };
 
-    const handleAvatarSelect = (seed) => {
-        const url = `${AVATAR_API}${seed}`;
+    const getAvatarUrl = (seed, gender) => {
+        let params = `&seed=${seed}`;
+        // Strict restrictions for females to avoid "bearded lady" glitches
+        if (gender === 'female') {
+            params += '&facialHairProbability=0&facialHair=[]';
+        }
+        return `${BASE_API}${params}`;
+    };
+
+    const handleAvatarSelect = (url) => {
         setFormData(prev => ({ ...prev, avatar_url: url }));
     };
 
@@ -139,24 +162,28 @@ const ProfileSettings = () => {
                             )}
                         </div>
 
-                        {/* Suggestions Grid (Unified) */}
+                        {/* Suggestions Grid (Unified & Curated) */}
                         <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                            {ALL_AVATARS.map(seed => (
-                                <div
-                                    key={seed}
-                                    onClick={() => handleAvatarSelect(seed)}
-                                    style={{
-                                        width: '60px', height: '60px', borderRadius: '50%', cursor: 'pointer', overflow: 'hidden',
-                                        border: formData.avatar_url.includes(seed) ? '3px solid var(--color-primary)' : '2px solid transparent',
-                                        transition: 'transform 0.2s',
-                                        background: '#f1f5f9'
-                                    }}
-                                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                                >
-                                    <img src={`${AVATAR_API}${seed}`} alt={seed} style={{ width: '100%', height: '100%' }} referrerPolicy="no-referrer" />
-                                </div>
-                            ))}
+                            {AVATAR_OPTIONS.map((opt) => {
+                                const url = getAvatarUrl(opt.seed, opt.gender);
+                                return (
+                                    <div
+                                        key={opt.seed}
+                                        onClick={() => handleAvatarSelect(url)}
+                                        style={{
+                                            width: '60px', height: '60px', borderRadius: '50%', cursor: 'pointer', overflow: 'hidden',
+                                            border: formData.avatar_url === url ? '3px solid var(--color-primary)' : '2px solid transparent',
+                                            transition: 'transform 0.2s',
+                                            background: '#f1f5f9'
+                                        }}
+                                        title={opt.seed}
+                                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                    >
+                                        <img src={url} alt={opt.seed} style={{ width: '100%', height: '100%' }} referrerPolicy="no-referrer" />
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
 
