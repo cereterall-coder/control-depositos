@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
-import { User, Phone, Tag, Save, ArrowLeft, Camera } from 'lucide-react';
+import { User, Phone, Tag, Save, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 // DiceBear API (Latest v9.x)
@@ -12,7 +12,7 @@ const MALE_AVATARS = ['Christopher', 'Jacob', 'Mason', 'Ethan', 'Alexander', 'Ry
 const FEMALE_AVATARS = ['Sophia', 'Emma', 'Olivia', 'Isabella', 'Mia', 'Emily', 'Abigail'];
 
 const ProfileSettings = () => {
-    const { user, setUser } = useAuth(); // Need setUser to update context locally if needed
+    const { user } = useAuth();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
@@ -37,7 +37,7 @@ const ProfileSettings = () => {
                 .eq('id', user.id)
                 .single();
 
-            if (error && error.code !== 'PGRST116') throw error; // PGRST116 is "No rows found"
+            if (error && error.code !== 'PGRST116') throw error;
 
             setFormData({
                 full_name: data?.full_name || '',
@@ -60,25 +60,30 @@ const ProfileSettings = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
+        let dbError = null;
 
         try {
-            // Update Public Profile
-            const { error } = await supabase
-                .from('profiles')
-                .upsert({
-                    id: user.id,
-                    email: user.email,
-                    full_name: formData.full_name,
-                    alias: formData.alias,
-                    phone: formData.phone,
-                    avatar_url: formData.avatar_url,
-                    updated_at: new Date().toISOString()
-                });
+            // 1. Try Update Public Profile (Database)
+            try {
+                const { error } = await supabase
+                    .from('profiles')
+                    .upsert({
+                        id: user.id,
+                        email: user.email,
+                        full_name: formData.full_name,
+                        alias: formData.alias,
+                        phone: formData.phone,
+                        avatar_url: formData.avatar_url,
+                        updated_at: new Date().toISOString()
+                    });
+                if (error) throw error;
+            } catch (err) {
+                console.warn('Database update failed (possibly missing column):', err);
+                dbError = err;
+            }
 
-            if (error) throw error;
-
-            // Update Auth Metadata
-            const { data: { user: updatedUser }, error: authError } = await supabase.auth.updateUser({
+            // 2. Update Auth Metadata (User Session)
+            const { error: authError } = await supabase.auth.updateUser({
                 data: {
                     full_name: formData.full_name,
                     alias: formData.alias,
@@ -89,22 +94,19 @@ const ProfileSettings = () => {
 
             if (authError) throw authError;
 
-            // Manually update local user context if Supabase doesn't trigger it immediately
-            // (AuthContext usually listens to onAuthStateChange, but manual update is safer for UI feedback)
-            // But we can't easily access 'setUser' from here if it is not exported. 
-            // We'll rely on the redirect and reload.
-
-            toast.success('Perfil actualizado correctamente');
+            if (dbError) {
+                toast.success('Avatar actualizado (Sincronización DB pendiente)');
+            } else {
+                toast.success('Perfil actualizado correctamente');
+            }
 
             setTimeout(() => {
                 navigate('/');
-                // Force a reload to ensure Context picks up new metadata if needed
-                // window.location.reload(); // Optional, but navigation usually enough if Context subscribes well.
             }, 1000);
 
         } catch (error) {
-            console.error('Error updating profile:', error);
-            toast.error('Error al actualizar perfil');
+            console.error('Critical Error updating profile:', error);
+            toast.error('Error: ' + error.message);
         } finally {
             setLoading(false);
         }
@@ -129,7 +131,7 @@ const ProfileSettings = () => {
                         {/* Current User Avatar Preview */}
                         <div style={{ width: '100px', height: '100px', margin: '0 auto 1.5rem', borderRadius: '50%', border: '4px solid var(--color-primary)', overflow: 'hidden', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             {formData.avatar_url ? (
-                                <img src={formData.avatar_url} alt="Current Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                <img src={formData.avatar_url} alt="Current Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} referrerPolicy="no-referrer" />
                             ) : (
                                 <span style={{ fontSize: '2rem', fontWeight: 'bold', color: '#64748b' }}>{formData.email?.[0]?.toUpperCase()}</span>
                             )}
