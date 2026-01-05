@@ -641,15 +641,7 @@ const SenderDashboard = () => {
 
                             {/* NEW: Email Notification Setting */}
                             <div className="checkbox-container" style={{ display: 'flex', flexDirection: 'column', padding: '0.5rem 0', borderBottom: '1px solid var(--border-subtle)' }}>
-                                {/* DEBUG INFO */}
-                                <div style={{ fontSize: '0.7rem', color: 'gray', marginBottom: '0.5rem', wordBreak: 'break-all' }}>
-                                    DEBUG: {JSON.stringify({
-                                        SERVICE: !!import.meta.env.VITE_EMAILJS_SERVICE_ID,
-                                        TEMPLATE: !!import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-                                        KEY_EXISTS: !!import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
-                                        KEY_LEN: import.meta.env.VITE_EMAILJS_PUBLIC_KEY?.length
-                                    })}
-                                </div>
+
 
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: '0.5rem' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
