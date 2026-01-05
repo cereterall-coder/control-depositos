@@ -73,7 +73,7 @@ const ProfileSettings = () => {
         let params = `&seed=${seed}`;
         // Strict restrictions for females to avoid "bearded lady" glitches
         if (gender === 'female') {
-            params += '&facialHairProbability=0&facialHair=[]';
+            params += '&facialHairProbability=0';
         }
         return `${BASE_API}${params}`;
     };
