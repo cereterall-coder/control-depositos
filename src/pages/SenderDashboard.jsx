@@ -332,6 +332,21 @@ const SenderDashboard = () => {
                                 <span style={{ fontWeight: 'bold', color: '#3b82f6' }}>ROL:</span>
                                 {(user.role === 'admin' || user.user_metadata?.role === 'admin') ? 'Administrador' : 'Usuario'}
                             </div>
+
+                            <div style={{ marginTop: '0.8rem', paddingTop: '0.8rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                                <button
+                                    onClick={logout}
+                                    style={{
+                                        background: 'rgba(239, 68, 68, 0.2)', color: '#f87171', border: 'none',
+                                        borderRadius: '6px', padding: '0.5rem 1rem', width: '100%',
+                                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                                        fontSize: '0.8rem', fontWeight: 'bold'
+                                    }}
+                                >
+                                    <LogOut size={14} />
+                                    Cerrar Sesión
+                                </button>
+                            </div>
                         </div>
                     )}
                 </div>
