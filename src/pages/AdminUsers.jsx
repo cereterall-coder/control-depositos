@@ -73,6 +73,12 @@ const AdminUsers = () => {
     return (
         <DashboardLayout title="Administración de Usuarios">
             <div className="glass-panel card-padding">
+                <button
+                    onClick={() => navigate('/sender')}
+                    style={{ background: 'none', border: 'none', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', cursor: 'pointer', fontSize: '1rem' }}
+                >
+                    &larr; Regresar al Dashboard
+                </button>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
                     <Shield size={24} color="var(--color-primary)" />
                     <h2 className="text-h2" style={{ margin: 0 }}>Gestión de Perfiles</h2>
