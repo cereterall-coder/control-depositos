@@ -337,8 +337,8 @@ const SenderDashboard = () => {
                             <div className="form-group">
                                 <label className="text-label">Monto (S/.)</label>
                                 <div style={{ position: 'relative' }}>
-                                    <DollarSign size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                                    <input type="number" step="0.01" required className="input-field" style={{ paddingLeft: '2.5rem', fontSize: '1.2rem', fontWeight: 'bold' }}
+                                    <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontWeight: 'bold', fontSize: '1rem' }}>S/.</span>
+                                    <input type="number" step="0.01" required className="input-field" style={{ paddingLeft: '3rem', fontSize: '1.2rem', fontWeight: 'bold' }}
                                         value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" />
                                 </div>
                             </div>
