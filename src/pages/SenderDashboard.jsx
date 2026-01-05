@@ -45,8 +45,9 @@ const SenderDashboard = () => {
     const [reportWithVoucher, setReportWithVoucher] = useState(false);
     const [generatingPdf, setGeneratingPdf] = useState(false);
 
-    // About Modal State
+    // Modals & Tooltips
     const [showAboutModal, setShowAboutModal] = useState(false);
+    const [showUserTooltip, setShowUserTooltip] = useState(false);
 
     // Initial Load
     useEffect(() => {
@@ -85,10 +86,8 @@ const SenderDashboard = () => {
     };
 
     // --- Computed Data ---
-    // Filter Logic for History Tab AND Reports
     const getFilteredDeposits = () => {
         return deposits.filter(d => {
-            // Type Filter
             if (reportType === 'sent') {
                 if (d.sender_id !== user.id) return false;
                 if (d.sender_deleted_at) return false;
@@ -101,7 +100,6 @@ const SenderDashboard = () => {
                 if (!d.sender_deleted_at) return false;
             }
 
-            // Date/Recipient Filters (Only apply if set, heavily used in Reports tab)
             if (!reportStart && !reportEnd && !reportRecipient) return true;
 
             const dDate = new Date(d.deposit_date);
@@ -127,13 +125,9 @@ const SenderDashboard = () => {
     };
 
     const visibleDeposits = getFilteredDeposits();
-    // Sort: Newest First
     const sortedDeposits = [...visibleDeposits].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-    // Limit for Display
     const displayedDeposits = activeTab === 'history' ? sortedDeposits.slice(0, historyLimit) : sortedDeposits;
-
     const totalAmount = visibleDeposits.reduce((sum, d) => sum + Number(d.amount), 0).toFixed(2);
-
 
     // --- Actions ---
     const handleSubmit = async (e) => {
@@ -152,7 +146,6 @@ const SenderDashboard = () => {
                 file
             });
             toast.success('¡Depósito enviado!', { id: toastId });
-            // Reset Form and Switch to History
             setAmount('');
             setRecipientEmail('');
             setObservation('');
@@ -209,7 +202,6 @@ const SenderDashboard = () => {
         }
     };
 
-    // --- Render Helpers ---
     const getTabStyle = (tabName) => ({
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         padding: '0.5rem', flex: 1, cursor: 'pointer',
@@ -231,19 +223,42 @@ const SenderDashboard = () => {
                     <img src="/pwa-192x192.png" alt="Logo" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
                     Control Depósitos
                 </h1>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', position: 'relative' }}>
                     <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>v3.1</span>
-                    <div style={{ width: '32px', height: '32px', background: 'var(--color-primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', overflow: 'hidden', border: '2px solid white' }}>
+
+                    {/* User Avatar with Popover */}
+                    <div
+                        onClick={() => setShowUserTooltip(!showUserTooltip)}
+                        onMouseEnter={() => setShowUserTooltip(true)}
+                        onMouseLeave={() => setShowUserTooltip(false)}
+                        style={{ width: '32px', height: '32px', background: 'var(--color-primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', overflow: 'hidden', border: '2px solid white', cursor: 'pointer', position: 'relative' }}
+                    >
                         {(user.user_metadata?.avatar_url || user.avatar_url) ? (
                             <img src={user.user_metadata?.avatar_url || user.avatar_url} alt="You" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (
                             user.email[0].toUpperCase()
                         )}
                     </div>
+
+                    {/* Popover */}
+                    {showUserTooltip && (
+                        <div style={{
+                            position: 'absolute', top: '100%', right: 0, marginTop: '10px',
+                            background: 'white', border: '1px solid var(--border-subtle)', borderRadius: '8px',
+                            padding: '0.8rem', boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                            width: 'max-content', zIndex: 60, animation: 'fadeIn 0.2s', minWidth: '150px'
+                        }}>
+                            <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '4px', wordBreak: 'break-all' }}>{user.email}</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--color-primary)', textTransform: 'uppercase', fontWeight: 'bold' }}>
+                                Role: {(user.role === 'admin' || user.user_metadata?.role === 'admin') ? 'Administrador' : 'Usuario'}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
-            {/* --- ABOUT MODAL --- */}
+            {/* --- ABOUT MODAL (Branding) --- */}
             {showAboutModal && (
                 <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', zIndex: 200, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '2rem', animation: 'fadeIn 0.2s' }} onClick={() => setShowAboutModal(false)}>
                     <div style={{ background: 'white', padding: '2rem', borderRadius: '20px', textAlign: 'center', maxWidth: '400px', width: '100%', position: 'relative' }} onClick={e => e.stopPropagation()}>
@@ -279,7 +294,6 @@ const SenderDashboard = () => {
                     <div className="glass-panel" style={{ padding: '1.5rem', animation: 'fadeIn 0.3s' }}>
                         <h2 className="text-h2" style={{ marginBottom: '1.5rem' }}>Nuevo Depósito</h2>
                         <form onSubmit={handleSubmit}>
-                            {/* Form Fields (Simplified Layout) */}
                             <div className="form-group">
                                 <label className="text-label">Monto (S/.)</label>
                                 <div style={{ position: 'relative' }}>
@@ -337,7 +351,6 @@ const SenderDashboard = () => {
                 {/* --- TAB 2: HISTORIAL --- */}
                 {activeTab === 'history' && (
                     <div style={{ animation: 'fadeIn 0.3s' }}>
-                        {/* Toggle Type */}
                         <div style={{ display: 'flex', background: 'var(--bg-surface)', padding: '0.3rem', borderRadius: '12px', marginBottom: '1rem', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
                             {['sent', 'received', 'trash'].map(type => (
                                 <button key={type} onClick={() => setReportType(type)} style={{
@@ -350,7 +363,6 @@ const SenderDashboard = () => {
                             ))}
                         </div>
 
-                        {/* Summary Card */}
                         <div className="glass-panel" style={{ padding: '1rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div>
                                 <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Total en pantalla</span>
@@ -361,10 +373,8 @@ const SenderDashboard = () => {
                             </div>
                         </div>
 
-                        {/* List */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                             {displayedDeposits.map(dep => {
-                                const isToday = new Date().toDateString() === new Date(dep.created_at).toDateString();
                                 return (
                                     <div key={dep.id} className="glass-panel" style={{ padding: '1rem', borderLeft: `4px solid ${dep.sender_id === user.id ? 'var(--color-primary)' : 'var(--color-success)'}` }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
@@ -387,7 +397,6 @@ const SenderDashboard = () => {
                                                         <Eye size={16} />
                                                     </button>
                                                 )}
-                                                {/* Actions */}
                                                 {reportType === 'trash' ? (
                                                     <button onClick={() => handleRestore(dep.id)} className="btn-icon" style={{ color: 'var(--color-success)', background: 'rgba(16,185,129,0.1)' }}>
                                                         <RefreshCw size={16} />
@@ -423,9 +432,6 @@ const SenderDashboard = () => {
                         <h2 className="text-h2" style={{ marginBottom: '1.5rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                             <FilePieChart size={24} /> Reportes PDF
                         </h2>
-                        <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
-                            Configura los filtros para generar tu reporte.
-                        </p>
 
                         <div className="form-group">
                             <label className="text-label">Fecha Inicio</label>
@@ -468,7 +474,6 @@ const SenderDashboard = () => {
                     <div className="glass-panel" style={{ padding: '1.5rem', animation: 'fadeIn 0.3s' }}>
                         <h2 className="text-h2" style={{ marginBottom: '1.5rem' }}>Configuración</h2>
 
-                        {/* User Info Card */}
                         <div style={{ background: 'var(--bg-app)', padding: '1rem', borderRadius: '12px', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                             <div style={{ width: '50px', height: '50px', background: 'var(--color-primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', fontSize: '1.5rem', overflow: 'hidden', border: '2px solid white' }}>
                                 {(user.user_metadata?.avatar_url || user.avatar_url) ? (
@@ -485,7 +490,7 @@ const SenderDashboard = () => {
                                     {user.email}
                                 </div>
                                 <div style={{ fontSize: '0.75rem', color: 'var(--color-primary)', marginTop: '0.2rem' }}>
-                                    {user.user_metadata?.role === 'admin' ? '👑 Administrador' : '👤 Cuenta Estándar'}
+                                    {(user.role === 'admin' || user.user_metadata?.role === 'admin') ? '👑 Administrador' : '👤 Cuenta Estándar'}
                                 </div>
                             </div>
                         </div>
@@ -495,7 +500,6 @@ const SenderDashboard = () => {
                                 <User size={18} /> Mis Datos Personales
                             </button>
 
-                            {/* Admin Link if Admin */}
                             {(user.user_metadata?.role === 'admin' || user.role === 'admin') && (
                                 <button onClick={() => navigate('/admin/users')} className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center', background: 'rgba(234,179,8,0.1)', color: 'orange', borderColor: 'orange' }}>
                                     <Star size={18} /> Panel Admin
@@ -528,7 +532,7 @@ const SenderDashboard = () => {
                 position: 'fixed', bottom: 0, left: 0, right: 0,
                 height: '70px', background: 'var(--bg-surface)',
                 display: 'flex', boxShadow: '0 -2px 10px rgba(0,0,0,0.1)',
-                zIndex: 100, paddingBottom: '10px' // Safe area for iPhone
+                zIndex: 100, paddingBottom: '10px'
             }}>
                 <div onClick={() => setActiveTab('new')} style={getTabStyle('new')}>
                     <PlusCircle size={24} strokeWidth={activeTab === 'new' ? 2.5 : 2} />
