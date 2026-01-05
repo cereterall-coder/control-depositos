@@ -670,10 +670,9 @@ const SenderDashboard = () => {
                                                     // Delete Button (Only for Sent items created today for now, or relax?)
                                                     // User said "Eliminar solo para enviados". Keeping isToday check for safety or removing?
                                                     // Usually Trash logic allows deleting anytime. Let's keep isToday for now to avoid historical modification, OR relax it since it's soft delete.
-                                                    // "Eliminar solo para los depositos enviados".
-                                                    // Let's keep existing isToday logic for now to be safe, or ask?
-                                                    // Let's relax it? Soft delete is safe.
-                                                    (isToday && dep.sender_id === user.id && reportType === 'sent') && (
+                                                    // user said "Eliminar solo para enviados".
+                                                    // Removed isToday restriction to allow full cleanup history.
+                                                    (dep.sender_id === user.id && reportType === 'sent') && (
                                                         <button
                                                             onClick={() => handleDelete(dep.id)}
                                                             className="btn-icon"
