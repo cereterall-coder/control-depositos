@@ -300,14 +300,16 @@ const SenderDashboard = () => {
                     Control Depósitos
                 </h1>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', position: 'relative' }}>
+                <div
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', position: 'relative' }}
+                    onMouseEnter={() => setShowUserTooltip(true)}
+                    onMouseLeave={() => setShowUserTooltip(false)}
+                >
                     <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>v3.1</span>
 
                     {/* User Avatar with Popover */}
                     <div
                         onClick={() => setShowUserTooltip(!showUserTooltip)}
-                        onMouseEnter={() => setShowUserTooltip(true)}
-                        onMouseLeave={() => setShowUserTooltip(false)}
                         style={{ width: '32px', height: '32px', background: '#2563eb', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', overflow: 'hidden', border: '2px solid rgba(255,255,255,0.8)', cursor: 'pointer', position: 'relative', boxShadow: '0 2px 5px rgba(37, 99, 235, 0.3)' }}
                     >
                         {(user.user_metadata?.avatar_url || user.avatar_url) ? (
