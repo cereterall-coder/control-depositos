@@ -154,7 +154,7 @@ const ProfileSettings = () => {
                                             onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
                                             onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                                         >
-                                            <img src={`${AVATAR_API}${seed}`} alt={seed} style={{ width: '100%', height: '100%' }} />
+                                            <img src={`${AVATAR_API}${seed}`} alt={seed} style={{ width: '100%', height: '100%' }} referrerPolicy="no-referrer" />
                                         </div>
                                     ))}
                                 </div>
