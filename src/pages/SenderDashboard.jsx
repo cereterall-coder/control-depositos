@@ -486,8 +486,8 @@ Equipo de Control de Depósitos`;
                                             </span>
 
                                             <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                                {dep.voucher_path && (
-                                                    <button onClick={() => window.open(depositService.getVoucherUrl(dep.voucher_path), '_blank')} className="btn-icon" title="Ver Voucher">
+                                                {dep.voucher_url && (
+                                                    <button onClick={() => window.open(depositService.getVoucherUrl(dep.voucher_url), '_blank')} className="btn-icon" title="Ver Voucher">
                                                         <Eye size={16} />
                                                     </button>
                                                 )}

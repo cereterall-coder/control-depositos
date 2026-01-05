@@ -40,7 +40,7 @@ export const depositService = {
                     deposit_date: deposit_date,
                     recipient_email: recipient_email,
                     sender_id: sender_id,
-                    voucher_path: voucherUrl, // Correct column name based on previous code
+                    voucher_url: voucherUrl, // Corrected column name back to voucher_url
                     status: 'sent',
                     observation: observation
                 }])
