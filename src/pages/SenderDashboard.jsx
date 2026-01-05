@@ -640,31 +640,67 @@ const SenderDashboard = () => {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
                             {/* NEW: Email Notification Setting */}
-                            <div className="checkbox-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.5rem 0', borderBottom: '1px solid var(--border-subtle)' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <Mail size={18} color="var(--color-primary)" />
-                                    <div>
-                                        <h4 style={{ margin: 0 }}>Notificación por Correo</h4>
-                                        <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>Enviar alerta automática al destinatario</p>
+                            <div className="checkbox-container" style={{ display: 'flex', flexDirection: 'column', padding: '0.5rem 0', borderBottom: '1px solid var(--border-subtle)' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: '0.5rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <Mail size={18} color="var(--color-primary)" />
+                                        <div>
+                                            <h4 style={{ margin: 0 }}>Notificación por Correo</h4>
+                                            <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>Enviar alerta automática</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <label className="switch" style={{ position: 'relative', display: 'inline-block', width: '40px', height: '20px' }}>
-                                    <input
-                                        type="checkbox"
-                                        checked={emailNotify}
-                                        onChange={toggleEmailNotify}
-                                        style={{ opacity: 0, width: 0, height: 0 }}
-                                    />
-                                    <span style={{
-                                        position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0,
-                                        backgroundColor: emailNotify ? 'var(--color-primary)' : '#ccc', borderRadius: '34px', transition: '.4s'
-                                    }}>
+                                    <label className="switch" style={{ position: 'relative', display: 'inline-block', width: '40px', height: '20px' }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={emailNotify}
+                                            onChange={toggleEmailNotify}
+                                            style={{ opacity: 0, width: 0, height: 0 }}
+                                        />
                                         <span style={{
-                                            position: 'absolute', content: '""', height: '16px', width: '16px', left: emailNotify ? '22px' : '2px', bottom: '2px',
-                                            backgroundColor: 'white', borderRadius: '50%', transition: '.4s'
-                                        }}></span>
-                                    </span>
-                                </label>
+                                            position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0,
+                                            backgroundColor: emailNotify ? 'var(--color-primary)' : '#ccc', borderRadius: '34px', transition: '.4s'
+                                        }}>
+                                            <span style={{
+                                                position: 'absolute', content: '""', height: '16px', width: '16px', left: emailNotify ? '22px' : '2px', bottom: '2px',
+                                                backgroundColor: 'white', borderRadius: '50%', transition: '.4s'
+                                            }}></span>
+                                        </span>
+                                    </label>
+                                </div>
+
+                                {emailNotify && (
+                                    <div style={{ padding: '0.5rem', background: 'rgba(59,130,246,0.05)', borderRadius: '8px', fontSize: '0.8rem' }}>
+                                        {!import.meta.env.VITE_EMAILJS_PUBLIC_KEY ? (
+                                            <div style={{ color: 'var(--color-danger)', fontWeight: 'bold' }}>
+                                                ⚠️ Faltan las claves API en .env.local
+                                            </div>
+                                        ) : (
+                                            <button
+                                                onClick={() => {
+                                                    toast.promise(
+                                                        notificationService.sendDepositAlert({
+                                                            to_email: user.email,
+                                                            to_name: user.user_metadata?.full_name || 'Usuario',
+                                                            from_name: 'Sistema de Prueba',
+                                                            amount: '10.00',
+                                                            date: new Date().toLocaleDateString(),
+                                                            link: window.location.origin
+                                                        }),
+                                                        {
+                                                            loading: 'Enviando prueba...',
+                                                            success: '¡Prueba enviada! Revisa tu correo.',
+                                                            error: (e) => `Error: ${e.error || e.message}`
+                                                        }
+                                                    );
+                                                }}
+                                                className="btn btn-sm"
+                                                style={{ width: '100%', fontSize: '0.8rem', padding: '0.3rem', background: 'white', border: '1px solid var(--border-subtle)', color: 'var(--color-primary)' }}
+                                            >
+                                                Enviar Correo de Prueba a Mí Mismo
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
                             </div>
 
                             <button onClick={() => navigate('/profile')} className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
