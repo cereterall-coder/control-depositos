@@ -232,7 +232,7 @@ const SenderDashboard = () => {
                         onClick={() => setShowUserTooltip(!showUserTooltip)}
                         onMouseEnter={() => setShowUserTooltip(true)}
                         onMouseLeave={() => setShowUserTooltip(false)}
-                        style={{ width: '32px', height: '32px', background: 'var(--color-primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', overflow: 'hidden', border: '2px solid white', cursor: 'pointer', position: 'relative' }}
+                        style={{ width: '32px', height: '32px', background: '#2563eb', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', overflow: 'hidden', border: '2px solid rgba(255,255,255,0.8)', cursor: 'pointer', position: 'relative', boxShadow: '0 2px 5px rgba(37, 99, 235, 0.3)' }}
                     >
                         {(user.user_metadata?.avatar_url || user.avatar_url) ? (
                             <img src={user.user_metadata?.avatar_url || user.avatar_url} alt="You" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -241,17 +241,21 @@ const SenderDashboard = () => {
                         )}
                     </div>
 
-                    {/* Popover */}
+                    {/* Popover - Premium Dark Glass Style */}
                     {showUserTooltip && (
                         <div style={{
-                            position: 'absolute', top: '100%', right: 0, marginTop: '10px',
-                            background: 'white', border: '1px solid var(--border-subtle)', borderRadius: '8px',
-                            padding: '0.8rem', boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                            width: 'max-content', zIndex: 60, animation: 'fadeIn 0.2s', minWidth: '150px'
+                            position: 'absolute', top: '120%', right: 0,
+                            background: 'rgba(15, 23, 42, 0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px',
+                            padding: '1rem', boxShadow: '0 10px 25px rgba(0,0,0,0.2)', backdropFilter: 'blur(10px)',
+                            width: 'max-content', zIndex: 60, animation: 'fadeIn 0.2s', minWidth: '180px', color: 'white'
                         }}>
-                            <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '4px', wordBreak: 'break-all' }}>{user.email}</div>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--color-primary)', textTransform: 'uppercase', fontWeight: 'bold' }}>
-                                Role: {(user.role === 'admin' || user.user_metadata?.role === 'admin') ? 'Administrador' : 'Usuario'}
+                            {/* Arrow Tip */}
+                            <div style={{ position: 'absolute', top: '-6px', right: '10px', width: '12px', height: '12px', background: 'rgba(15, 23, 42, 0.95)', transform: 'rotate(45deg)', borderLeft: '1px solid rgba(255,255,255,0.1)', borderTop: '1px solid rgba(255,255,255,0.1)' }}></div>
+
+                            <div style={{ fontSize: '0.9rem', fontWeight: 'bold', marginBottom: '0.3rem', wordBreak: 'break-all' }}>{user.email}</div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                <span style={{ fontWeight: 'bold', color: '#3b82f6' }}>ROL:</span>
+                                {(user.role === 'admin' || user.user_metadata?.role === 'admin') ? 'Administrador' : 'Usuario'}
                             </div>
                         </div>
                     )}
