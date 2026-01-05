@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { depositService } from '../services/depositService';
+import { notificationService } from '../services/notificationService';
 import { supabase } from '../lib/supabase';
 import {
     PlusCircle, List, FileText, Settings,
@@ -161,24 +162,25 @@ const SenderDashboard = () => {
             });
             toast.success('¡Depósito enviado!', { id: toastId });
 
-            // Send Email Notification if enabled
+            // Send Automatic Email Notification if enabled
             if (emailNotify && recipientEmail.includes('@')) {
-                const subject = "SE REGISTRO UN DEPOSITO A SU NOMBRE";
-                const body = `Hola,
+                const recipientName = contacts.find(c => c.contact_email === recipientEmail)?.contact_name || recipientEmail;
 
-Se registro un depósito a su nombre por el monto de S/. ${amount}.
-Realizado por: ${user.user_metadata?.full_name || user.email}.
-
-Puede revisar el detalle en su aplicación de Control de Depósitos:
-${window.location.origin}
-
-Si aún no tiene la aplicación, puede instalarla y registrarse con este correo.
-
-Saludos,
-Equipo de Control de Depósitos`;
-
-                const mailtoLink = `mailto:${recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-                window.open(mailtoLink, '_blank');
+                toast.promise(
+                    notificationService.sendDepositAlert({
+                        to_email: recipientEmail,
+                        to_name: recipientName,
+                        from_name: user.user_metadata?.full_name || user.email,
+                        amount: amount,
+                        date: date,
+                        link: window.location.origin
+                    }),
+                    {
+                        loading: 'Enviando notificación por correo...',
+                        success: '¡Correo de alerta enviado!',
+                        error: (err) => `No se pudo enviar el correo: ${err.error || err.message}`
+                    }
+                );
             }
 
             setAmount('');
