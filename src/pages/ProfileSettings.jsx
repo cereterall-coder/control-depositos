@@ -5,9 +5,8 @@ import { useAuth } from '../context/AuthContext';
 import { User, Phone, Tag, Save, ArrowLeft, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-// DiceBear API with Realistic Settings (Avataaars style)
-// We force natural skin and hair colors, and use professional style seeds.
-const AVATAR_API = "https://api.dicebear.com/7.x/avataaars/svg?backgroundColor=b6e3f4,c0aede,d1d4f9&radius=50&skinColor=light,pale,brown,darkBrown,black&hairColor=auburn,black,blonde,brown,platinum&seed=";
+// DiceBear API (Latest v9.x)
+const AVATAR_API = "https://api.dicebear.com/9.x/avataaars/svg?radius=50&backgroundColor=b6e3f4,c0aede,d1d4f9&seed=";
 
 const MALE_AVATARS = ['Christopher', 'Jacob', 'Mason', 'Ethan', 'Alexander', 'Ryan', 'David'];
 const FEMALE_AVATARS = ['Sophia', 'Emma', 'Olivia', 'Isabella', 'Mia', 'Emily', 'Abigail'];
@@ -178,7 +177,7 @@ const ProfileSettings = () => {
                                             onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
                                             onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                                         >
-                                            <img src={`${AVATAR_API}${seed}`} alt={seed} style={{ width: '100%', height: '100%' }} />
+                                            <img src={`${AVATAR_API}${seed}`} alt={seed} style={{ width: '100%', height: '100%' }} referrerPolicy="no-referrer" />
                                         </div>
                                     ))}
                                 </div>
