@@ -506,7 +506,7 @@ const SenderDashboard = () => {
 
                             <button
                                 onClick={() => {
-                                    if (confirm('¿Seguro que quieres cerrar sesión?')) signOut();
+                                    if (confirm('¿Seguro que quieres cerrar sesión?')) logout();
                                 }}
                                 className="btn"
                                 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center', background: 'var(--color-danger)', color: 'white', border: 'none', padding: '0.8rem' }}
