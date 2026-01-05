@@ -45,6 +45,9 @@ const SenderDashboard = () => {
     const [reportWithVoucher, setReportWithVoucher] = useState(false);
     const [generatingPdf, setGeneratingPdf] = useState(false);
 
+    // About Modal State
+    const [showAboutModal, setShowAboutModal] = useState(false);
+
     // Initial Load
     useEffect(() => {
         const loadInitial = async () => {
@@ -220,17 +223,54 @@ const SenderDashboard = () => {
 
             {/* --- HEADER --- */}
             <div style={{ background: 'var(--bg-surface)', padding: '1rem', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', position: 'sticky', top: 0, zIndex: 50, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h1 style={{ fontSize: '1.2rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
-                    <img src="/pwa-192x192.png" alt="Logo" style={{ width: '24px', height: '24px', objectFit: 'contain' }} />
+                <h1
+                    onClick={() => setShowAboutModal(true)}
+                    style={{ fontSize: '1.2rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, cursor: 'pointer' }}
+                    title="Ver Información del Desarrollador"
+                >
+                    <img src="/pwa-192x192.png" alt="Logo" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
                     Control Depósitos
                 </h1>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>v3.1</span>
-                    <div style={{ width: '32px', height: '32px', background: 'var(--color-primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold' }}>
-                        {user.email[0].toUpperCase()}
+                    <div style={{ width: '32px', height: '32px', background: 'var(--color-primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', overflow: 'hidden', border: '2px solid white' }}>
+                        {(user.user_metadata?.avatar_url || user.avatar_url) ? (
+                            <img src={user.user_metadata?.avatar_url || user.avatar_url} alt="You" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                            user.email[0].toUpperCase()
+                        )}
                     </div>
                 </div>
             </div>
+
+            {/* --- ABOUT MODAL --- */}
+            {showAboutModal && (
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', zIndex: 200, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '2rem', animation: 'fadeIn 0.2s' }} onClick={() => setShowAboutModal(false)}>
+                    <div style={{ background: 'white', padding: '2rem', borderRadius: '20px', textAlign: 'center', maxWidth: '400px', width: '100%', position: 'relative' }} onClick={e => e.stopPropagation()}>
+                        <button onClick={() => setShowAboutModal(false)} style={{ position: 'absolute', top: '10px', right: '10px', background: 'none', border: 'none', cursor: 'pointer' }}><X size={24} /></button>
+
+                        <img src="/pwa-512x512.png" alt="Logo Grande" style={{ width: '120px', height: '120px', borderRadius: '20px', marginBottom: '1rem', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }} />
+
+                        <h2 style={{ color: 'var(--color-primary)', marginBottom: '0.5rem' }}>Control Depósitos</h2>
+                        <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Versión 3.1 Enterprise</div>
+
+                        <div style={{ background: 'var(--bg-app)', padding: '1rem', borderRadius: '12px', marginBottom: '1rem' }}>
+                            <div style={{ fontWeight: 'bold', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Desarrollado y Gestionado por:</div>
+                            <div style={{ fontSize: '1.1rem', color: 'var(--text-primary)', fontWeight: 'bold' }}>Ing. Amaro A. Vilela V.</div>
+                            <div style={{ fontSize: '0.9rem', color: 'var(--color-primary)', marginTop: '0.5rem' }}>Software Engineer</div>
+                        </div>
+
+                        <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                            <p style={{ margin: '0.2rem' }}>📞 944 499 069</p>
+                            <p style={{ margin: '0.2rem' }}>📧 amalviva@gmail.com</p>
+                        </div>
+
+                        <div style={{ marginTop: '2rem', fontSize: '0.8rem', opacity: 0.6 }}>
+                            &copy; 2026 Todos los derechos reservados
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div className="container" style={{ padding: '1rem', maxWidth: '600px', margin: '0 auto' }}>
 
