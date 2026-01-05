@@ -161,6 +161,7 @@ const SenderDashboard = () => {
                 file
             });
             toast.success('¡Depósito enviado!', { id: toastId });
+            await refreshData(); // Update history immediately
 
             // 1. Verify if it is a valid email
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
