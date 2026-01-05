@@ -206,7 +206,7 @@ const SenderDashboard = () => {
                 includeImages: reportWithVoucher,
                 user: user,
                 totalAmount: totalAmount,
-                engineerCredits: "Desarrollado por Ing. Amaro A. Vilela V. | amalviva@gmail.com | 944499069"
+                engineerCredits: localStorage.getItem('dev_name') || "Desarrollado por Ing. Amaro A. Vilela V. | amalviva@gmail.com | 944499069"
             });
             toast.success("PDF Descargado", { id: toastId });
         } catch (e) {
@@ -275,7 +275,7 @@ const SenderDashboard = () => {
                 </div>
             </div>
 
-            {/* --- ABOUT MODAL --- */}
+            {/* --- ABOUT "AUTHORSHIP" MODAL --- */}
             {showAboutModal && (
                 <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', zIndex: 200, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '2rem', animation: 'fadeIn 0.2s' }} onClick={() => setShowAboutModal(false)}>
                     <div style={{ background: 'white', padding: '2rem', borderRadius: '20px', textAlign: 'center', maxWidth: '400px', width: '100%', position: 'relative' }} onClick={e => e.stopPropagation()}>
@@ -286,15 +286,42 @@ const SenderDashboard = () => {
                         <h2 style={{ color: 'var(--color-primary)', marginBottom: '0.5rem' }}>Control Depósitos</h2>
                         <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Versión 3.1 Enterprise</div>
 
-                        <div style={{ background: 'var(--bg-app)', padding: '1rem', borderRadius: '12px', marginBottom: '1rem' }}>
+                        {/* Credits Section */}
+                        <div style={{ background: 'var(--bg-app)', padding: '1rem', borderRadius: '12px', marginBottom: '1rem', position: 'relative' }}>
+                            {/* Allow Admin to Edit Authorship */}
+                            {(user.role === 'admin' || user.user_metadata?.role === 'admin') && (
+                                <button
+                                    onClick={() => {
+                                        const newName = prompt("Nombre del Desarrollador:", localStorage.getItem('dev_name') || "Ing. Amaro A. Vilela V.");
+                                        if (newName !== null) {
+                                            localStorage.setItem('dev_name', newName); // Allow empty string
+                                            const newPhone = prompt("Teléfono:", localStorage.getItem('dev_phone') || "944 499 069");
+                                            localStorage.setItem('dev_phone', newPhone || "");
+                                            const newEmail = prompt("Email:", localStorage.getItem('dev_email') || "amalviva@gmail.com");
+                                            localStorage.setItem('dev_email', newEmail || "");
+
+                                            // Force re-render close/open
+                                            setShowAboutModal(false);
+                                            setTimeout(() => setShowAboutModal(true), 50);
+                                        }
+                                    }}
+                                    style={{ position: 'absolute', top: '5px', right: '5px', background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer' }}
+                                    title="Editar Autoría"
+                                >
+                                    <Settings size={14} />
+                                </button>
+                            )}
+
                             <div style={{ fontWeight: 'bold', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Desarrollado y Gestionado por:</div>
-                            <div style={{ fontSize: '1.1rem', color: 'var(--text-primary)', fontWeight: 'bold' }}>Ing. Amaro A. Vilela V.</div>
+                            <div style={{ fontSize: '1.1rem', color: 'var(--text-primary)', fontWeight: 'bold' }}>
+                                {localStorage.getItem('dev_name') || "Ing. Amaro A. Vilela V."}
+                            </div>
                             <div style={{ fontSize: '0.9rem', color: 'var(--color-primary)', marginTop: '0.5rem' }}>Software Engineer</div>
                         </div>
 
                         <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                            <p style={{ margin: '0.2rem' }}>📞 944 499 069</p>
-                            <p style={{ margin: '0.2rem' }}>📧 amalviva@gmail.com</p>
+                            <p style={{ margin: '0.2rem' }}>📞 {localStorage.getItem('dev_phone') || "944 499 069"}</p>
+                            <p style={{ margin: '0.2rem' }}>📧 {localStorage.getItem('dev_email') || "amalviva@gmail.com"}</p>
                         </div>
                     </div>
                 </div>
