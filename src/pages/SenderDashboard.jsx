@@ -221,7 +221,7 @@ const SenderDashboard = () => {
             {/* --- HEADER --- */}
             <div style={{ background: 'var(--bg-surface)', padding: '1rem', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', position: 'sticky', top: 0, zIndex: 50, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h1 style={{ fontSize: '1.2rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
-                    <Activity color="var(--color-primary)" size={20} />
+                    <img src="/pwa-192x192.png" alt="Logo" style={{ width: '24px', height: '24px', objectFit: 'contain' }} />
                     Control Depósitos
                 </h1>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
