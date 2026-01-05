@@ -15,18 +15,19 @@ export const depositService = {
         return deposits;
     },
 
-    addDeposit: async ({ amount, date, voucherFile, recipientEmail, senderId, observation }) => {
+    // Renamed to match usage in SenderDashboard
+    createDeposit: async ({ amount, deposit_date, file, recipient_email, sender_id, observation }) => {
         try {
             let voucherUrl = null;
 
-            if (voucherFile) {
-                const fileExt = voucherFile.name.split('.').pop();
+            if (file) {
+                const fileExt = file.name.split('.').pop();
                 const fileName = `${Math.random()}.${fileExt}`;
-                const filePath = `${senderId}/${fileName}`;
+                const filePath = `${sender_id}/${fileName}`;
 
                 const { error: uploadError } = await supabase.storage
                     .from('vouchers')
-                    .upload(filePath, voucherFile);
+                    .upload(filePath, file);
 
                 if (uploadError) throw uploadError;
                 voucherUrl = filePath;
@@ -36,10 +37,10 @@ export const depositService = {
                 .from('deposits')
                 .insert([{
                     amount: amount,
-                    deposit_date: date,
-                    recipient_email: recipientEmail,
-                    sender_id: senderId,
-                    voucher_url: voucherUrl,
+                    deposit_date: deposit_date,
+                    recipient_email: recipient_email,
+                    sender_id: sender_id,
+                    voucher_path: voucherUrl, // Correct column name based on previous code
                     status: 'sent',
                     observation: observation
                 }])
@@ -53,6 +54,22 @@ export const depositService = {
         }
     },
 
+    // Alias for backward compatibility if needed
+    addDeposit: async (params) => {
+        return depositService.createDeposit(params);
+    },
+
+    // New Update Method
+    updateDeposit: async (id, updates) => {
+        // updates: { amount, deposit_date, observation }
+        const { error } = await supabase
+            .from('deposits')
+            .update(updates)
+            .eq('id', id);
+
+        if (error) throw error;
+    },
+
     markAsRead: async (depositId) => {
         const { error } = await supabase
             .from('deposits')
@@ -62,10 +79,10 @@ export const depositService = {
         if (error) throw error;
     },
 
-    getVoucherUrl: async (path) => {
+    getVoucherUrl: (path) => {
         if (!path) return null;
-        const { data } = await supabase.storage.from('vouchers').createSignedUrl(path, 3600); // 1 hour link
-        return data?.signedUrl;
+        const { data } = supabase.storage.from('vouchers').getPublicUrl(path);
+        return data.publicUrl;
     },
 
     // --- Contacts / Favorites Features ---
