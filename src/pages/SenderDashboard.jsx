@@ -334,15 +334,7 @@ const SenderDashboard = () => {
                     <div className="glass-panel" style={{ padding: '1.5rem', animation: 'fadeIn 0.3s' }}>
                         <h2 className="text-h2" style={{ marginBottom: '1.5rem' }}>Nuevo Depósito</h2>
                         <form onSubmit={handleSubmit}>
-                            <div className="form-group">
-                                <label className="text-label">Monto (S/.)</label>
-                                <div style={{ position: 'relative' }}>
-                                    <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontWeight: 'bold', fontSize: '1rem' }}>S/.</span>
-                                    <input type="number" step="0.01" required className="input-field" style={{ paddingLeft: '3rem', fontSize: '1.2rem', fontWeight: 'bold' }}
-                                        value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" />
-                                </div>
-                            </div>
-
+                            {/* 1. Recipient (Destinatario) - Moved to Top */}
                             <div className="form-group">
                                 <label className="text-label">Destinatario</label>
                                 <div style={{ position: 'relative' }}>
@@ -363,9 +355,36 @@ const SenderDashboard = () => {
                                 </div>
                             </div>
 
+                            {/* 2. Amount (Monto) */}
+                            <div className="form-group">
+                                <label className="text-label">Monto (S/.)</label>
+                                <div style={{ position: 'relative' }}>
+                                    <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontWeight: 'bold', fontSize: '1rem' }}>S/.</span>
+                                    <input type="number" step="0.01" required className="input-field" style={{ paddingLeft: '3rem', fontSize: '1.2rem', fontWeight: 'bold' }}
+                                        value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" />
+                                </div>
+                            </div>
+
+                            {/* 3. Date (Fecha) - Added Calendar Icon & Trigger */}
                             <div className="form-group">
                                 <label className="text-label">Fecha</label>
-                                <input type="date" required className="input-field" value={date} onChange={e => setDate(e.target.value)} />
+                                <div style={{ position: 'relative' }}>
+                                    <Calendar
+                                        size={18}
+                                        style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', cursor: 'pointer' }}
+                                        onClick={() => document.getElementById('deposit-date-picker').showPicker()}
+                                    />
+                                    <input
+                                        id="deposit-date-picker"
+                                        type="date"
+                                        required
+                                        className="input-field"
+                                        style={{ paddingLeft: '2.5rem' }}
+                                        value={date}
+                                        onChange={e => setDate(e.target.value)}
+                                        onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                                    />
+                                </div>
                             </div>
 
                             <div className="form-group">
