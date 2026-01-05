@@ -2,18 +2,23 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
-import { User, Phone, Tag, Save, ArrowLeft } from 'lucide-react';
+import { User, Phone, Tag, Save, ArrowLeft, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+const AVATAR_API = "https://api.dicebear.com/7.x/avataaars/svg?seed=";
+const MALE_AVATARS = ['Felix', 'Joshua', 'Avery', 'Leo'];
+const FEMALE_AVATARS = ['Aneka', 'Zoe', 'Sarah', 'Maria'];
+
 const ProfileSettings = () => {
-    const { user } = useAuth();
+    const { user, setUser } = useAuth(); // Need setUser to update context locally if needed
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         full_name: '',
         alias: '',
         phone: '',
-        email: ''
+        email: '',
+        avatar_url: ''
     });
 
     useEffect(() => {
@@ -30,20 +35,24 @@ const ProfileSettings = () => {
                 .eq('id', user.id)
                 .single();
 
-            if (error) throw error;
+            if (error && error.code !== 'PGRST116') throw error; // PGRST116 is "No rows found"
 
-            if (data) {
-                setFormData({
-                    full_name: data.full_name || '',
-                    alias: data.alias || '',
-                    phone: data.phone || '',
-                    email: user.email // Email from Auth, immutable
-                });
-            }
+            setFormData({
+                full_name: data?.full_name || '',
+                alias: data?.alias || '',
+                phone: data?.phone || '',
+                email: user.email,
+                avatar_url: data?.avatar_url || user.user_metadata?.avatar_url || ''
+            });
         } catch (error) {
             console.error('Error loading profile:', error);
             toast.error('Error al cargar datos del perfil');
         }
+    };
+
+    const handleAvatarSelect = (seed) => {
+        const url = `${AVATAR_API}${seed}`;
+        setFormData(prev => ({ ...prev, avatar_url: url }));
     };
 
     const handleSubmit = async (e) => {
@@ -51,40 +60,48 @@ const ProfileSettings = () => {
         setLoading(true);
 
         try {
-            // Update Public Profile (Upsert to handle missing rows)
+            // Update Public Profile
             const { error } = await supabase
                 .from('profiles')
                 .upsert({
                     id: user.id,
-                    email: user.email, // Required for new inserts
+                    email: user.email,
                     full_name: formData.full_name,
                     alias: formData.alias,
                     phone: formData.phone,
+                    avatar_url: formData.avatar_url,
                     updated_at: new Date().toISOString()
                 });
 
             if (error) throw error;
 
-            // Also try to update Auth Metadata (Best effort)
-            await supabase.auth.updateUser({
+            // Update Auth Metadata
+            const { data: { user: updatedUser }, error: authError } = await supabase.auth.updateUser({
                 data: {
                     full_name: formData.full_name,
                     alias: formData.alias,
-                    phone: formData.phone
+                    phone: formData.phone,
+                    avatar_url: formData.avatar_url
                 }
             });
 
+            if (authError) throw authError;
+
+            // Manually update local user context if Supabase doesn't trigger it immediately
+            // (AuthContext usually listens to onAuthStateChange, but manual update is safer for UI feedback)
+            // But we can't easily access 'setUser' from here if it is not exported. 
+            // We'll rely on the redirect and reload.
+
             toast.success('Perfil actualizado correctamente');
 
-            // Redirect back to dashboard after short delay
             setTimeout(() => {
                 navigate('/');
+                // Force a reload to ensure Context picks up new metadata if needed
+                // window.location.reload(); // Optional, but navigation usually enough if Context subscribes well.
             }, 1000);
 
         } catch (error) {
             console.error('Error updating profile:', error);
-            // Show exact error to user for debugging
-            alert(`Error Detallado: ${JSON.stringify(error, null, 2)}`);
             toast.error('Error al actualizar perfil');
         } finally {
             setLoading(false);
@@ -92,20 +109,85 @@ const ProfileSettings = () => {
     };
 
     return (
-        <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '1rem' }}>
-            <div className="glass-panel animate-fade-in" style={{ width: '100%', maxWidth: '500px', padding: '2rem' }}>
+        <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '1rem', background: 'var(--bg-app)' }}>
+            <div className="glass-panel animate-fade-in" style={{ width: '100%', maxWidth: '600px', padding: '2rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
                     <button onClick={() => navigate('/')} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
                         <ArrowLeft size={24} />
                     </button>
-                    <h2 className="text-h2" style={{ margin: 0 }}>Mis Datos</h2>
+                    <h2 className="text-h2" style={{ margin: 0 }}>Mis Datos Personales</h2>
                 </div>
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
-                    {/* Read Only Email */}
+                    {/* Avatar Selection Section */}
+                    <div className="form-group" style={{ textAlign: 'center' }}>
+                        <label className="text-label" style={{ marginBottom: '1rem', display: 'block' }}>Elige tu Avatar</label>
+
+                        {/* Current User Avatar Preview */}
+                        <div style={{ width: '100px', height: '100px', margin: '0 auto 1.5rem', borderRadius: '50%', border: '4px solid var(--color-primary)', overflow: 'hidden', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {formData.avatar_url ? (
+                                <img src={formData.avatar_url} alt="Current Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            ) : (
+                                <span style={{ fontSize: '2rem', fontWeight: 'bold', color: '#64748b' }}>{formData.email?.[0]?.toUpperCase()}</span>
+                            )}
+                        </div>
+
+                        {/* Suggestions Grid */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {/* Males */}
+                            <div>
+                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Hombres</div>
+                                <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                                    {MALE_AVATARS.map(seed => (
+                                        <div
+                                            key={seed}
+                                            onClick={() => handleAvatarSelect(seed)}
+                                            style={{
+                                                width: '60px', height: '60px', borderRadius: '50%', cursor: 'pointer', overflow: 'hidden',
+                                                border: formData.avatar_url.includes(seed) ? '3px solid var(--color-primary)' : '2px solid transparent',
+                                                transition: 'transform 0.2s',
+                                                background: '#f1f5f9'
+                                            }}
+                                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                        >
+                                            <img src={`${AVATAR_API}${seed}`} alt={seed} style={{ width: '100%', height: '100%' }} />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Females */}
+                            <div>
+                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Mujeres</div>
+                                <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                                    {FEMALE_AVATARS.map(seed => (
+                                        <div
+                                            key={seed}
+                                            onClick={() => handleAvatarSelect(seed)}
+                                            style={{
+                                                width: '60px', height: '60px', borderRadius: '50%', cursor: 'pointer', overflow: 'hidden',
+                                                border: formData.avatar_url.includes(seed) ? '3px solid var(--color-primary)' : '2px solid transparent',
+                                                transition: 'transform 0.2s',
+                                                background: '#f1f5f9'
+                                            }}
+                                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                        >
+                                            <img src={`${AVATAR_API}${seed}`} alt={seed} style={{ width: '100%', height: '100%' }} />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr style={{ border: 'none', borderTop: '1px solid var(--border-subtle)', margin: '1rem 0' }} />
+
+                    {/* Basic Info Fields */}
                     <div className="form-group">
-                        <label className="text-label">Correo Electrónico (No editable)</label>
+                        <label className="text-label">Correo Electrónico</label>
                         <input
                             type="email"
                             value={formData.email}
@@ -129,11 +211,10 @@ const ProfileSettings = () => {
                                 required
                             />
                         </div>
-                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.3rem' }}>Este nombre aparecerá en los depósitos que envíes.</p>
                     </div>
 
                     <div className="form-group">
-                        <label className="text-label">Alias / Apodo (Opcional)</label>
+                        <label className="text-label">Alias / Apodo</label>
                         <div style={{ position: 'relative', marginTop: '0.5rem' }}>
                             <Tag size={18} style={{ position: 'absolute', left: '1rem', top: '1rem', color: 'var(--text-muted)' }} />
                             <input
