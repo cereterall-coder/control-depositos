@@ -455,11 +455,53 @@ const SenderDashboard = () => {
                             </div>
 
                             <div className="form-group">
-                                <label className="file-upload-label">
-                                    <Upload size={20} />
-                                    <span>{file ? file.name : 'Subir Voucher (Imagen)'}</span>
-                                    <input type="file" accept="image/*" onChange={e => setFile(e.target.files[0])} style={{ display: 'none' }} />
-                                </label>
+                                <label className="text-label" style={{ marginBottom: '0.5rem', display: 'block' }}>Comprobante (Voucher)</label>
+
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    {/* Option 1: Gallery/File */}
+                                    <label className="btn btn-secondary" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.8rem' }}>
+                                        <Upload size={20} />
+                                        <span>Galería</span>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={e => e.target.files[0] && setFile(e.target.files[0])}
+                                            style={{ display: 'none' }}
+                                        />
+                                    </label>
+
+                                    {/* Option 2: Camera (Direct Capture) */}
+                                    <label className="btn btn-secondary" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.8rem', background: 'rgba(37,99,235,0.1)', color: 'var(--color-primary)', border: '1px solid var(--color-primary)' }}>
+                                        <Camera size={20} />
+                                        <span>Cámara</span>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            capture="environment"
+                                            onChange={e => e.target.files[0] && setFile(e.target.files[0])}
+                                            style={{ display: 'none' }}
+                                        />
+                                    </label>
+                                </div>
+
+                                {/* Preview / Selected File Name */}
+                                {file && (
+                                    <div style={{ marginTop: '0.5rem', padding: '0.5rem', background: 'var(--bg-app)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.9rem' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', overflow: 'hidden' }}>
+                                            <FileText size={16} color="var(--color-primary)" />
+                                            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '180px' }}>
+                                                {file.name}
+                                            </span>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => setFile(null)}
+                                            style={{ background: 'none', border: 'none', color: 'var(--color-danger)', cursor: 'pointer', padding: '4px' }}
+                                        >
+                                            <X size={16} />
+                                        </button>
+                                    </div>
+                                )}
                             </div>
 
                             <button type="submit" className="btn" style={{ width: '100%', marginTop: '1rem', background: '#2563eb', color: 'white', border: 'none' }} disabled={submitting}>
