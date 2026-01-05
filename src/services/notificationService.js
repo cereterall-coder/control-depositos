@@ -24,8 +24,8 @@ export const notificationService = {
         const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
         if (!serviceId || !templateId || !publicKey) {
-            console.warn("EmailJS keys are missing. Email notification skipped.");
-            return { success: false, error: "Faltan las claves de EmailJS en la configuración (.env)" };
+            console.warn("EmailJS keys are missing.");
+            throw new Error("Faltan las claves de EmailJS en .env.local");
         }
 
         try {
@@ -46,7 +46,8 @@ export const notificationService = {
             return { success: true, response };
         } catch (error) {
             console.error("EmailJS Error:", error);
-            return { success: false, error: error.text || "Error al enviar el correo" };
+            // Throw the error so toast.promise detects the failure
+            throw new Error(error.text || error.message || "Error desconocido al contactar EmailJS");
         }
     }
 };
