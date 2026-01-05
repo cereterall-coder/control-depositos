@@ -11,7 +11,7 @@ import { generateDepositReport } from '../utils/pdfGenerator';
 import { useNavigate } from 'react-router-dom';
 
 const SenderDashboard = () => {
-    const { user, signOut } = useAuth();
+    const { user, logout } = useAuth();
     const navigate = useNavigate();
 
     // Tab State: 'new', 'history', 'reports', 'settings'
