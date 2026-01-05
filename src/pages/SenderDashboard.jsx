@@ -225,7 +225,7 @@ const SenderDashboard = () => {
                     Control Depósitos
                 </h1>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>v3.0</span>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>v3.1</span>
                     <div style={{ width: '32px', height: '32px', background: 'var(--color-primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold' }}>
                         {user.email[0].toUpperCase()}
                     </div>
@@ -428,6 +428,28 @@ const SenderDashboard = () => {
                     <div className="glass-panel" style={{ padding: '1.5rem', animation: 'fadeIn 0.3s' }}>
                         <h2 className="text-h2" style={{ marginBottom: '1.5rem' }}>Configuración</h2>
 
+                        {/* User Info Card */}
+                        <div style={{ background: 'var(--bg-app)', padding: '1rem', borderRadius: '12px', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <div style={{ width: '50px', height: '50px', background: 'var(--color-primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', fontSize: '1.5rem', overflow: 'hidden', border: '2px solid white' }}>
+                                {(user.user_metadata?.avatar_url || user.avatar_url) ? (
+                                    <img src={user.user_metadata?.avatar_url || user.avatar_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                ) : (
+                                    user.email[0].toUpperCase()
+                                )}
+                            </div>
+                            <div style={{ overflow: 'hidden' }}>
+                                <div style={{ fontWeight: 'bold', fontSize: '1.1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                    {user.user_metadata?.full_name || 'Usuario'}
+                                </div>
+                                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                    {user.email}
+                                </div>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--color-primary)', marginTop: '0.2rem' }}>
+                                    {user.user_metadata?.role === 'admin' ? '👑 Administrador' : '👤 Cuenta Estándar'}
+                                </div>
+                            </div>
+                        </div>
+
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             <button onClick={() => navigate('/profile')} className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
                                 <User size={18} /> Mis Datos Personales
@@ -442,13 +464,19 @@ const SenderDashboard = () => {
 
                             <hr style={{ border: 'none', borderTop: '1px solid var(--border-subtle)', margin: '1rem 0' }} />
 
-                            <button onClick={() => signOut()} className="btn" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center', background: 'var(--color-danger)', color: 'white', border: 'none' }}>
-                                <LogOut size={18} /> Cerrar Sesión
+                            <button
+                                onClick={() => {
+                                    if (confirm('¿Seguro que quieres cerrar sesión?')) signOut();
+                                }}
+                                className="btn"
+                                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center', background: 'var(--color-danger)', color: 'white', border: 'none', padding: '0.8rem' }}
+                            >
+                                <LogOut size={18} /> CERRAR SESIÓN
                             </button>
                         </div>
 
                         <div style={{ textAlign: 'center', marginTop: '3rem', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                            App v3.0 Mobile • 2026
+                            App v3.1 Mobile • 2026
                         </div>
                     </div>
                 )}
