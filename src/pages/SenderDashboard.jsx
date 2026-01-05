@@ -14,7 +14,7 @@ const SenderDashboard = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
 
-    // Tab State: 'new', 'history', 'reports', 'settings'
+    // Tab State
     const [activeTab, setActiveTab] = useState('new');
 
     // Data State
@@ -33,6 +33,9 @@ const SenderDashboard = () => {
     const [observation, setObservation] = useState('');
     const [file, setFile] = useState(null);
     const [showSuggestions, setShowSuggestions] = useState(false);
+
+    // Edit Deposit State
+    const [editingDeposit, setEditingDeposit] = useState(null);
 
     // History View State
     const [historyLimit, setHistoryLimit] = useState(10);
@@ -140,7 +143,6 @@ const SenderDashboard = () => {
                 amount,
                 deposit_date: date,
                 recipient_email: recipientEmail,
-                sender_email: user.email,
                 sender_id: user.id,
                 observation,
                 file
@@ -156,6 +158,18 @@ const SenderDashboard = () => {
             toast.error(error.message, { id: toastId });
         } finally {
             setSubmitting(false);
+        }
+    };
+
+    const handleEditSubmit = async (id, updates) => {
+        try {
+            await depositService.updateDeposit(id, updates);
+            toast.success("Depósito actualizado");
+            setEditingDeposit(null);
+            refreshData();
+        } catch (e) {
+            toast.error("Error al actualizar");
+            console.error(e);
         }
     };
 
@@ -241,7 +255,7 @@ const SenderDashboard = () => {
                         )}
                     </div>
 
-                    {/* Popover - Premium Dark Glass Style */}
+                    {/* Popover */}
                     {showUserTooltip && (
                         <div style={{
                             position: 'absolute', top: '120%', right: 0,
@@ -249,7 +263,6 @@ const SenderDashboard = () => {
                             padding: '1rem', boxShadow: '0 10px 25px rgba(0,0,0,0.2)', backdropFilter: 'blur(10px)',
                             width: 'max-content', zIndex: 60, animation: 'fadeIn 0.2s', minWidth: '180px', color: 'white'
                         }}>
-                            {/* Arrow Tip */}
                             <div style={{ position: 'absolute', top: '-6px', right: '10px', width: '12px', height: '12px', background: 'rgba(15, 23, 42, 0.95)', transform: 'rotate(45deg)', borderLeft: '1px solid rgba(255,255,255,0.1)', borderTop: '1px solid rgba(255,255,255,0.1)' }}></div>
 
                             <div style={{ fontSize: '0.9rem', fontWeight: 'bold', marginBottom: '0.3rem', wordBreak: 'break-all' }}>{user.email}</div>
@@ -262,7 +275,7 @@ const SenderDashboard = () => {
                 </div>
             </div>
 
-            {/* --- ABOUT MODAL (Branding) --- */}
+            {/* --- ABOUT MODAL --- */}
             {showAboutModal && (
                 <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', zIndex: 200, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '2rem', animation: 'fadeIn 0.2s' }} onClick={() => setShowAboutModal(false)}>
                     <div style={{ background: 'white', padding: '2rem', borderRadius: '20px', textAlign: 'center', maxWidth: '400px', width: '100%', position: 'relative' }} onClick={e => e.stopPropagation()}>
@@ -282,10 +295,6 @@ const SenderDashboard = () => {
                         <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
                             <p style={{ margin: '0.2rem' }}>📞 944 499 069</p>
                             <p style={{ margin: '0.2rem' }}>📧 amalviva@gmail.com</p>
-                        </div>
-
-                        <div style={{ marginTop: '2rem', fontSize: '0.8rem', opacity: 0.6 }}>
-                            &copy; 2026 Todos los derechos reservados
                         </div>
                     </div>
                 </div>
@@ -388,6 +397,8 @@ const SenderDashboard = () => {
                                         <div style={{ fontSize: '0.9rem', marginBottom: '0.5rem' }}>
                                             {dep.sender_id === user.id ? `Para: ${dep.recipient_email}` : `De: ${dep.sender_name || dep.sender_email}`}
                                         </div>
+                                        {dep.observation && <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic', marginBottom: '0.5rem' }}>"{dep.observation}"</div>}
+
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                             <span className={`badge ${dep.status === 'read' ? 'badge-success' : 'badge-warning'}`}>
                                                 {dep.sender_id === user.id
@@ -397,19 +408,29 @@ const SenderDashboard = () => {
 
                                             <div style={{ display: 'flex', gap: '0.5rem' }}>
                                                 {dep.voucher_path && (
-                                                    <button onClick={() => window.open(depositService.getVoucherUrl(dep.voucher_path), '_blank')} className="btn-icon">
+                                                    <button onClick={() => window.open(depositService.getVoucherUrl(dep.voucher_path), '_blank')} className="btn-icon" title="Ver Voucher">
                                                         <Eye size={16} />
                                                     </button>
                                                 )}
                                                 {reportType === 'trash' ? (
-                                                    <button onClick={() => handleRestore(dep.id)} className="btn-icon" style={{ color: 'var(--color-success)', background: 'rgba(16,185,129,0.1)' }}>
+                                                    <button onClick={() => handleRestore(dep.id)} className="btn-icon" style={{ color: 'var(--color-success)', background: 'rgba(16,185,129,0.1)' }} title="Restaurar">
                                                         <RefreshCw size={16} />
                                                     </button>
                                                 ) : (
                                                     (dep.sender_id === user.id && reportType === 'sent') && (
-                                                        <button onClick={() => handleDelete(dep.id)} className="btn-icon" style={{ color: 'var(--color-danger)', background: 'rgba(239,68,68,0.1)' }}>
-                                                            <Trash2 size={16} />
-                                                        </button>
+                                                        <>
+                                                            <button
+                                                                onClick={() => setEditingDeposit(dep)}
+                                                                className="btn-icon"
+                                                                style={{ color: 'var(--color-primary)', background: 'rgba(59,130,246,0.1)' }}
+                                                                title="Editar"
+                                                            >
+                                                                <Settings size={16} />
+                                                            </button>
+                                                            <button onClick={() => handleDelete(dep.id)} className="btn-icon" style={{ color: 'var(--color-danger)', background: 'rgba(239,68,68,0.1)' }} title="Eliminar">
+                                                                <Trash2 size={16} />
+                                                            </button>
+                                                        </>
                                                     )
                                                 )}
                                             </div>
@@ -427,6 +448,42 @@ const SenderDashboard = () => {
                         {sortedDeposits.length === 0 && (
                             <p style={{ textAlign: 'center', color: 'var(--text-muted)', marginTop: '2rem' }}>No hay movimientos.</p>
                         )}
+                    </div>
+                )}
+
+                {/* --- EDIT DEPOSIT MODAL --- */}
+                {editingDeposit && (
+                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', zIndex: 200, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '1rem', animation: 'fadeIn 0.2s' }}>
+                        <div className="glass-panel" style={{ width: '100%', maxWidth: '400px', padding: '1.5rem', background: 'var(--bg-surface)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>Editar Depósito</h3>
+                                <button onClick={() => setEditingDeposit(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><X size={24} /></button>
+                            </div>
+
+                            <form onSubmit={(e) => {
+                                e.preventDefault();
+                                handleEditSubmit(editingDeposit.id, {
+                                    amount: e.target.amount.value,
+                                    deposit_date: e.target.date.value,
+                                    observation: e.target.observation.value
+                                });
+                            }}>
+                                <div className="form-group">
+                                    <label className="text-label">Monto (S/.)</label>
+                                    <input name="amount" type="number" step="0.01" defaultValue={editingDeposit.amount} className="input-field" required />
+                                </div>
+                                <div className="form-group">
+                                    <label className="text-label">Fecha</label>
+                                    <input name="date" type="date" defaultValue={editingDeposit.deposit_date} className="input-field" required />
+                                </div>
+                                <div className="form-group">
+                                    <label className="text-label">Observación</label>
+                                    <input name="observation" type="text" defaultValue={editingDeposit.observation || ''} className="input-field" />
+                                </div>
+
+                                <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '1rem' }}>Guardar Cambios</button>
+                            </form>
+                        </div>
                     </div>
                 )}
 
