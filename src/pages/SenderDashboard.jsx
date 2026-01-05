@@ -327,8 +327,8 @@ const SenderDashboard = () => {
                                 </label>
                             </div>
 
-                            <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '1rem' }} disabled={submitting}>
-                                {submitting ? 'Enviando...' : 'Realizar Depósito'}
+                            <button type="submit" className="btn" style={{ width: '100%', marginTop: '1rem', background: '#2563eb', color: 'white', border: 'none' }} disabled={submitting}>
+                                {submitting ? 'Enviando...' : 'Registrar Depósito'}
                             </button>
                         </form>
                     </div>
