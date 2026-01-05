@@ -5,9 +5,12 @@ import { useAuth } from '../context/AuthContext';
 import { User, Phone, Tag, Save, ArrowLeft, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-const AVATAR_API = "https://api.dicebear.com/7.x/avataaars/svg?seed=";
-const MALE_AVATARS = ['Felix', 'Joshua', 'Avery', 'Leo'];
-const FEMALE_AVATARS = ['Aneka', 'Zoe', 'Sarah', 'Maria'];
+// DiceBear API with Realistic Settings (Avataaars style)
+// We force natural skin and hair colors, and use professional style seeds.
+const AVATAR_API = "https://api.dicebear.com/7.x/avataaars/svg?backgroundColor=b6e3f4,c0aede,d1d4f9&radius=50&skinColor=light,pale,brown,darkBrown,black&hairColor=auburn,black,blonde,brown,platinum&seed=";
+
+const MALE_AVATARS = ['Christopher', 'Jacob', 'Mason', 'Ethan', 'Alexander', 'Ryan', 'David'];
+const FEMALE_AVATARS = ['Sophia', 'Emma', 'Olivia', 'Isabella', 'Mia', 'Emily', 'Abigail'];
 
 const ProfileSettings = () => {
     const { user, setUser } = useAuth(); // Need setUser to update context locally if needed
