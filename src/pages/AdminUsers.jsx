@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
 import { useAuth } from '../context/AuthContext';
 import { depositService } from '../services/depositService';
-import { Trash2, UserCog, Shield, Users, Save, X, Lock, Activity, Ban, CheckCircle } from 'lucide-react';
+import { Trash2, UserCog, Shield, Users, Save, X, Lock, Activity, Ban, CheckCircle, Search } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
@@ -16,6 +16,9 @@ const AdminUsers = () => {
     // Edit States
     const [editRole, setEditRole] = useState('');
     const [editStatus, setEditStatus] = useState('');
+
+    // Search State
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         if (user && user.role !== 'admin') {
@@ -70,6 +73,14 @@ const AdminUsers = () => {
         }
     };
 
+    // Filter Logic
+    const filteredProfiles = profiles.filter(profile => {
+        const term = searchTerm.toLowerCase();
+        const email = (profile.email || '').toLowerCase();
+        const name = (profile.full_name || '').toLowerCase();
+        return email.includes(term) || name.includes(term);
+    });
+
     return (
         <DashboardLayout title="Administración de Usuarios">
             <div className="glass-panel card-padding">
@@ -79,9 +90,25 @@ const AdminUsers = () => {
                 >
                     &larr; Regresar al Dashboard
                 </button>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                    <Shield size={24} color="var(--color-primary)" />
-                    <h2 className="text-h2" style={{ margin: 0 }}>Gestión de Perfiles</h2>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <Shield size={24} color="var(--color-primary)" />
+                        <h2 className="text-h2" style={{ margin: 0 }}>Gestión de Perfiles</h2>
+                    </div>
+
+                    {/* Search Input */}
+                    <div style={{ position: 'relative', width: '300px' }}>
+                        <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                        <input
+                            type="text"
+                            placeholder="Buscar por nombre o email..."
+                            value={searchTerm}
+                            onChange={e => setSearchTerm(e.target.value)}
+                            className="input-field"
+                            style={{ paddingLeft: '2.5rem', width: '100%' }}
+                        />
+                    </div>
                 </div>
 
                 {loading ? (
@@ -99,7 +126,7 @@ const AdminUsers = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {profiles.map(profile => (
+                                {filteredProfiles.map(profile => (
                                     <tr key={profile.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                                         <td style={{ padding: '1rem' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -207,9 +234,9 @@ const AdminUsers = () => {
                             </tbody>
                         </table>
 
-                        {profiles.length === 0 && (
+                        {filteredProfiles.length === 0 && (
                             <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
-                                No hay usuarios registrados.
+                                {profiles.length === 0 ? 'No hay usuarios registrados.' : 'No se encontraron resultados.'}
                             </div>
                         )}
                     </div>
