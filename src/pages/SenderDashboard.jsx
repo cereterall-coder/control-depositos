@@ -496,7 +496,7 @@ const SenderDashboard = () => {
                             </button>
 
                             {/* Admin Link if Admin */}
-                            {user.user_metadata?.role === 'admin' && (
+                            {(user.user_metadata?.role === 'admin' || user.role === 'admin') && (
                                 <button onClick={() => navigate('/admin/users')} className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center', background: 'rgba(234,179,8,0.1)', color: 'orange', borderColor: 'orange' }}>
                                     <Star size={18} /> Panel Admin
                                 </button>
