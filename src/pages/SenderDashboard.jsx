@@ -162,8 +162,12 @@ const SenderDashboard = () => {
             });
             toast.success('¡Depósito enviado!', { id: toastId });
 
-            // Send Automatic Email Notification if enabled
-            if (emailNotify && recipientEmail.includes('@')) {
+            // 1. Verify if it is a valid email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const isEmail = emailRegex.test(recipientEmail);
+
+            // 2. Send Automatic Email Notification ONLY if valid email AND enabled
+            if (isEmail && emailNotify) {
                 const recipientName = contacts.find(c => c.contact_email === recipientEmail)?.contact_name || recipientEmail;
 
                 toast.promise(
@@ -181,6 +185,28 @@ const SenderDashboard = () => {
                         error: (err) => `No se pudo enviar el correo: ${err.error || err.message}`
                     }
                 );
+            }
+
+            // 3. Prompt to Add to Favorites (if not exists)
+            const existsInContacts = contacts.some(c =>
+                c.contact_email.toLowerCase() === recipientEmail.toLowerCase() ||
+                c.contact_name.toLowerCase() === recipientEmail.toLowerCase()
+            );
+
+            if (!existsInContacts) {
+                // Small delay to let the toast finish or not block UI immediately
+                setTimeout(async () => {
+                    if (window.confirm(`¿Deseas guardar a "${recipientEmail}" en tus favoritos para la próxima vez?`)) {
+                        try {
+                            await depositService.addContact(user.id, recipientEmail, recipientEmail); // Use same value for name/email if simple
+                            toast.success("Contacto guardado en favoritos");
+                            refreshData(); // Refresh list
+                        } catch (e) {
+                            console.error(e);
+                            toast.error("Error al guardar contacto");
+                        }
+                    }
+                }, 500);
             }
 
             setAmount('');
