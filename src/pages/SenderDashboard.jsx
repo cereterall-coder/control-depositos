@@ -4,7 +4,7 @@ import { depositService } from '../services/depositService';
 import { supabase } from '../lib/supabase';
 import {
     PlusCircle, List, FileText, Settings,
-    Upload, DollarSign, Calendar, Eye, Activity, UserPlus, Star, Trash2, X, Camera, Ban, Link as LinkIcon, RefreshCw, LogOut, User, FilePieChart
+    Upload, DollarSign, Calendar, Eye, Activity, UserPlus, Star, Trash2, X, Camera, Ban, Link as LinkIcon, RefreshCw, LogOut, User, FilePieChart, Mail
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { generateDepositReport } from '../utils/pdfGenerator';
@@ -33,6 +33,11 @@ const SenderDashboard = () => {
     const [observation, setObservation] = useState('');
     const [file, setFile] = useState(null);
     const [showSuggestions, setShowSuggestions] = useState(false);
+
+    // Settings State
+    const [emailNotify, setEmailNotify] = useState(() => {
+        return localStorage.getItem('setting_email_notify') === 'true';
+    });
 
     // Edit Deposit State
     const [editingDeposit, setEditingDeposit] = useState(null);
@@ -133,6 +138,13 @@ const SenderDashboard = () => {
     const totalAmount = visibleDeposits.reduce((sum, d) => sum + Number(d.amount), 0).toFixed(2);
 
     // --- Actions ---
+    const toggleEmailNotify = () => {
+        const newValue = !emailNotify;
+        setEmailNotify(newValue);
+        localStorage.setItem('setting_email_notify', String(newValue));
+        toast.success(newValue ? 'Notificaciones por correo activadas' : 'Notificaciones desactivadas');
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!user) return;
@@ -148,6 +160,27 @@ const SenderDashboard = () => {
                 file
             });
             toast.success('¡Depósito enviado!', { id: toastId });
+
+            // Send Email Notification if enabled
+            if (emailNotify && recipientEmail.includes('@')) {
+                const subject = "SE REGISTRO UN DEPOSITO A SU NOMBRE";
+                const body = `Hola,
+
+Se registro un depósito a su nombre por el monto de S/. ${amount}.
+Realizado por: ${user.user_metadata?.full_name || user.email}.
+
+Puede revisar el detalle en su aplicación de Control de Depósitos:
+${window.location.origin}
+
+Si aún no tiene la aplicación, puede instalarla y registrarse con este correo.
+
+Saludos,
+Equipo de Control de Depósitos`;
+
+                const mailtoLink = `mailto:${recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                window.open(mailtoLink, '_blank');
+            }
+
             setAmount('');
             setRecipientEmail('');
             setObservation('');
@@ -603,6 +636,35 @@ const SenderDashboard = () => {
                         </div>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+
+                            {/* NEW: Email Notification Setting */}
+                            <div className="checkbox-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.5rem 0', borderBottom: '1px solid var(--border-subtle)' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <Mail size={18} color="var(--color-primary)" />
+                                    <div>
+                                        <h4 style={{ margin: 0 }}>Notificación por Correo</h4>
+                                        <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>Enviar alerta automática al destinatario</p>
+                                    </div>
+                                </div>
+                                <label className="switch" style={{ position: 'relative', display: 'inline-block', width: '40px', height: '20px' }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={emailNotify}
+                                        onChange={toggleEmailNotify}
+                                        style={{ opacity: 0, width: 0, height: 0 }}
+                                    />
+                                    <span style={{
+                                        position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0,
+                                        backgroundColor: emailNotify ? 'var(--color-primary)' : '#ccc', borderRadius: '34px', transition: '.4s'
+                                    }}>
+                                        <span style={{
+                                            position: 'absolute', content: '""', height: '16px', width: '16px', left: emailNotify ? '22px' : '2px', bottom: '2px',
+                                            backgroundColor: 'white', borderRadius: '50%', transition: '.4s'
+                                        }}></span>
+                                    </span>
+                                </label>
+                            </div>
+
                             <button onClick={() => navigate('/profile')} className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
                                 <User size={18} /> Mis Datos Personales
                             </button>
