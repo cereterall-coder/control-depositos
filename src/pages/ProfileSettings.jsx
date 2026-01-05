@@ -8,8 +8,10 @@ import toast from 'react-hot-toast';
 // DiceBear API (Latest v9.x)
 const AVATAR_API = "https://api.dicebear.com/9.x/avataaars/svg?radius=50&backgroundColor=b6e3f4,c0aede,d1d4f9&seed=";
 
-const MALE_AVATARS = ['Christopher', 'Jacob', 'Mason', 'Ethan', 'Alexander', 'Ryan', 'David'];
-const FEMALE_AVATARS = ['Sophia', 'Emma', 'Olivia', 'Isabella', 'Mia', 'Emily', 'Abigail'];
+const ALL_AVATARS = [
+    'Christopher', 'Sophia', 'Jacob', 'Emma', 'Mason', 'Olivia',
+    'Ethan', 'Isabella', 'Alexander', 'Mia', 'Ryan', 'Emily', 'David', 'Abigail'
+];
 
 const ProfileSettings = () => {
     const { user } = useAuth();
@@ -137,53 +139,24 @@ const ProfileSettings = () => {
                             )}
                         </div>
 
-                        {/* Suggestions Grid */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            {/* Males */}
-                            <div>
-                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Hombres</div>
-                                <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                                    {MALE_AVATARS.map(seed => (
-                                        <div
-                                            key={seed}
-                                            onClick={() => handleAvatarSelect(seed)}
-                                            style={{
-                                                width: '60px', height: '60px', borderRadius: '50%', cursor: 'pointer', overflow: 'hidden',
-                                                border: formData.avatar_url.includes(seed) ? '3px solid var(--color-primary)' : '2px solid transparent',
-                                                transition: 'transform 0.2s',
-                                                background: '#f1f5f9'
-                                            }}
-                                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                                        >
-                                            <img src={`${AVATAR_API}${seed}`} alt={seed} style={{ width: '100%', height: '100%' }} referrerPolicy="no-referrer" />
-                                        </div>
-                                    ))}
+                        {/* Suggestions Grid (Unified) */}
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                            {ALL_AVATARS.map(seed => (
+                                <div
+                                    key={seed}
+                                    onClick={() => handleAvatarSelect(seed)}
+                                    style={{
+                                        width: '60px', height: '60px', borderRadius: '50%', cursor: 'pointer', overflow: 'hidden',
+                                        border: formData.avatar_url.includes(seed) ? '3px solid var(--color-primary)' : '2px solid transparent',
+                                        transition: 'transform 0.2s',
+                                        background: '#f1f5f9'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                >
+                                    <img src={`${AVATAR_API}${seed}`} alt={seed} style={{ width: '100%', height: '100%' }} referrerPolicy="no-referrer" />
                                 </div>
-                            </div>
-
-                            {/* Females */}
-                            <div>
-                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Mujeres</div>
-                                <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                                    {FEMALE_AVATARS.map(seed => (
-                                        <div
-                                            key={seed}
-                                            onClick={() => handleAvatarSelect(seed)}
-                                            style={{
-                                                width: '60px', height: '60px', borderRadius: '50%', cursor: 'pointer', overflow: 'hidden',
-                                                border: formData.avatar_url.includes(seed) ? '3px solid var(--color-primary)' : '2px solid transparent',
-                                                transition: 'transform 0.2s',
-                                                background: '#f1f5f9'
-                                            }}
-                                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                                        >
-                                            <img src={`${AVATAR_API}${seed}`} alt={seed} style={{ width: '100%', height: '100%' }} referrerPolicy="no-referrer" />
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
+                            ))}
                         </div>
                     </div>
 
