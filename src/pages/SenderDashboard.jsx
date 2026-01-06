@@ -33,6 +33,7 @@ const SenderDashboard = () => {
     const [historySearch, setHistorySearch] = useState('');
     const [historyStart, setHistoryStart] = useState('');
     const [historyEnd, setHistoryEnd] = useState('');
+    const [historySearch, setHistorySearch] = useState('');
     const [showSuggestions, setShowSuggestions] = useState(false);
 
     // Settings State
