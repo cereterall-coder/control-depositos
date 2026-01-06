@@ -376,22 +376,7 @@ const SenderDashboard = () => {
                                 </button>
                             </div>
 
-                            {/* Admin Links */}
-                            {(user.role === 'admin' || user.user_metadata?.role === 'admin') && (
-                                <div style={{ marginTop: '0.5rem' }}>
-                                    <Link
-                                        to="/admin/dashboard"
-                                        style={{
-                                            display: 'flex', alignItems: 'center', gap: '0.5rem',
-                                            padding: '0.5rem', textDecoration: 'none', color: '#60a5fa',
-                                            fontSize: '0.8rem', fontWeight: 'bold', justifyContent: 'center',
-                                            border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '6px'
-                                        }}
-                                    >
-                                        <Activity size={14} /> Panel Admin
-                                    </Link>
-                                </div>
-                            )}
+
                         </div>
                     )}
                 </div>
