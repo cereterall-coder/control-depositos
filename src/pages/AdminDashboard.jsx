@@ -33,6 +33,7 @@ const AdminDashboard = ({ isTab = false }) => {
                 let today = 0;
                 let month = 0;
                 let pending = 0;
+                const monthlyAgg = {};
 
                 allDeposits.forEach(d => {
                     const amt = parseFloat(d.amount) || 0;
@@ -51,7 +52,22 @@ const AdminDashboard = ({ isTab = false }) => {
                     }
 
                     if (d.status !== 'read') pending++; // Assuming 'read' = confirmed/processed
+
+                    // Chart
+                    const key = `${dDate.getFullYear()}-${String(dDate.getMonth() + 1).padStart(2, '0')}`;
+                    monthlyAgg[key] = (monthlyAgg[key] || 0) + amt;
                 });
+
+                // Format Chart Data
+                const chartData = Object.entries(monthlyAgg)
+                    .sort((a, b) => a[0].localeCompare(b[0]))
+                    .slice(-6)
+                    .map(([key, value]) => {
+                        const [y, m] = key.split('-');
+                        const monthName = new Date(parseInt(y), parseInt(m) - 1, 1)
+                            .toLocaleDateString('es-ES', { month: 'short' });
+                        return { label: monthName, value };
+                    });
 
                 setStats({
                     totalAmount: total,
@@ -59,7 +75,8 @@ const AdminDashboard = ({ isTab = false }) => {
                     monthAmount: month,
                     totalDeposits: allDeposits.length,
                     pendingCount: pending,
-                    deposits: allDeposits.slice(0, 10) // Top 10 recent
+                    deposits: allDeposits.slice(0, 10), // Top 10 recent
+                    chartData
                 });
             } catch (e) {
                 console.error("Error loading admin stats", e);
