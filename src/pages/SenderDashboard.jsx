@@ -33,6 +33,8 @@ const SenderDashboard = () => {
     const [recipientEmail, setRecipientEmail] = useState('');
     const [observation, setObservation] = useState('');
     const [file, setFile] = useState(null);
+    const [historySearch, setHistorySearch] = useState('');
+    const [historyDate, setHistoryDate] = useState('');
     const [showSuggestions, setShowSuggestions] = useState(false);
 
     // Settings State
@@ -109,24 +111,41 @@ const SenderDashboard = () => {
                 if (!d.sender_deleted_at) return false;
             }
 
-            if (!reportStart && !reportEnd && !reportRecipient) return true;
+            // History specific filters
+            if (activeTab === 'history') {
+                if (historySearch) {
+                    const searchLower = historySearch.toLowerCase();
+                    const matches =
+                        (d.recipient_email || '').toLowerCase().includes(searchLower) ||
+                        (d.sender_email || '').toLowerCase().includes(searchLower) ||
+                        (d.sender_name || '').toLowerCase().includes(searchLower) ||
+                        String(d.amount).includes(searchLower) ||
+                        (d.observation || '').toLowerCase().includes(searchLower);
 
-            const dDate = new Date(d.deposit_date);
-            dDate.setHours(0, 0, 0, 0);
+                    if (!matches) return false;
+                }
 
-            if (reportStart) {
-                const start = new Date(reportStart);
-                start.setHours(0, 0, 0, 0);
-                if (dDate < start) return false;
-            }
-            if (reportEnd) {
-                const end = new Date(reportEnd);
-                end.setHours(0, 0, 0, 0);
-                if (dDate > end) return false;
-            }
-            if (reportRecipient) {
-                const otherParty = d.sender_id === user.id ? d.recipient_email : d.sender_email;
-                if (otherParty !== reportRecipient) return false;
+                if (historyDate) {
+                    const filterDate = new Date(historyDate);
+                    filterDate.setHours(0, 0, 0, 0);
+                    if (dDate.getTime() !== filterDate.getTime()) return false;
+                }
+            } else {
+                // Report filters (Advanced)
+                if (reportStart) {
+                    const start = new Date(reportStart);
+                    start.setHours(0, 0, 0, 0);
+                    if (dDate < start) return false;
+                }
+                if (reportEnd) {
+                    const end = new Date(reportEnd);
+                    end.setHours(0, 0, 0, 0);
+                    if (dDate > end) return false;
+                }
+                if (reportRecipient) {
+                    const otherParty = d.sender_id === user.id ? d.recipient_email : d.sender_email;
+                    if (otherParty !== reportRecipient) return false;
+                }
             }
 
             return true;
