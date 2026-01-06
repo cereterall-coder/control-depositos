@@ -355,25 +355,32 @@ const SenderDashboard = () => {
             </div>
 
             {/* --- ABOUT "AUTHORSHIP" MODAL --- */}
+            {/* --- ABOUT "AUTHORSHIP" MODAL --- */}
             {showAboutModal && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', zIndex: 200, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '2rem', animation: 'fadeIn 0.2s' }} onClick={() => setShowAboutModal(false)}>
-                    <div style={{ background: 'white', padding: '2rem', borderRadius: '20px', textAlign: 'center', maxWidth: '400px', width: '100%', position: 'relative' }} onClick={e => e.stopPropagation()}>
-                        <button onClick={() => setShowAboutModal(false)} style={{ position: 'absolute', top: '10px', right: '10px', background: 'none', border: 'none', cursor: 'pointer' }}><X size={24} /></button>
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.92)', zIndex: 200, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '2rem', animation: 'fadeIn 0.2s', backdropFilter: 'blur(5px)' }} onClick={() => setShowAboutModal(false)}>
+                    <div style={{ background: 'linear-gradient(145deg, #1e293b, #0f172a)', border: '1px solid rgba(255,255,255,0.1)', padding: '2.5rem', borderRadius: '30px', textAlign: 'center', maxWidth: '400px', width: '100%', position: 'relative', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' }} onClick={e => e.stopPropagation()}>
 
-                        <img src="/pwa-512x512.png" alt="Logo Grande" style={{ width: '120px', height: '120px', borderRadius: '20px', marginBottom: '1rem', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }} />
+                        <button onClick={() => setShowAboutModal(false)} style={{ position: 'absolute', top: '15px', right: '15px', background: 'rgba(255,255,255,0.1)', border: 'none', cursor: 'pointer', borderRadius: '50%', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#cbd5e1' }}>
+                            <X size={18} />
+                        </button>
 
-                        <h2 style={{ color: 'var(--color-primary)', marginBottom: '0.5rem' }}>Control Depósitos</h2>
-                        <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Versión 3.1 Enterprise</div>
+                        <div style={{ position: 'relative', display: 'inline-block', marginBottom: '1.5rem' }}>
+                            <div style={{ position: 'absolute', inset: '-5px', background: 'linear-gradient(45deg, #3b82f6, #ec4899)', borderRadius: '24px', filter: 'blur(10px)', opacity: 0.6 }}></div>
+                            <img src="/pwa-512x512.png" alt="Logo Grande" style={{ width: '120px', height: '120px', borderRadius: '20px', position: 'relative', boxShadow: '0 10px 20px rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)' }} />
+                        </div>
+
+                        <h2 style={{ color: 'white', marginBottom: '0.2rem', fontSize: '1.8rem', fontWeight: '800', letterSpacing: '-0.02em' }}>Control Depósitos</h2>
+                        <div style={{ fontSize: '0.9rem', color: '#94a3b8', marginBottom: '2rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 'bold' }}>Versión 3.1 Enterprise</div>
 
                         {/* Credits Section */}
-                        <div style={{ background: 'var(--bg-app)', padding: '1rem', borderRadius: '12px', marginBottom: '1rem', position: 'relative' }}>
+                        <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1.5rem', borderRadius: '20px', marginBottom: '1.5rem', position: 'relative', border: '1px solid rgba(255,255,255,0.05)' }}>
                             {/* Allow Admin to Edit Authorship */}
                             {(user.role === 'admin' || user.user_metadata?.role === 'admin') && (
                                 <button
                                     onClick={() => {
                                         const newName = prompt("Nombre del Desarrollador:", localStorage.getItem('dev_name') || "Ing. Amaro A. Vilela V.");
                                         if (newName !== null) {
-                                            localStorage.setItem('dev_name', newName); // Allow empty string
+                                            localStorage.setItem('dev_name', newName);
                                             const newPhone = prompt("Teléfono:", localStorage.getItem('dev_phone') || "944 499 069");
                                             localStorage.setItem('dev_phone', newPhone || "");
                                             const newEmail = prompt("Email:", localStorage.getItem('dev_email') || "amalviva@gmail.com");
@@ -384,23 +391,27 @@ const SenderDashboard = () => {
                                             setTimeout(() => setShowAboutModal(true), 50);
                                         }
                                     }}
-                                    style={{ position: 'absolute', top: '5px', right: '5px', background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer' }}
+                                    style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(59, 130, 246, 0.2)', border: 'none', color: '#60a5fa', cursor: 'pointer', padding: '5px', borderRadius: '6px' }}
                                     title="Editar Autoría"
                                 >
                                     <Settings size={14} />
                                 </button>
                             )}
 
-                            <div style={{ fontWeight: 'bold', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Desarrollado y Gestionado por:</div>
-                            <div style={{ fontSize: '1.1rem', color: 'var(--text-primary)', fontWeight: 'bold' }}>
+                            <div style={{ fontWeight: '600', fontSize: '0.8rem', marginBottom: '0.5rem', color: '#cbd5e1' }}>Desarrollado por:</div>
+                            <div style={{ fontSize: '1.2rem', color: 'white', fontWeight: 'bold', background: 'linear-gradient(90deg, #fff, #cbd5e1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                                 {localStorage.getItem('dev_name') || "Ing. Amaro A. Vilela V."}
                             </div>
-                            <div style={{ fontSize: '0.9rem', color: 'var(--color-primary)', marginTop: '0.5rem' }}>Software Engineer</div>
+                            <div style={{ fontSize: '0.9rem', color: '#60a5fa', marginTop: '0.3rem', fontWeight: '500' }}>Software Engineer</div>
                         </div>
 
-                        <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                            <p style={{ margin: '0.2rem' }}>📞 {localStorage.getItem('dev_phone') || "944 499 069"}</p>
-                            <p style={{ margin: '0.2rem' }}>📧 {localStorage.getItem('dev_email') || "amalviva@gmail.com"}</p>
+                        <div style={{ fontSize: '0.9rem', color: '#94a3b8', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                                <span style={{ opacity: 0.7 }}>📞</span> {localStorage.getItem('dev_phone') || "944 499 069"}
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                                <span style={{ opacity: 0.7 }}>📧</span> {localStorage.getItem('dev_email') || "amalviva@gmail.com"}
+                            </div>
                         </div>
                     </div>
                 </div>
