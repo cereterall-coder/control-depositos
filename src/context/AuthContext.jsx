@@ -68,16 +68,20 @@ export const AuthProvider = ({ children }) => {
         // 2. Listen for Auth Changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
             console.log("Auth State Change:", _event);
+
             if (session?.user) {
-                // If we already have the user and IDs match, maybe don't re-fetch? 
-                // But on LOGIN event we MUST fetch.
-                setLoading(true); // Ensure loading is true while fetching profile
+                // Only show loading screen on initial login actions, not silent refreshes
+                const isSilentRefresh = _event === 'TOKEN_REFRESHED';
+                if (!isSilentRefresh) setLoading(true);
+
                 const fullUser = await enrichUser(session.user);
                 setUser(fullUser);
+
+                if (!isSilentRefresh) setLoading(false);
             } else {
                 setUser(null);
+                setLoading(false);
             }
-            setLoading(false);
         });
 
         return () => subscription.unsubscribe();
