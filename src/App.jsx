@@ -3,14 +3,11 @@ import { supabase } from './lib/supabase';
 import Login from './pages/Login';
 import SenderDashboard from './pages/SenderDashboard';
 import RecipientDashboardV2 from './pages/RecipientDashboardV2';
+import AdminDashboard from './pages/AdminDashboard';
 import AdminUsers from './pages/AdminUsers';
 import UpdatePassword from './pages/UpdatePassword';
-import ConnectionTest from './pages/ConnectionTest';
-import SimpleLogin from './pages/SimpleLogin';
-import ProfileSettings from './pages/ProfileSettings';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
-import { Toaster } from 'react-hot-toast';
+
+// ... imports ...
 
 function AppRoutes() {
     const { user } = useAuth();
@@ -31,6 +28,7 @@ function AppRoutes() {
             <Route path="/billetera-v3" element={<ProtectedRoute><RecipientDashboardV2 /></ProtectedRoute>} />
             <Route path="/recipient" element={<Navigate to="/billetera-v3" />} />
             <Route path="/admin/users" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
+            <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
             <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
     );

@@ -15,6 +15,17 @@ export const depositService = {
         return deposits;
     },
 
+    // Admin: Get ALL deposits
+    getAllDeposits: async () => {
+        const { data: deposits, error } = await supabase
+            .from('deposits')
+            .select('*, sender_email, sender_name')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        return deposits;
+    },
+
     // Renamed to match usage in SenderDashboard
     createDeposit: async ({ amount, deposit_date, file, recipient_email, sender_id, observation }) => {
         try {
