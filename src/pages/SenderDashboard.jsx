@@ -573,6 +573,38 @@ const SenderDashboard = () => {
                             ))}
                         </div>
 
+                        {/* HISTORY FILTERS */}
+                        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+                            <div style={{ position: 'relative', flex: 1 }}>
+                                <Search size={18} style={{ position: 'absolute', left: '0.8rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                                <input
+                                    type="text"
+                                    className="input-field"
+                                    placeholder="Buscar..."
+                                    value={historySearch}
+                                    onChange={e => setHistorySearch(e.target.value)}
+                                    style={{ paddingLeft: '2.5rem', height: '42px' }}
+                                />
+                            </div>
+                            <div style={{ position: 'relative' }}>
+                                <input
+                                    type="date"
+                                    className="input-field"
+                                    value={historyDate}
+                                    onChange={e => setHistoryDate(e.target.value)}
+                                    style={{ height: '42px', maxWidth: '140px' }}
+                                />
+                                {historyDate && (
+                                    <button
+                                        onClick={() => setHistoryDate('')}
+                                        style={{ position: 'absolute', right: '-10px', top: '-10px', background: 'var(--color-danger)', color: 'white', borderRadius: '50%', width: '20px', height: '20px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                    >
+                                        <X size={12} />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
                         <div className="glass-panel" style={{ padding: '1rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div>
                                 <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Total en pantalla</span>
