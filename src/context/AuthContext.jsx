@@ -7,6 +7,31 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // Helper to merge Auth User + Profile Data
+    const enrichUser = async (authUser) => {
+        if (!authUser) return null;
+        try {
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', authUser.id)
+                .maybeSingle();
+
+            if (profile) {
+                console.log("Profile loaded for:", authUser.email);
+                return {
+                    ...authUser,
+                    role: profile.role,
+                    profile_name: profile.full_name,
+                    status: profile.status || 'active'
+                };
+            }
+        } catch (e) {
+            console.error("Profile Fetch Error:", e);
+        }
+        return authUser;
+    };
+
     // 1. Initial Session Check
     useEffect(() => {
         if (supabase.isMock) {
@@ -16,13 +41,12 @@ export const AuthProvider = ({ children }) => {
 
         const initSession = async () => {
             try {
-                // Get Session FAST (No DB calls yet)
                 const { data: { session }, error } = await supabase.auth.getSession();
                 if (error) throw error;
 
                 if (session?.user) {
-                    console.log("Session found:", session.user.id);
-                    setUser(session.user);
+                    const fullUser = await enrichUser(session.user);
+                    setUser(fullUser);
                 }
             } catch (e) {
                 console.error("Session Init Error:", e);
@@ -37,7 +61,11 @@ export const AuthProvider = ({ children }) => {
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
             console.log("Auth State Change:", _event);
             if (session?.user) {
-                setUser(session.user);
+                // If we already have the user and IDs match, maybe don't re-fetch? 
+                // But on LOGIN event we MUST fetch.
+                setLoading(true); // Ensure loading is true while fetching profile
+                const fullUser = await enrichUser(session.user);
+                setUser(fullUser);
             } else {
                 setUser(null);
             }
@@ -46,37 +74,6 @@ export const AuthProvider = ({ children }) => {
 
         return () => subscription.unsubscribe();
     }, []);
-
-    // 3. Fetch Profile SEPARATELY (Side Effect)
-    useEffect(() => {
-        const fetchProfile = async () => {
-            if (!user) return;
-            // If we already have the extended data, skip
-            if (user.role && user.status) return;
-
-            try {
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', user.id)
-                    .maybeSingle();
-
-                if (profile) {
-                    console.log("Profile loaded:", profile);
-                    setUser(prev => ({
-                        ...prev,
-                        role: profile.role,
-                        profile_name: profile.full_name,
-                        status: profile.status || 'active'
-                    }));
-                }
-            } catch (e) {
-                console.error("Profile Load Error:", e);
-            }
-        };
-
-        fetchProfile();
-    }, [user?.id]); // Run when user ID changes
 
     const signIn = async (email, password) => {
         if (supabase.isMock) throw new Error("Supabase no configurado");
