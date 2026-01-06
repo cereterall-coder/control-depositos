@@ -26,10 +26,18 @@ const SenderDashboard = () => {
     const [submitting, setSubmitting] = useState(false);
 
     // Form State
-    const [amount, setAmount] = useState('');
+    // Form State with Persistence
+    const [amount, setAmount] = useState(() => localStorage.getItem('draft_amount') || '');
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-    const [recipientEmail, setRecipientEmail] = useState('');
-    const [observation, setObservation] = useState('');
+    const [recipientEmail, setRecipientEmail] = useState(() => localStorage.getItem('draft_recipient') || '');
+    const [observation, setObservation] = useState(() => localStorage.getItem('draft_observation') || '');
+
+    // Auto-save Draft
+    useEffect(() => {
+        localStorage.setItem('draft_amount', amount);
+        localStorage.setItem('draft_recipient', recipientEmail);
+        localStorage.setItem('draft_observation', observation);
+    }, [amount, recipientEmail, observation]);
     const [file, setFile] = useState(null);
     const [historySearch, setHistorySearch] = useState('');
     const [historyStart, setHistoryStart] = useState('');
