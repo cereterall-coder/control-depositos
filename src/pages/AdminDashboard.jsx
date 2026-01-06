@@ -241,46 +241,6 @@ const AdminDashboard = ({ isTab = false }) => {
                 </div>
             </div>
 
-            {/* Danger Zone */}
-            <div style={{ marginTop: '3rem', borderTop: '1px solid rgba(239, 68, 68, 0.2)', paddingTop: '2rem' }}>
-                <h3 style={{ color: 'var(--color-danger)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem' }}>
-                    <XCircle size={18} /> Zona de Peligro
-                </h3>
-                <div className="glass-panel" style={{ padding: '1.5rem', marginTop: '1rem', borderColor: 'var(--color-danger)', borderWidth: '1px', borderStyle: 'solid' }}>
-                    <p style={{ margin: '0 0 1rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-                        Si deseas iniciar desde cero con datos reales, puedes eliminar todos los depósitos de prueba.
-                        Esta acción es <strong>irreversible</strong>. Los usuarios NO serán eliminados.
-                    </p>
-                    <button
-                        onClick={async () => {
-                            // Calculate Dynamic Code: 02855470 + DD + MM
-                            const now = new Date();
-                            const day = String(now.getDate()).padStart(2, '0');
-                            const month = String(now.getMonth() + 1).padStart(2, '0');
-                            const expectedCode = `02855470${day}${month}`;
-
-                            const inputCode = window.prompt(`🔒 SEGURIDAD REQUERIDA\n\nPara eliminar el historial, ingrese el código de autorización del día:\n(Base: 02855470 + Día + Mes)`);
-
-                            if (inputCode === expectedCode) {
-                                try {
-                                    setLoading(true);
-                                    await depositService.deleteAllDeposits();
-                                    alert("✅ Código Correcto using. Sistema reiniciado.");
-                                    window.location.reload();
-                                } catch (e) {
-                                    alert("Error al eliminar: " + e.message);
-                                    setLoading(false);
-                                }
-                            } else if (inputCode !== null) {
-                                alert("❌ Código Incorrecto. Acceso denegado.");
-                            }
-                        }}
-                        style={{ background: 'rgba(239, 68, 68, 0.1)', color: 'var(--color-danger)', border: '1px solid var(--color-danger)', padding: '0.8rem 1.5rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', width: '100%' }}
-                    >
-                        🗑️ Eliminar Historial Completo
-                    </button>
-                </div>
-            </div>
         </div>
     );
 };

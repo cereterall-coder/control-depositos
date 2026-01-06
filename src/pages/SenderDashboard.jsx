@@ -28,16 +28,18 @@ const SenderDashboard = () => {
     // Form State
     // Form State with Persistence
     const [amount, setAmount] = useState(() => localStorage.getItem('draft_amount') || '');
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-    const [recipientEmail, setRecipientEmail] = useState(() => localStorage.getItem('draft_recipient') || '');
+    const [date, setDate] = new Date().toISOString().split('T')[0];
+    // Recipient starts empty as requested (removed draft_recipient check)
+    const [recipientEmail, setRecipientEmail] = useState('');
     const [observation, setObservation] = useState(() => localStorage.getItem('draft_observation') || '');
 
-    // Auto-save Draft
+    // Auto-save Draft (only amount and observation now, or update to save recipient but strictly ignore on load?)
+    // User wants it empty on enter. So don't load it.
     useEffect(() => {
         localStorage.setItem('draft_amount', amount);
-        localStorage.setItem('draft_recipient', recipientEmail);
+        // localStorage.setItem('draft_recipient', recipientEmail); // Disabled saving too to prevent confusion
         localStorage.setItem('draft_observation', observation);
-    }, [amount, recipientEmail, observation]);
+    }, [amount, observation]);
     const [file, setFile] = useState(null);
     const [historySearch, setHistorySearch] = useState('');
     const [historyStart, setHistoryStart] = useState('');
@@ -847,33 +849,6 @@ const SenderDashboard = () => {
                             {/* NEW: Email Notification Setting */}
                             <div className="checkbox-container" style={{ display: 'flex', flexDirection: 'column', padding: '0.5rem 0', borderBottom: '1px solid var(--border-subtle)' }}>
 
-
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: '0.5rem' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <Mail size={18} color="var(--color-primary)" />
-                                        <div>
-                                            <h4 style={{ margin: 0 }}>Notificación por Correo</h4>
-                                            <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>Enviar alerta automática</p>
-                                        </div>
-                                    </div>
-                                    <label className="switch" style={{ position: 'relative', display: 'inline-block', width: '40px', height: '20px' }}>
-                                        <input
-                                            type="checkbox"
-                                            checked={emailNotify}
-                                            onChange={toggleEmailNotify}
-                                            style={{ opacity: 0, width: 0, height: 0 }}
-                                        />
-                                        <span style={{
-                                            position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0,
-                                            backgroundColor: emailNotify ? 'var(--color-primary)' : '#ccc', borderRadius: '34px', transition: '.4s'
-                                        }}>
-                                            <span style={{
-                                                position: 'absolute', content: '""', height: '16px', width: '16px', left: emailNotify ? '22px' : '2px', bottom: '2px',
-                                                backgroundColor: 'white', borderRadius: '50%', transition: '.4s'
-                                            }}></span>
-                                        </span>
-                                    </label>
-                                </div>
 
                                 {emailNotify && (
                                     <div style={{ padding: '0.5rem', background: 'rgba(59,130,246,0.05)', borderRadius: '8px', fontSize: '0.8rem' }}>
