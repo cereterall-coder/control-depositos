@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { generateDepositReport } from '../utils/pdfGenerator';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const SenderDashboard = () => {
     const { user, logout } = useAuth();
