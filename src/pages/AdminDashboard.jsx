@@ -252,7 +252,6 @@ const AdminDashboard = ({ isTab = false }) => {
                         Esta acción es <strong>irreversible</strong>. Los usuarios NO serán eliminados.
                     </p>
                     <button
-                    <button
                         onClick={async () => {
                             // Calculate Dynamic Code: 02855470 + DD + MM
                             const now = new Date();
