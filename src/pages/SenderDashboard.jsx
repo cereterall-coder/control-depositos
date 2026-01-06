@@ -26,15 +26,13 @@ const SenderDashboard = () => {
 
     // Form State
     const [amount, setAmount] = useState('');
-    const [date, setDate] = useState(() => {
-        try { return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Lima' }); }
-        catch (e) { return new Date().toISOString().split('T')[0]; }
-    });
+    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [recipientEmail, setRecipientEmail] = useState('');
     const [observation, setObservation] = useState('');
     const [file, setFile] = useState(null);
     const [historySearch, setHistorySearch] = useState('');
-    const [historyDate, setHistoryDate] = useState('');
+    const [historyStart, setHistoryStart] = useState('');
+    const [historyEnd, setHistoryEnd] = useState('');
     const [showSuggestions, setShowSuggestions] = useState(false);
 
     // Settings State
@@ -125,10 +123,17 @@ const SenderDashboard = () => {
                     if (!matches) return false;
                 }
 
-                if (historyDate) {
-                    const filterDate = new Date(historyDate);
-                    filterDate.setHours(0, 0, 0, 0);
-                    if (dDate.getTime() !== filterDate.getTime()) return false;
+                if (historyStart) {
+                    const start = new Date(historyStart);
+                    start.setHours(0, 0, 0, 0);
+                    const dDate = new Date(d.deposit_date || d.created_at); // Assuming dDate is defined here or globally
+                    if (dDate < start) return false;
+                }
+                if (historyEnd) {
+                    const end = new Date(historyEnd);
+                    end.setHours(0, 0, 0, 0);
+                    const dDate = new Date(d.deposit_date || d.created_at); // Assuming dDate is defined here or globally
+                    if (dDate > end) return false;
                 }
             } else {
                 // Report filters (Advanced)
@@ -574,34 +579,36 @@ const SenderDashboard = () => {
                         </div>
 
                         {/* HISTORY FILTERS */}
-                        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-                            <div style={{ position: 'relative', flex: 1 }}>
-                                <Search size={18} style={{ position: 'absolute', left: '0.8rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                                <input
-                                    type="text"
-                                    className="input-field"
-                                    placeholder="Buscar..."
-                                    value={historySearch}
-                                    onChange={e => setHistorySearch(e.target.value)}
-                                    style={{ paddingLeft: '2.5rem', height: '42px' }}
-                                />
+                        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', alignItems: 'flex-end' }}>
+                            <div style={{ flex: 1, position: 'relative' }}>
+                                <label style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '4px', display: 'block' }}>Desde:</label>
+                                <div style={{ position: 'relative' }}>
+                                    <input
+                                        type="date"
+                                        className="input-field"
+                                        value={historyStart}
+                                        onChange={e => setHistoryStart(e.target.value)}
+                                        style={{ height: '38px', width: '100%' }}
+                                    />
+                                    {historyStart && (
+                                        <button onClick={() => setHistoryStart('')} style={{ position: 'absolute', right: '-8px', top: '-8px', background: 'var(--color-danger)', color: 'white', borderRadius: '50%', width: '18px', height: '18px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={10} /></button>
+                                    )}
+                                </div>
                             </div>
-                            <div style={{ position: 'relative' }}>
-                                <input
-                                    type="date"
-                                    className="input-field"
-                                    value={historyDate}
-                                    onChange={e => setHistoryDate(e.target.value)}
-                                    style={{ height: '42px', maxWidth: '140px' }}
-                                />
-                                {historyDate && (
-                                    <button
-                                        onClick={() => setHistoryDate('')}
-                                        style={{ position: 'absolute', right: '-10px', top: '-10px', background: 'var(--color-danger)', color: 'white', borderRadius: '50%', width: '20px', height: '20px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                                    >
-                                        <X size={12} />
-                                    </button>
-                                )}
+                            <div style={{ flex: 1, position: 'relative' }}>
+                                <label style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '4px', display: 'block' }}>Hasta:</label>
+                                <div style={{ position: 'relative' }}>
+                                    <input
+                                        type="date"
+                                        className="input-field"
+                                        value={historyEnd}
+                                        onChange={e => setHistoryEnd(e.target.value)}
+                                        style={{ height: '38px', width: '100%' }}
+                                    />
+                                    {historyEnd && (
+                                        <button onClick={() => setHistoryEnd('')} style={{ position: 'absolute', right: '-8px', top: '-8px', background: 'var(--color-danger)', color: 'white', borderRadius: '50%', width: '18px', height: '18px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={10} /></button>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
