@@ -137,6 +137,43 @@ const AdminDashboard = ({ isTab = false }) => {
                 />
             </div>
 
+            {/* Monthly Chart */}
+            <h2 style={{ fontSize: '1.2rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <TrendingUp size={18} /> Tendencia Mensual
+            </h2>
+            <div className="glass-panel" style={{ padding: '1.5rem', marginBottom: '2rem', height: '220px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '10px' }}>
+                {(() => {
+                    if (!stats.chartData || stats.chartData.length === 0) return <div style={{ width: '100%', textAlign: 'center', color: 'var(--text-muted)' }}>Sin datos suficientes</div>;
+
+                    const maxVal = Math.max(...stats.chartData.map(d => d.value)) || 1;
+
+                    return stats.chartData.map((d, i) => (
+                        <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%' }}>
+                            <div style={{ flex: 1, width: '100%', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+                                <div
+                                    className="chart-bar"
+                                    style={{
+                                        width: '80%',
+                                        height: `${(d.value / maxVal) * 100}%`,
+                                        background: 'linear-gradient(to top, var(--color-primary), #60a5fa)',
+                                        borderRadius: '6px 6px 0 0',
+                                        transition: 'height 0.5s ease',
+                                        position: 'relative',
+                                        minHeight: '4px'
+                                    }}
+                                    title={`S/ ${d.value.toFixed(2)}`}
+                                >
+                                    <div style={{ position: 'absolute', top: '-25px', width: '100%', textAlign: 'center', fontSize: '0.7rem', color: 'white', fontWeight: 'bold' }}>
+                                        {d.value >= 1000 ? `${(d.value / 1000).toFixed(1)}k` : Math.round(d.value)}
+                                    </div>
+                                </div>
+                            </div>
+                            <div style={{ marginTop: '0.5rem', fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{d.label}</div>
+                        </div>
+                    ));
+                })()}
+            </div>
+
             {/* Recent Activity Section */}
             <h2 style={{ fontSize: '1.2rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Clock size={18} /> Actividad Reciente (Global)
