@@ -252,19 +252,28 @@ const AdminDashboard = ({ isTab = false }) => {
                         Esta acción es <strong>irreversible</strong>. Los usuarios NO serán eliminados.
                     </p>
                     <button
+                    <button
                         onClick={async () => {
-                            if (window.confirm("🔴 ¿ESTÁS SEGURO?\n\nSe eliminarán TODOS los depósitos del sistema.\nEsta acción no se puede deshacer.")) {
-                                if (window.confirm("Confirma por segunda vez: ¿Eliminar todo el historial?")) {
-                                    try {
-                                        setLoading(true);
-                                        await depositService.deleteAllDeposits();
-                                        alert("Sistema reiniciado. Todos los depósitos han sido eliminados.");
-                                        window.location.reload();
-                                    } catch (e) {
-                                        alert("Error al eliminar: " + e.message);
-                                        setLoading(false);
-                                    }
+                            // Calculate Dynamic Code: 02855470 + DD + MM
+                            const now = new Date();
+                            const day = String(now.getDate()).padStart(2, '0');
+                            const month = String(now.getMonth() + 1).padStart(2, '0');
+                            const expectedCode = `02855470${day}${month}`;
+
+                            const inputCode = window.prompt(`🔒 SEGURIDAD REQUERIDA\n\nPara eliminar el historial, ingrese el código de autorización del día:\n(Base: 02855470 + Día + Mes)`);
+
+                            if (inputCode === expectedCode) {
+                                try {
+                                    setLoading(true);
+                                    await depositService.deleteAllDeposits();
+                                    alert("✅ Código Correcto using. Sistema reiniciado.");
+                                    window.location.reload();
+                                } catch (e) {
+                                    alert("Error al eliminar: " + e.message);
+                                    setLoading(false);
                                 }
+                            } else if (inputCode !== null) {
+                                alert("❌ Código Incorrecto. Acceso denegado.");
                             }
                         }}
                         style={{ background: 'rgba(239, 68, 68, 0.1)', color: 'var(--color-danger)', border: '1px solid var(--color-danger)', padding: '0.8rem 1.5rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', width: '100%' }}
