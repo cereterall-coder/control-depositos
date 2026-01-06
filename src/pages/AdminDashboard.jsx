@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const AdminDashboard = () => {
+const AdminDashboard = ({ isTab = false }) => {
     const { user } = useAuth();
     const [stats, setStats] = useState({
         totalAmount: 0,
@@ -89,17 +89,25 @@ const AdminDashboard = () => {
     );
 
     return (
-        <div style={{ minHeight: '100vh', background: 'var(--bg-app)', padding: '1rem', paddingBottom: '80px' }}>
-            {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                <Link to="/" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.1)', padding: '0.5rem 1rem', borderRadius: '8px' }}>
-                    <ArrowLeft size={18} /> Volver
-                </Link>
-                <h1 style={{ margin: 0, fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <LayoutDashboard color="#60a5fa" />
-                    Panel Maestro
-                </h1>
-            </div>
+        <div style={{ minHeight: isTab ? 'auto' : '100vh', background: isTab ? 'transparent' : 'var(--bg-app)', padding: isTab ? '0' : '1rem', paddingBottom: '80px' }}>
+            {/* Header - Only show if NOT a tab */}
+            {!isTab && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+                    <Link to="/" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.1)', padding: '0.5rem 1rem', borderRadius: '8px' }}>
+                        <ArrowLeft size={18} /> Volver
+                    </Link>
+                    <h1 style={{ margin: 0, fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <LayoutDashboard color="#60a5fa" />
+                        Panel Maestro
+                    </h1>
+                </div>
+            )}
+
+            {isTab && (
+                <h2 className="text-h2" style={{ marginBottom: '1.5rem', display: 'flex', gap: '0.5rem', alignItems: 'center', color: 'white' }}>
+                    <LayoutDashboard size={24} /> Métricas & Gestión
+                </h2>
+            )}
 
             {/* Metrics Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>

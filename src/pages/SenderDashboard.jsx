@@ -10,6 +10,7 @@ import {
 import toast from 'react-hot-toast';
 import { generateDepositReport } from '../utils/pdfGenerator';
 import { useNavigate, Link } from 'react-router-dom';
+import AdminDashboard from './AdminDashboard';
 
 const SenderDashboard = () => {
     const { user, logout } = useAuth();
@@ -815,6 +816,13 @@ const SenderDashboard = () => {
                     </div>
                 )}
 
+                {/* --- TAB 5: MÉTRICAS (Admin) --- */}
+                {activeTab === 'metrics' && (
+                    <div style={{ animation: 'fadeIn 0.3s' }}>
+                        <AdminDashboard isTab={true} />
+                    </div>
+                )}
+
                 {/* --- TAB 4: AJUSTES --- */}
                 {activeTab === 'settings' && (
                     <div className="glass-panel" style={{ padding: '1.5rem', animation: 'fadeIn 0.3s' }}>
@@ -963,6 +971,13 @@ const SenderDashboard = () => {
                     <Settings size={24} strokeWidth={activeTab === 'settings' ? 2.5 : 2} />
                     <span style={{ fontSize: '0.7rem', marginTop: '2px' }}>Ajustes</span>
                 </div>
+
+                {(user.role === 'admin' || user.user_metadata?.role === 'admin') && (
+                    <div onClick={() => setActiveTab('metrics')} style={getTabStyle('metrics')}>
+                        <Activity size={24} strokeWidth={activeTab === 'metrics' ? 2.5 : 2} />
+                        <span style={{ fontSize: '0.7rem', marginTop: '2px' }}>Métricas</span>
+                    </div>
+                )}
             </div>
 
         </div>
