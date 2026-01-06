@@ -234,11 +234,43 @@ const AdminDashboard = ({ isTab = false }) => {
                     <div style={{ fontWeight: 'bold' }}>Usuarios</div>
                     <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Gestionar accesos</div>
                 </Link>
-                {/* Placeholder for Approval Queue */}
                 <div className="glass-panel" style={{ padding: '1.5rem', textAlign: 'center', opacity: 0.7, cursor: 'not-allowed' }}>
                     <CheckCircle size={32} style={{ marginBottom: '0.5rem', color: '#10b981' }} />
                     <div style={{ fontWeight: 'bold' }}>Aprobaciones</div>
                     <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Próximamente</div>
+                </div>
+            </div>
+
+            {/* Danger Zone */}
+            <div style={{ marginTop: '3rem', borderTop: '1px solid rgba(239, 68, 68, 0.2)', paddingTop: '2rem' }}>
+                <h3 style={{ color: 'var(--color-danger)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem' }}>
+                    <XCircle size={18} /> Zona de Peligro
+                </h3>
+                <div className="glass-panel" style={{ padding: '1.5rem', marginTop: '1rem', borderColor: 'var(--color-danger)', borderWidth: '1px', borderStyle: 'solid' }}>
+                    <p style={{ margin: '0 0 1rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                        Si deseas iniciar desde cero con datos reales, puedes eliminar todos los depósitos de prueba.
+                        Esta acción es <strong>irreversible</strong>. Los usuarios NO serán eliminados.
+                    </p>
+                    <button
+                        onClick={async () => {
+                            if (window.confirm("🔴 ¿ESTÁS SEGURO?\n\nSe eliminarán TODOS los depósitos del sistema.\nEsta acción no se puede deshacer.")) {
+                                if (window.confirm("Confirma por segunda vez: ¿Eliminar todo el historial?")) {
+                                    try {
+                                        setLoading(true);
+                                        await depositService.deleteAllDeposits();
+                                        alert("Sistema reiniciado. Todos los depósitos han sido eliminados.");
+                                        window.location.reload();
+                                    } catch (e) {
+                                        alert("Error al eliminar: " + e.message);
+                                        setLoading(false);
+                                    }
+                                }
+                            }
+                        }}
+                        style={{ background: 'rgba(239, 68, 68, 0.1)', color: 'var(--color-danger)', border: '1px solid var(--color-danger)', padding: '0.8rem 1.5rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', width: '100%' }}
+                    >
+                        🗑️ Eliminar Historial Completo
+                    </button>
                 </div>
             </div>
         </div>

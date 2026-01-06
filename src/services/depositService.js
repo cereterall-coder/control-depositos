@@ -185,19 +185,26 @@ export const depositService = {
         if (error) throw error;
     },
 
-    async softDeleteDeposit(id) {
+            .update({ sender_deleted_at: new Date().toISOString() })
+        .eq('id', id);
+    if(error) throw error;
+},
+
+    // DANGER: Delete ALL deposits (Admin Reset)
+    async deleteAllDeposits() {
         const { error } = await supabase
             .from('deposits')
-            .update({ sender_deleted_at: new Date().toISOString() })
-            .eq('id', id);
+            .delete()
+            .gt('id', 0); // Delete all rows
         if (error) throw error;
+    }
     },
 
     async restoreDeposit(id) {
-        const { error } = await supabase
-            .from('deposits')
-            .update({ sender_deleted_at: null })
-            .eq('id', id);
-        if (error) throw error;
-    },
+    const { error } = await supabase
+        .from('deposits')
+        .update({ sender_deleted_at: null })
+        .eq('id', id);
+    if (error) throw error;
+},
 };
