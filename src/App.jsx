@@ -7,7 +7,12 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminUsers from './pages/AdminUsers';
 import UpdatePassword from './pages/UpdatePassword';
 
-// ... imports ...
+import ConnectionTest from './pages/ConnectionTest';
+import SimpleLogin from './pages/SimpleLogin';
+import ProfileSettings from './pages/ProfileSettings';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import { Toaster } from 'react-hot-toast';
 
 function AppRoutes() {
     const { user } = useAuth();
