@@ -5,7 +5,7 @@ import { notificationService } from '../services/notificationService';
 import { supabase } from '../lib/supabase';
 import {
     PlusCircle, List, FileText, Settings,
-    Upload, DollarSign, Calendar, Eye, Activity, UserPlus, Star, Trash2, X, Camera, Ban, Link as LinkIcon, RefreshCw, LogOut, User, FilePieChart, Mail
+    Upload, DollarSign, Calendar, Eye, Activity, UserPlus, Star, Trash2, X, Camera, Ban, Link as LinkIcon, RefreshCw, LogOut, User, FilePieChart, Mail, Search
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { generateDepositReport } from '../utils/pdfGenerator';
