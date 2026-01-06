@@ -602,30 +602,42 @@ const SenderDashboard = () => {
                                 <div style={{ flex: 1, position: 'relative' }}>
                                     <label style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '4px', display: 'block' }}>Desde:</label>
                                     <div style={{ position: 'relative' }}>
+                                        <Calendar
+                                            size={16}
+                                            style={{ position: 'absolute', left: '0.5rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', cursor: 'pointer', zIndex: 1 }}
+                                            onClick={() => document.getElementById('history-start-picker').showPicker()}
+                                        />
                                         <input
+                                            id="history-start-picker"
                                             type="date"
                                             className="input-field"
                                             value={historyStart}
                                             onChange={e => setHistoryStart(e.target.value)}
-                                            style={{ height: '38px', width: '100%' }}
+                                            style={{ height: '38px', width: '100%', paddingLeft: '2rem' }}
                                         />
                                         {historyStart && (
-                                            <button onClick={() => setHistoryStart('')} style={{ position: 'absolute', right: '-8px', top: '-8px', background: 'var(--color-danger)', color: 'white', borderRadius: '50%', width: '18px', height: '18px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={10} /></button>
+                                            <button onClick={() => setHistoryStart('')} style={{ position: 'absolute', right: '-8px', top: '-8px', background: 'var(--color-danger)', color: 'white', borderRadius: '50%', width: '18px', height: '18px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}><X size={10} /></button>
                                         )}
                                     </div>
                                 </div>
                                 <div style={{ flex: 1, position: 'relative' }}>
                                     <label style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '4px', display: 'block' }}>Hasta:</label>
                                     <div style={{ position: 'relative' }}>
+                                        <Calendar
+                                            size={16}
+                                            style={{ position: 'absolute', left: '0.5rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', cursor: 'pointer', zIndex: 1 }}
+                                            onClick={() => document.getElementById('history-end-picker').showPicker()}
+                                        />
                                         <input
+                                            id="history-end-picker"
                                             type="date"
                                             className="input-field"
                                             value={historyEnd}
                                             onChange={e => setHistoryEnd(e.target.value)}
-                                            style={{ height: '38px', width: '100%' }}
+                                            style={{ height: '38px', width: '100%', paddingLeft: '2rem' }}
                                         />
                                         {historyEnd && (
-                                            <button onClick={() => setHistoryEnd('')} style={{ position: 'absolute', right: '-8px', top: '-8px', background: 'var(--color-danger)', color: 'white', borderRadius: '50%', width: '18px', height: '18px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={10} /></button>
+                                            <button onClick={() => setHistoryEnd('')} style={{ position: 'absolute', right: '-8px', top: '-8px', background: 'var(--color-danger)', color: 'white', borderRadius: '50%', width: '18px', height: '18px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}><X size={10} /></button>
                                         )}
                                     </div>
                                 </div>
