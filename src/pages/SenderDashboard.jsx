@@ -33,7 +33,7 @@ const SenderDashboard = () => {
     const [historySearch, setHistorySearch] = useState('');
     const [historyStart, setHistoryStart] = useState('');
     const [historyEnd, setHistoryEnd] = useState('');
-    const [historySearch, setHistorySearch] = useState('');
+
     const [showSuggestions, setShowSuggestions] = useState(false);
 
     // Settings State
@@ -580,35 +580,54 @@ const SenderDashboard = () => {
                         </div>
 
                         {/* HISTORY FILTERS */}
-                        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', alignItems: 'flex-end' }}>
-                            <div style={{ flex: 1, position: 'relative' }}>
-                                <label style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '4px', display: 'block' }}>Desde:</label>
-                                <div style={{ position: 'relative' }}>
-                                    <input
-                                        type="date"
-                                        className="input-field"
-                                        value={historyStart}
-                                        onChange={e => setHistoryStart(e.target.value)}
-                                        style={{ height: '38px', width: '100%' }}
-                                    />
-                                    {historyStart && (
-                                        <button onClick={() => setHistoryStart('')} style={{ position: 'absolute', right: '-8px', top: '-8px', background: 'var(--color-danger)', color: 'white', borderRadius: '50%', width: '18px', height: '18px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={10} /></button>
-                                    )}
-                                </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
+                            {/* Search Bar */}
+                            <div style={{ position: 'relative', width: '100%' }}>
+                                <Search size={18} style={{ position: 'absolute', left: '0.8rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                                <input
+                                    type="text"
+                                    className="input-field"
+                                    placeholder="Buscar por nombre, correo, monto..."
+                                    value={historySearch}
+                                    onChange={e => setHistorySearch(e.target.value)}
+                                    style={{ paddingLeft: '2.5rem', height: '40px', width: '100%' }}
+                                />
+                                {historySearch && (
+                                    <button onClick={() => setHistorySearch('')} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><X size={16} /></button>
+                                )}
                             </div>
-                            <div style={{ flex: 1, position: 'relative' }}>
-                                <label style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '4px', display: 'block' }}>Hasta:</label>
-                                <div style={{ position: 'relative' }}>
-                                    <input
-                                        type="date"
-                                        className="input-field"
-                                        value={historyEnd}
-                                        onChange={e => setHistoryEnd(e.target.value)}
-                                        style={{ height: '38px', width: '100%' }}
-                                    />
-                                    {historyEnd && (
-                                        <button onClick={() => setHistoryEnd('')} style={{ position: 'absolute', right: '-8px', top: '-8px', background: 'var(--color-danger)', color: 'white', borderRadius: '50%', width: '18px', height: '18px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={10} /></button>
-                                    )}
+
+                            {/* Date Range */}
+                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end' }}>
+                                <div style={{ flex: 1, position: 'relative' }}>
+                                    <label style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '4px', display: 'block' }}>Desde:</label>
+                                    <div style={{ position: 'relative' }}>
+                                        <input
+                                            type="date"
+                                            className="input-field"
+                                            value={historyStart}
+                                            onChange={e => setHistoryStart(e.target.value)}
+                                            style={{ height: '38px', width: '100%' }}
+                                        />
+                                        {historyStart && (
+                                            <button onClick={() => setHistoryStart('')} style={{ position: 'absolute', right: '-8px', top: '-8px', background: 'var(--color-danger)', color: 'white', borderRadius: '50%', width: '18px', height: '18px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={10} /></button>
+                                        )}
+                                    </div>
+                                </div>
+                                <div style={{ flex: 1, position: 'relative' }}>
+                                    <label style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '4px', display: 'block' }}>Hasta:</label>
+                                    <div style={{ position: 'relative' }}>
+                                        <input
+                                            type="date"
+                                            className="input-field"
+                                            value={historyEnd}
+                                            onChange={e => setHistoryEnd(e.target.value)}
+                                            style={{ height: '38px', width: '100%' }}
+                                        />
+                                        {historyEnd && (
+                                            <button onClick={() => setHistoryEnd('')} style={{ position: 'absolute', right: '-8px', top: '-8px', background: 'var(--color-danger)', color: 'white', borderRadius: '50%', width: '18px', height: '18px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={10} /></button>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
