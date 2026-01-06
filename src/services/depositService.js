@@ -198,7 +198,6 @@ export const depositService = {
         const { error } = await supabase
             .from('deposits')
             .delete()
-            .delete()
             .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all rows (UUID safe)
         if (error) throw error;
     },
