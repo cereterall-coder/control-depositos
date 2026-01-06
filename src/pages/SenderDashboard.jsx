@@ -818,164 +818,126 @@ const SenderDashboard = () => {
                     </div>
                 )}
 
-                {/* --- TAB 4: AJUSTES --- */}
+                {/* --- TAB 4: AJUSTES (Diseño Prolijo & Azul) --- */}
                 {activeTab === 'settings' && (
-                    <div className="glass-panel" style={{ padding: '1.5rem', animation: 'fadeIn 0.3s' }}>
-                        <h2 className="text-h2" style={{ marginBottom: '1.5rem' }}>Configuración</h2>
-
-                        <div style={{ background: 'var(--bg-app)', padding: '1rem', borderRadius: '12px', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                            <div style={{ width: '50px', height: '50px', background: 'var(--color-primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', fontSize: '1.5rem', overflow: 'hidden', border: '2px solid white' }}>
-                                {(user.user_metadata?.avatar_url || user.avatar_url) ? (
-                                    <img src={user.user_metadata?.avatar_url || user.avatar_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                ) : (
-                                    user.email[0].toUpperCase()
-                                )}
-                            </div>
-                            <div style={{ overflow: 'hidden' }}>
-                                <div style={{ fontWeight: 'bold', fontSize: '1.1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                    {user.user_metadata?.full_name || 'Usuario'}
-                                </div>
-                                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                    {user.email}
-                                </div>
-                                <div style={{ fontSize: '0.75rem', color: 'var(--color-primary)', marginTop: '0.2rem' }}>
-                                    {(user.role === 'admin' || user.user_metadata?.role === 'admin') ? '👑 Administrador' : '👤 Cuenta Estándar'}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: '0.5rem' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <Mail size={18} color="var(--color-primary)" />
-                                    <div>
-                                        <h4 style={{ margin: 0 }}>Notificación por Correo</h4>
-                                        <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>Enviar alerta automática</p>
-                                    </div>
-                                </div>
-                                <label className="switch" style={{ position: 'relative', display: 'inline-block', width: '40px', height: '20px' }}>
-                                    <input
-                                        type="checkbox"
-                                        checked={emailNotify}
-                                        onChange={toggleEmailNotify}
-                                        style={{ opacity: 0, width: 0, height: 0 }}
-                                    />
-                                    <span style={{
-                                        position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0,
-                                        backgroundColor: emailNotify ? 'var(--color-primary)' : '#ccc', borderRadius: '34px', transition: '.4s'
-                                    }}>
-                                        <span style={{
-                                            position: 'absolute', content: '""', height: '16px', width: '16px', left: emailNotify ? '22px' : '2px', bottom: '2px',
-                                            backgroundColor: 'white', borderRadius: '50%', transition: '.4s'
-                                        }}></span>
-                                    </span>
-                                </label>
-                            </div>
-
-                            {emailNotify && (
-                                <div style={{ padding: '0.5rem', background: 'rgba(59,130,246,0.05)', borderRadius: '8px', fontSize: '0.8rem' }}>
-                                    {!import.meta.env.VITE_EMAILJS_PUBLIC_KEY ? (
-                                        <div style={{ color: 'var(--color-danger)', fontWeight: 'bold' }}>
-                                            ⚠️ Faltan las claves API en .env.local
-                                        </div>
+                    <div className="glass-panel" style={{ padding: '0', animation: 'fadeIn 0.3s', overflow: 'hidden', background: 'rgba(30, 41, 59, 0.7)' }}>
+                        {/* 1. Header with Profile */}
+                        <div style={{ padding: '2rem 1.5rem', background: 'linear-gradient(135deg, var(--color-primary), #1e40af)', color: 'white' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <div style={{
+                                    width: '60px', height: '60px', borderRadius: '50%', border: '3px solid rgba(255,255,255,0.3)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    background: 'var(--bg-surface)', color: 'var(--color-primary)', fontSize: '1.5rem', fontWeight: 'bold'
+                                }}>
+                                    {(user.user_metadata?.avatar_url || user.avatar_url) ? (
+                                        <img src={user.user_metadata?.avatar_url || user.avatar_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                                     ) : (
-                                        <button
-                                            onClick={() => {
-                                                toast.promise(
-                                                    notificationService.sendDepositAlert({
-                                                        to_email: user.email,
-                                                        to_name: user.user_metadata?.full_name || 'Usuario',
-                                                        from_name: 'Sistema de Prueba',
-                                                        amount: '10.00',
-                                                        date: new Date().toLocaleDateString(),
-                                                        link: window.location.origin
-                                                    }),
-                                                    {
-                                                        loading: 'Enviando prueba...',
-                                                        success: '¡Prueba enviada! Revisa tu correo.',
-                                                        error: (e) => `Error: ${e.error || e.message}`
-                                                    }
-                                                );
-                                            }}
-                                            className="btn btn-sm"
-                                            style={{ width: '100%', fontSize: '0.8rem', padding: '0.3rem', background: 'white', border: '1px solid var(--border-subtle)', color: 'var(--color-primary)' }}
-                                        >
-                                            Enviar Correo de Prueba a Mí Mismo
-                                        </button>
+                                        user.email[0].toUpperCase()
                                     )}
                                 </div>
-                            )}
+                                <div style={{ flex: 1 }}>
+                                    <h2 style={{ margin: 0, fontSize: '1.2rem' }}>{user.user_metadata?.full_name || 'Usuario'}</h2>
+                                    <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.8 }}>{user.email}</p>
+                                    <div style={{ marginTop: '0.4rem', display: 'inline-block', padding: '0.2rem 0.6rem', background: 'rgba(255,255,255,0.2)', borderRadius: '12px', fontSize: '0.7rem' }}>
+                                        {(user.role === 'admin' || user.user_metadata?.role === 'admin') ? '👑 Administrador' : '👤 Cuenta Estándar'}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Danger Zone (Admin Only) */}
-                        {(user.role === 'admin' || user.user_metadata?.role === 'admin') && (
-                            <div style={{ borderTop: '1px solid rgba(239, 68, 68, 0.2)', paddingTop: '1rem' }}>
-                                <h3 style={{ color: 'var(--color-danger)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem' }}>
-                                    <Ban size={18} /> Zona de Peligro (Admin)
-                                </h3>
-                                <div style={{ marginTop: '0.5rem', padding: '1rem', border: '1px solid var(--color-danger)', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.05)' }}>
-                                    <p style={{ margin: '0 0 1rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                                        Eliminar historial completo. Requiere Código del Día.
-                                    </p>
+                        {/* 2. Settings Menu List */}
+                        <div style={{ padding: '1rem' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+
+                                {/* Item: My Profile */}
+                                <div onClick={() => navigate('/profile')} className="settings-item" style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: 'var(--bg-surface)', borderRadius: '12px', cursor: 'pointer', transition: 'transform 0.2s' }}>
+                                    <div style={{ padding: '0.6rem', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px', color: '#60a5fa' }}>
+                                        <User size={20} />
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ fontWeight: '500' }}>Mis Datos Personales</div>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Editar perfil y contraseña</div>
+                                    </div>
+                                    <ArrowRight size={16} color="var(--text-muted)" />
+                                </div>
+
+                                {/* Item: Email Notifications */}
+                                <div className="settings-item" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', background: 'var(--bg-surface)', borderRadius: '12px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                        <div style={{ padding: '0.6rem', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px', color: '#60a5fa' }}>
+                                            <Mail size={20} />
+                                        </div>
+                                        <div>
+                                            <div style={{ fontWeight: '500' }}>Notificaciones</div>
+                                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Alertas por correo</div>
+                                        </div>
+                                    </div>
+                                    <label className="switch" style={{ position: 'relative', display: 'inline-block', width: '40px', height: '22px' }}>
+                                        <input type="checkbox" checked={emailNotify} onChange={toggleEmailNotify} style={{ opacity: 0, width: 0, height: 0 }} />
+                                        <span style={{ position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: emailNotify ? '#3b82f6' : '#64748b', borderRadius: '34px', transition: '.4s' }}>
+                                            <span style={{ position: 'absolute', content: '""', height: '18px', width: '18px', left: emailNotify ? '19px' : '3px', bottom: '2px', backgroundColor: 'white', borderRadius: '50%', transition: '.4s' }}></span>
+                                        </span>
+                                    </label>
+                                </div>
+
+                                {/* Item: Admin Panel (If Admin) */}
+                                {(user.user_metadata?.role === 'admin' || user.role === 'admin') && (
+                                    <div onClick={() => navigate('/admin/users')} className="settings-item" style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: 'var(--bg-surface)', borderRadius: '12px', cursor: 'pointer', border: '1px solid rgba(59, 130, 246, 0.3)' }}>
+                                        <div style={{ padding: '0.6rem', background: 'rgba(59, 130, 246, 0.2)', borderRadius: '8px', color: '#60a5fa' }}>
+                                            <Users size={20} />
+                                        </div>
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ fontWeight: '500', color: '#93c5fd' }}>Gestión de Usuarios</div>
+                                            <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)' }}>Panel Administrativo</div>
+                                        </div>
+                                        <ArrowRight size={16} color="#60a5fa" />
+                                    </div>
+                                )}
+
+                                {/* Danger Zone (Blue Theme) */}
+                                {(user.role === 'admin' || user.user_metadata?.role === 'admin') && (
+                                    <div style={{ marginTop: '1rem' }}>
+                                        <div style={{ padding: '1rem', border: '1px solid #1e40af', borderRadius: '12px', background: 'rgba(30, 58, 138, 0.3)' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: '#60a5fa' }}>
+                                                <Ban size={18} />
+                                                <span style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>Reinicio del Sistema</span>
+                                            </div>
+                                            <p style={{ margin: '0 0 1rem', fontSize: '0.8rem', color: 'rgba(255,255,255,0.7)' }}>
+                                                Eliminar historial de depósitos. Requiere código.
+                                            </p>
+                                            <button
+                                                onClick={async () => {
+                                                    const now = new Date();
+                                                    const day = String(now.getDate()).padStart(2, '0');
+                                                    const month = String(now.getMonth() + 1).padStart(2, '0');
+                                                    const expectedCode = `02855470${day}${month}`;
+                                                    const inputCode = window.prompt(`🔒 CÓDIGO DE AUTORIZACIÓN:\nBase: 02855470 + Día + Mes`);
+                                                    if (inputCode === expectedCode) {
+                                                        try {
+                                                            const toastId = toast.loading("Procesando reinicio...");
+                                                            await depositService.deleteAllDeposits();
+                                                            toast.success("✅ Reinicio Exitoso", { id: toastId });
+                                                            setTimeout(() => window.location.reload(), 1500);
+                                                        } catch (e) { toast.error("Error: " + e.message); }
+                                                    } else if (inputCode !== null) { toast.error("❌ Código Incorrecto"); }
+                                                }}
+                                                style={{ width: '100%', padding: '0.75rem', background: '#2563eb', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 6px rgba(37, 99, 235, 0.2)' }}
+                                            >
+                                                Limpiar Historial de Datos
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div style={{ marginTop: '1rem' }}>
                                     <button
-                                        onClick={async () => {
-                                            const now = new Date();
-                                            const day = String(now.getDate()).padStart(2, '0');
-                                            const month = String(now.getMonth() + 1).padStart(2, '0');
-                                            const expectedCode = `02855470${day}${month}`;
-
-                                            const inputCode = window.prompt(`🔒 CÓDIGO DE AUTORIZACIÓN:\nBase: 02855470 + Día + Mes`);
-
-                                            if (inputCode === expectedCode) {
-                                                try {
-                                                    const toastId = toast.loading("Eliminando...");
-                                                    await depositService.deleteAllDeposits();
-                                                    toast.success("✅ Sistema reiniciado", { id: toastId });
-                                                    setTimeout(() => window.location.reload(), 1500);
-                                                } catch (e) {
-                                                    toast.error("Error: " + e.message);
-                                                }
-                                            } else if (inputCode !== null) {
-                                                toast.error("❌ Código Incorrecto");
-                                            }
-                                        }}
-                                        style={{ width: '100%', padding: '0.75rem', background: 'var(--color-danger)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}
+                                        onClick={() => { if (confirm('¿Cerrar Sesión?')) logout(); }}
+                                        style={{ width: '100%', padding: '1rem', background: 'transparent', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
                                     >
-                                        🗑️ Eliminar Todo
+                                        <LogOut size={18} /> Cerrar Sesión
                                     </button>
                                 </div>
                             </div>
-                        )}
-
-                        {/* Spacing for Next Section */}
-                        <div>
-
-                            <button onClick={() => navigate('/profile')} className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
-                                <User size={18} /> Mis Datos Personales
-                            </button>
-
-                            {(user.user_metadata?.role === 'admin' || user.role === 'admin') && (
-                                <button onClick={() => navigate('/admin/users')} className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center', background: 'rgba(234,179,8,0.1)', color: 'orange', borderColor: 'orange' }}>
-                                    <Star size={18} /> Panel Admin
-                                </button>
-                            )}
-
-                            <hr style={{ border: 'none', borderTop: '1px solid var(--border-subtle)', margin: '1rem 0' }} />
-
-                            <button
-                                onClick={() => {
-                                    if (confirm('¿Seguro que quieres cerrar sesión?')) logout();
-                                }}
-                                className="btn"
-                                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center', background: 'var(--color-danger)', color: 'white', border: 'none', padding: '0.8rem' }}
-                            >
-                                <LogOut size={18} /> CERRAR SESIÓN
-                            </button>
-                        </div>
-
-                        <div style={{ textAlign: 'center', marginTop: '3rem', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                            App v3.1 Mobile • 2026
                         </div>
                     </div>
                 )}
