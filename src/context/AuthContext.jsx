@@ -11,11 +11,19 @@ export const AuthProvider = ({ children }) => {
     const enrichUser = async (authUser) => {
         if (!authUser) return null;
         try {
-            const { data: profile } = await supabase
+            // Create a promise that rejects after 2 seconds
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Profile fetch timeout')), 2000)
+            );
+
+            const fetchProfile = supabase
                 .from('profiles')
                 .select('*')
                 .eq('id', authUser.id)
                 .maybeSingle();
+
+            // Race the fetch against the timeout
+            const { data: profile } = await Promise.race([fetchProfile, timeoutPromise]);
 
             if (profile) {
                 console.log("Profile loaded for:", authUser.email);
@@ -27,7 +35,7 @@ export const AuthProvider = ({ children }) => {
                 };
             }
         } catch (e) {
-            console.error("Profile Fetch Error:", e);
+            console.error("Profile Fetch Error/Timeout:", e);
         }
         return authUser;
     };

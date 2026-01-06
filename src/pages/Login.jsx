@@ -32,8 +32,7 @@ const Login = () => {
             } else {
                 await signIn(email, password);
                 toast.success('Bienvenido de vuelta');
-                // Force reload to ensure session is picked up and state is synced
-                window.location.href = '/';
+                navigate('/');
             }
         } catch (err) {
             toast.error(err.message);
