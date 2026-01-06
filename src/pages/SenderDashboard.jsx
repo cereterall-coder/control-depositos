@@ -339,10 +339,10 @@ const SenderDashboard = () => {
                                 <button
                                     onClick={logout}
                                     style={{
-                                        background: 'rgba(239, 68, 68, 0.2)', color: '#f87171', border: 'none',
+                                        background: '#2563eb', color: 'white', border: 'none',
                                         borderRadius: '6px', padding: '0.5rem 1rem', width: '100%',
                                         cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-                                        fontSize: '0.8rem', fontWeight: 'bold'
+                                        fontSize: '0.8rem', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(37, 99, 235, 0.3)'
                                     }}
                                 >
                                     <LogOut size={14} />
