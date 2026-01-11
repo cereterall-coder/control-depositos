@@ -83,6 +83,11 @@ export const depositService = {
             console.error("Supabase update error:", error);
             throw error;
         }
+
+        if (!data || data.length === 0) {
+            throw new Error("No se pudo actualizar. Es posible que el depósito no exista o no tengas permisos.");
+        }
+
         return data;
     },
 

@@ -301,9 +301,10 @@ const SenderDashboard = () => {
             await depositService.updateDeposit(id, updates);
             toast.success("Depósito actualizado");
             setEditingDeposit(null);
-            refreshData();
+            // Force reload to ensure all state is perfectly synced
+            setTimeout(() => window.location.reload(), 1000);
         } catch (e) {
-            toast.error("Error al actualizar");
+            toast.error("Error al actualizar: " + e.message);
             console.error(e);
         }
     };
