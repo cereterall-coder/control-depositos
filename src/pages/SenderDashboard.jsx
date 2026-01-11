@@ -60,6 +60,17 @@ const SenderDashboard = () => {
 
     // Edit Deposit State
     const [editingDeposit, setEditingDeposit] = useState(null);
+    const [editFormData, setEditFormData] = useState({ amount: '', date: '', observation: '' });
+
+    useEffect(() => {
+        if (editingDeposit) {
+            setEditFormData({
+                amount: editingDeposit.amount,
+                date: editingDeposit.deposit_date,
+                observation: editingDeposit.observation || ''
+            });
+        }
+    }, [editingDeposit]);
 
     // History View State
     const [historyLimit, setHistoryLimit] = useState(10);
@@ -826,22 +837,43 @@ const SenderDashboard = () => {
                             <form onSubmit={(e) => {
                                 e.preventDefault();
                                 handleEditSubmit(editingDeposit.id, {
-                                    amount: e.target.amount.value,
-                                    deposit_date: e.target.date.value,
-                                    observation: e.target.observation.value
+                                    amount: parseFloat(editFormData.amount),
+                                    deposit_date: editFormData.date,
+                                    observation: editFormData.observation
                                 });
                             }}>
                                 <div className="form-group">
                                     <label className="text-label">Monto (S/.)</label>
-                                    <input name="amount" type="number" step="0.01" defaultValue={editingDeposit.amount} className="input-field" required />
+                                    <input
+                                        name="amount"
+                                        type="number"
+                                        step="0.01"
+                                        value={editFormData.amount}
+                                        onChange={e => setEditFormData({ ...editFormData, amount: e.target.value })}
+                                        className="input-field"
+                                        required
+                                    />
                                 </div>
                                 <div className="form-group">
                                     <label className="text-label">Fecha</label>
-                                    <input name="date" type="date" defaultValue={editingDeposit.deposit_date} className="input-field" required />
+                                    <input
+                                        name="date"
+                                        type="date"
+                                        value={editFormData.date}
+                                        onChange={e => setEditFormData({ ...editFormData, date: e.target.value })}
+                                        className="input-field"
+                                        required
+                                    />
                                 </div>
                                 <div className="form-group">
                                     <label className="text-label">Observación</label>
-                                    <input name="observation" type="text" defaultValue={editingDeposit.observation || ''} className="input-field" />
+                                    <input
+                                        name="observation"
+                                        type="text"
+                                        value={editFormData.observation}
+                                        onChange={e => setEditFormData({ ...editFormData, observation: e.target.value })}
+                                        className="input-field"
+                                    />
                                 </div>
 
                                 <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '1rem' }}>Guardar Cambios</button>
