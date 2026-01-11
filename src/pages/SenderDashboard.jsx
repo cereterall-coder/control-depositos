@@ -16,8 +16,12 @@ const SenderDashboard = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
 
-    // Tab State
-    const [activeTab, setActiveTab] = useState('new');
+    // Tab State - Persistent
+    const [activeTab, setActiveTab] = useState(() => localStorage.getItem('last_active_tab') || 'new');
+
+    useEffect(() => {
+        localStorage.setItem('last_active_tab', activeTab);
+    }, [activeTab]);
 
     // Data State
     const [deposits, setDeposits] = useState([]);
