@@ -301,14 +301,19 @@ const SenderDashboard = () => {
     };
 
     const handleEditSubmit = async (id, updates) => {
+        const toastId = toast.loading('Guardando cambios...');
         try {
             await depositService.updateDeposit(id, updates);
-            toast.success("Depósito actualizado");
+
+            // PROFESSIONAL UPDATE: Update local state immediately without reload
+            setDeposits(prev => prev.map(d =>
+                d.id === id ? { ...d, ...updates } : d
+            ));
+
+            toast.success("Depósito actualizado", { id: toastId });
             setEditingDeposit(null);
-            // Force reload to ensure all state is perfectly synced
-            setTimeout(() => window.location.reload(), 1000);
         } catch (e) {
-            toast.error("Error al actualizar: " + e.message);
+            toast.error("Error al actualizar: " + e.message, { id: toastId });
             console.error(e);
         }
     };
