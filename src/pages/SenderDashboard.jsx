@@ -28,18 +28,19 @@ const SenderDashboard = () => {
     // Form State
     // Form State with Persistence
     const [amount, setAmount] = useState(() => localStorage.getItem('draft_amount') || '');
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+    const [date, setDate] = useState(() => localStorage.getItem('draft_date') || new Date().toISOString().split('T')[0]);
     // Recipient starts empty as requested (removed draft_recipient check)
-    const [recipientEmail, setRecipientEmail] = useState('');
+    const [recipientEmail, setRecipientEmail] = useState(() => localStorage.getItem('draft_recipient') || '');
     const [observation, setObservation] = useState(() => localStorage.getItem('draft_observation') || '');
 
     // Auto-save Draft (only amount and observation now, or update to save recipient but strictly ignore on load?)
     // User wants it empty on enter. So don't load it.
     useEffect(() => {
         localStorage.setItem('draft_amount', amount);
-        // localStorage.setItem('draft_recipient', recipientEmail); // Disabled saving too to prevent confusion
+        localStorage.setItem('draft_recipient', recipientEmail);
+        localStorage.setItem('draft_date', date);
         localStorage.setItem('draft_observation', observation);
-    }, [amount, observation]);
+    }, [amount, recipientEmail, date, observation]);
     const [file, setFile] = useState(null);
     const [historySearch, setHistorySearch] = useState('');
     const [historyStart, setHistoryStart] = useState('');
@@ -249,6 +250,12 @@ const SenderDashboard = () => {
             setAmount('');
             setRecipientEmail('');
             setObservation('');
+
+            // Clear drafts
+            localStorage.removeItem('draft_amount');
+            localStorage.removeItem('draft_recipient');
+            localStorage.removeItem('draft_observation');
+            localStorage.removeItem('draft_date');
             setFile(null);
             setActiveTab('history');
             setReportType('sent');
