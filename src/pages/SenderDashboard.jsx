@@ -5,7 +5,7 @@ import { notificationService } from '../services/notificationService';
 import { supabase } from '../lib/supabase';
 import {
     PlusCircle, List, FileText, Settings,
-    Upload, DollarSign, Calendar, Eye, Activity, UserPlus, Star, Trash2, X, Camera, Ban, Link as LinkIcon, RefreshCw, LogOut, User, Users, FilePieChart, Mail, Search, ArrowRight
+    Upload, DollarSign, Calendar, Eye, Activity, UserPlus, Star, Trash2, X, Camera, Ban, Link as LinkIcon, RefreshCw, LogOut, User, Users, FilePieChart, Mail, Search, ArrowRight, ArrowLeft
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { generateDepositReport } from '../utils/pdfGenerator';
@@ -75,6 +75,7 @@ const SenderDashboard = () => {
     // Modals & Tooltips
     const [showAboutModal, setShowAboutModal] = useState(false);
     const [showUserTooltip, setShowUserTooltip] = useState(false);
+    const [viewingVoucher, setViewingVoucher] = useState(null);
 
     // Initial Load
     useEffect(() => {
@@ -361,7 +362,7 @@ const SenderDashboard = () => {
                         style={{ width: '32px', height: '32px', background: '#2563eb', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', overflow: 'hidden', border: '2px solid rgba(255,255,255,0.8)', cursor: 'pointer', position: 'relative', boxShadow: '0 2px 5px rgba(37, 99, 235, 0.3)' }}
                     >
                         {(user.user_metadata?.avatar_url || user.avatar_url) ? (
-                            <img src={user.user_metadata?.avatar_url || user.avatar_url} alt="You" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <img src={user.user_metadata?.avatar_url || user.avatar_url} alt="Perfil" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (
                             user.email[0].toUpperCase()
                         )}
@@ -452,7 +453,7 @@ const SenderDashboard = () => {
                             <div style={{ fontSize: '1.2rem', color: 'white', fontWeight: 'bold', background: 'linear-gradient(90deg, #fff, #cbd5e1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                                 {localStorage.getItem('dev_name') || "Ing. Amaro A. Vilela V."}
                             </div>
-                            <div style={{ fontSize: '0.9rem', color: '#60a5fa', marginTop: '0.3rem', fontWeight: '500' }}>Software Engineer</div>
+                            <div style={{ fontSize: '0.9rem', color: '#60a5fa', marginTop: '0.3rem', fontWeight: '500' }}>Ingeniero de Software</div>
                         </div>
 
                         <div style={{ fontSize: '0.9rem', color: '#94a3b8', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
@@ -701,7 +702,7 @@ const SenderDashboard = () => {
 
                                             <div style={{ display: 'flex', gap: '0.5rem' }}>
                                                 {dep.voucher_url && (
-                                                    <button onClick={() => window.open(depositService.getVoucherUrl(dep.voucher_url), '_blank')} className="btn-icon" title="Ver Voucher">
+                                                    <button onClick={() => setViewingVoucher(depositService.getVoucherUrl(dep.voucher_url))} className="btn-icon" title="Ver Voucher">
                                                         <Eye size={16} />
                                                     </button>
                                                 )}
@@ -741,6 +742,63 @@ const SenderDashboard = () => {
                         {sortedDeposits.length === 0 && (
                             <p style={{ textAlign: 'center', color: 'var(--text-muted)', marginTop: '2rem' }}>No hay movimientos.</p>
                         )}
+                    </div>
+                )}
+
+                {/* --- IMAGE VIEWER MODAL --- */}
+                {viewingVoucher && (
+                    <div style={{
+                        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                        background: 'rgba(0,0,0,0.95)', zIndex: 300,
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                        animation: 'fadeIn 0.2s'
+                    }} onClick={() => setViewingVoucher(null)}>
+
+                        {/* Top Bar for Controls */}
+                        <div style={{
+                            position: 'absolute', top: 0, left: 0, right: 0,
+                            padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                            background: 'linear-gradient(to bottom, rgba(0,0,0,0.8), transparent)',
+                            zIndex: 310
+                        }}>
+                            <button
+                                onClick={() => setViewingVoucher(null)}
+                                className="btn"
+                                style={{
+                                    background: 'white', color: 'black', border: 'none',
+                                    display: 'flex', alignItems: 'center', gap: '0.5rem',
+                                    fontWeight: 'bold', padding: '0.5rem 1rem', borderRadius: '30px'
+                                }}
+                            >
+                                <ArrowLeft size={18} /> Regresar
+                            </button>
+
+                            <button
+                                onClick={() => setViewingVoucher(null)}
+                                style={{
+                                    background: 'rgba(255,255,255,0.2)', border: 'none',
+                                    color: 'white', borderRadius: '50%', width: '40px', height: '40px',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer'
+                                }}
+                            >
+                                <X size={24} />
+                            </button>
+                        </div>
+
+                        {/* Image Container */}
+                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', boxSizing: 'border-box' }}>
+                            <img
+                                src={viewingVoucher}
+                                alt="Comprobante"
+                                style={{
+                                    maxWidth: '100%', maxHeight: '85vh',
+                                    objectFit: 'contain',
+                                    borderRadius: '8px',
+                                    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)'
+                                }}
+                                onClick={e => e.stopPropagation()} // Prevent closing when clicking image
+                            />
+                        </div>
                     </div>
                 )}
 
@@ -842,7 +900,7 @@ const SenderDashboard = () => {
                                     background: 'var(--bg-surface)', color: 'var(--color-primary)', fontSize: '1.5rem', fontWeight: 'bold'
                                 }}>
                                     {(user.user_metadata?.avatar_url || user.avatar_url) ? (
-                                        <img src={user.user_metadata?.avatar_url || user.avatar_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                                        <img src={user.user_metadata?.avatar_url || user.avatar_url} alt="Perfil" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                                     ) : (
                                         user.email[0].toUpperCase()
                                     )}
@@ -963,7 +1021,14 @@ const SenderDashboard = () => {
                 display: 'flex', boxShadow: '0 -2px 10px rgba(0,0,0,0.1)',
                 zIndex: 100, paddingBottom: '10px'
             }}>
-                <div onClick={() => setActiveTab('new')} style={getTabStyle('new')}>
+                <div onClick={() => {
+                    setAmount('');
+                    setRecipientEmail('');
+                    setObservation('');
+                    setFile(null);
+                    setDate(new Date().toLocaleDateString('en-CA', { timeZone: 'America/Lima' }));
+                    setActiveTab('new');
+                }} style={getTabStyle('new')}>
                     <PlusCircle size={24} strokeWidth={activeTab === 'new' ? 2.5 : 2} />
                     <span style={{ fontSize: '0.7rem', marginTop: '2px' }}>Nuevo</span>
                 </div>
