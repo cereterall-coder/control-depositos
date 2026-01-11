@@ -73,12 +73,17 @@ export const depositService = {
     // New Update Method
     updateDeposit: async (id, updates) => {
         // updates: { amount, deposit_date, observation }
-        const { error } = await supabase
+        const { data, error } = await supabase
             .from('deposits')
             .update(updates)
-            .eq('id', id);
+            .eq('id', id)
+            .select();
 
-        if (error) throw error;
+        if (error) {
+            console.error("Supabase update error:", error);
+            throw error;
+        }
+        return data;
     },
 
     markAsRead: async (depositId) => {

@@ -64,9 +64,15 @@ const SenderDashboard = () => {
 
     useEffect(() => {
         if (editingDeposit) {
+            // Ensure date is properly formatted for input type="date" (YYYY-MM-DD)
+            let formattedDate = '';
+            if (editingDeposit.deposit_date) {
+                formattedDate = editingDeposit.deposit_date.split('T')[0]; // Safe split for ISO strings
+            }
+
             setEditFormData({
                 amount: editingDeposit.amount,
-                date: editingDeposit.deposit_date,
+                date: formattedDate,
                 observation: editingDeposit.observation || ''
             });
         }
