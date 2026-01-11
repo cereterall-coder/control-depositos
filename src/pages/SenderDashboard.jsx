@@ -28,7 +28,7 @@ const SenderDashboard = () => {
     // Form State
     // Form State with Persistence
     const [amount, setAmount] = useState(() => localStorage.getItem('draft_amount') || '');
-    const [date, setDate] = useState(() => localStorage.getItem('draft_date') || new Date().toISOString().split('T')[0]);
+    const [date, setDate] = useState(() => localStorage.getItem('draft_date') || new Date().toLocaleDateString('en-CA', { timeZone: 'America/Lima' }));
     // Recipient starts empty as requested (removed draft_recipient check)
     const [recipientEmail, setRecipientEmail] = useState(() => localStorage.getItem('draft_recipient') || '');
     const [observation, setObservation] = useState(() => localStorage.getItem('draft_observation') || '');
