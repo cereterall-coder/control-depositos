@@ -37,7 +37,11 @@ const AdminDashboard = ({ isTab = false }) => {
 
                 allDeposits.forEach(d => {
                     const amt = parseFloat(d.amount) || 0;
-                    const dDate = new Date(d.deposit_date || d.created_at);
+                    // Fix: Parse as Local Time to avoid UTC shift
+                    const checkStr = d.deposit_date && !d.deposit_date.includes('T')
+                        ? d.deposit_date + 'T12:00:00'
+                        : (d.deposit_date || d.created_at);
+                    const dDate = new Date(checkStr);
 
                     total += amt;
 
@@ -210,7 +214,9 @@ const AdminDashboard = ({ isTab = false }) => {
                             <div>
                                 <div style={{ fontWeight: 'bold' }}>{d.sender_email || 'Desconocido'}</div>
                                 <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                                    {new Date(d.deposit_date || d.created_at).toLocaleDateString()} • {d.recipient_email}
+                                    {d.deposit_date
+                                        ? d.deposit_date.split('-').reverse().join('/')
+                                        : new Date(d.created_at).toLocaleDateString()} • {d.recipient_email}
                                 </div>
                             </div>
                         </div>
@@ -225,7 +231,7 @@ const AdminDashboard = ({ isTab = false }) => {
             </div>
 
             {/* Actions */}
-            <h2 style={{ fontSize: '1.2rem', margin: '2rem 0 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            < h2 style={{ fontSize: '1.2rem', margin: '2rem 0 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Users size={18} /> Gestión
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>

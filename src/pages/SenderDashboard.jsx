@@ -145,13 +145,20 @@ const SenderDashboard = () => {
                 if (historyStart) {
                     const start = new Date(historyStart);
                     start.setHours(0, 0, 0, 0);
-                    const dDate = new Date(d.deposit_date || d.created_at); // Assuming dDate is defined here or globally
+                    // Force Local Time for YYYY-MM-DD strings to avoid UTC-5 shift
+                    const checkStr = d.deposit_date && !d.deposit_date.includes('T')
+                        ? d.deposit_date + 'T12:00:00'
+                        : (d.deposit_date || d.created_at);
+                    const dDate = new Date(checkStr);
                     if (dDate < start) return false;
                 }
                 if (historyEnd) {
                     const end = new Date(historyEnd);
-                    end.setHours(0, 0, 0, 0);
-                    const dDate = new Date(d.deposit_date || d.created_at); // Assuming dDate is defined here or globally
+                    end.setHours(23, 59, 59, 999);
+                    const checkStr = d.deposit_date && !d.deposit_date.includes('T')
+                        ? d.deposit_date + 'T12:00:00'
+                        : (d.deposit_date || d.created_at);
+                    const dDate = new Date(checkStr);
                     if (dDate > end) return false;
                 }
             } else {
@@ -686,7 +693,12 @@ const SenderDashboard = () => {
                                     <div key={dep.id} className="glass-panel" style={{ padding: '1rem', borderLeft: `4px solid ${dep.sender_id === user.id ? 'var(--color-primary)' : 'var(--color-success)'}` }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                                             <span style={{ fontWeight: 'bold', fontSize: '1rem' }}>S/. {dep.amount}</span>
-                                            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{new Date(dep.deposit_date).toLocaleDateString()}</span>
+                                            {/* Fix: Display raw date parts to avoid timezone shift */}
+                                            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                                                {dep.deposit_date
+                                                    ? dep.deposit_date.split('-').reverse().join('/')
+                                                    : new Date(dep.created_at).toLocaleDateString()}
+                                            </span>
                                         </div>
                                         <div style={{ fontSize: '0.9rem', marginBottom: '0.5rem' }}>
                                             {dep.sender_id === user.id ? `Para: ${dep.recipient_email}` : `De: ${dep.sender_name || dep.sender_email}`}
