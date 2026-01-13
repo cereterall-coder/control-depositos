@@ -51,6 +51,18 @@ const SenderDashboard = () => {
         localStorage.setItem('draft_observation', observation);
     }, [amount, recipientEmail, date, observation]);
     const [file, setFile] = useState(null);
+    const [previewUrl, setPreviewUrl] = useState(null);
+
+    useEffect(() => {
+        if (!file) {
+            setPreviewUrl(null);
+            return;
+        }
+        const objectUrl = URL.createObjectURL(file);
+        setPreviewUrl(objectUrl);
+        return () => URL.revokeObjectURL(objectUrl);
+    }, [file]);
+
     const [historySearch, setHistorySearch] = useState('');
     const [historyStart, setHistoryStart] = useState('');
     const [historyEnd, setHistoryEnd] = useState('');
@@ -509,68 +521,12 @@ const SenderDashboard = () => {
                     <div className="glass-panel" style={{ padding: '1.5rem', animation: 'fadeIn 0.3s' }}>
                         <h2 className="text-h2" style={{ marginBottom: '1.5rem' }}>Nuevo Depósito</h2>
                         <form onSubmit={handleSubmit}>
-                            {/* 1. Recipient (Destinatario) - Moved to Top */}
-                            <div className="form-group">
-                                <label className="text-label">Destinatario</label>
-                                <div style={{ position: 'relative' }}>
-                                    <UserPlus size={18} style={{ position: 'absolute', left: '1rem', top: '1rem', color: 'var(--text-muted)' }} />
-                                    <input type="text" required className="input-field" style={{ paddingLeft: '2.5rem' }}
-                                        value={recipientEmail} onChange={e => { setRecipientEmail(e.target.value); setShowSuggestions(true); }}
-                                        placeholder="Nombre o Correo" onFocus={() => setShowSuggestions(true)}
-                                        onBlur={() => setTimeout(() => setShowSuggestions(false), 200)} />
-                                    {showSuggestions && contacts.length > 0 && (
-                                        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: '0 0 8px 8px', zIndex: 10 }}>
-                                            {contacts.filter(c => (c.contact_name + c.contact_email).toLowerCase().includes(recipientEmail.toLowerCase())).map(c => (
-                                                <div key={c.id} onClick={() => setRecipientEmail(c.contact_email)} style={{ padding: '0.8rem', cursor: 'pointer', borderBottom: '1px solid var(--border-subtle)' }}>
-                                                    <strong>{c.contact_name}</strong> <br /><small>{c.contact_email}</small>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
+                            {/* 1. Comprobante (Voucher) - Moved to Top for Better UX */}
+                            <div className="form-group" style={{ background: 'var(--bg-app)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border-subtle)' }}>
+                                <label className="text-label" style={{ marginBottom: '0.5rem', display: 'block', color: 'var(--color-primary)' }}>1. Subir Comprobante (Opcional)</label>
+                                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>Sube la foto primero para ver los datos mientras llenas el formulario.</p>
 
-                            {/* 2. Amount (Monto) */}
-                            <div className="form-group">
-                                <label className="text-label">Monto (S/.)</label>
-                                <div style={{ position: 'relative' }}>
-                                    <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontWeight: 'bold', fontSize: '1rem' }}>S/.</span>
-                                    <input type="number" step="0.01" required className="input-field" style={{ paddingLeft: '3rem', fontSize: '1.2rem', fontWeight: 'bold' }}
-                                        value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" />
-                                </div>
-                            </div>
-
-                            {/* 3. Date (Fecha) - Added Calendar Icon & Trigger */}
-                            <div className="form-group">
-                                <label className="text-label">Fecha</label>
-                                <div style={{ position: 'relative' }}>
-                                    <Calendar
-                                        size={18}
-                                        style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', cursor: 'pointer' }}
-                                        onClick={() => document.getElementById('deposit-date-picker').showPicker()}
-                                    />
-                                    <input
-                                        id="deposit-date-picker"
-                                        type="date"
-                                        required
-                                        className="input-field"
-                                        style={{ paddingLeft: '2.5rem' }}
-                                        value={date}
-                                        onChange={e => setDate(e.target.value)}
-                                        onClick={(e) => e.target.showPicker && e.target.showPicker()}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="form-group">
-                                <label className="text-label">Observación</label>
-                                <input type="text" className="input-field" value={observation} onChange={e => setObservation(e.target.value)} placeholder="Opcional..." />
-                            </div>
-
-                            <div className="form-group">
-                                <label className="text-label" style={{ marginBottom: '0.5rem', display: 'block' }}>Comprobante (Voucher)</label>
-
-                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
                                     {/* Option 1: Gallery/File */}
                                     <label className="btn btn-secondary" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.8rem' }}>
                                         <Upload size={20} />
@@ -599,22 +555,93 @@ const SenderDashboard = () => {
 
                                 {/* Preview / Selected File Name */}
                                 {file && (
-                                    <div style={{ marginTop: '0.5rem', padding: '0.5rem', background: 'var(--bg-app)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.9rem' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', overflow: 'hidden' }}>
-                                            <FileText size={16} color="var(--color-primary)" />
-                                            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '180px' }}>
-                                                {file.name}
-                                            </span>
+                                    <div style={{ padding: '0.5rem', background: 'var(--bg-surface)', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', overflow: 'hidden' }}>
+                                                <FileText size={16} color="var(--color-primary)" />
+                                                <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '180px', fontSize: '0.9rem', fontWeight: 'bold' }}>
+                                                    {file.name}
+                                                </span>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => setFile(null)}
+                                                style={{ background: 'none', border: 'none', color: 'var(--color-danger)', cursor: 'pointer', padding: '4px' }}
+                                            >
+                                                <X size={16} />
+                                            </button>
                                         </div>
-                                        <button
-                                            type="button"
-                                            onClick={() => setFile(null)}
-                                            style={{ background: 'none', border: 'none', color: 'var(--color-danger)', cursor: 'pointer', padding: '4px' }}
-                                        >
-                                            <X size={16} />
-                                        </button>
+
+                                        {/* IMAGE PREVIEW */}
+                                        {previewUrl && (
+                                            <div style={{ textAlign: 'center', background: '#000', borderRadius: '4px', overflow: 'hidden', maxHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                <img
+                                                    src={previewUrl}
+                                                    alt="Vista Previa"
+                                                    style={{ maxWidth: '100%', maxHeight: '300px', objectFit: 'contain' }}
+                                                />
+                                            </div>
+                                        )}
                                     </div>
                                 )}
+                            </div>
+
+                            {/* 2. Recipient (Destinatario) */}
+                            <div className="form-group">
+                                <label className="text-label">Destinatario</label>
+                                <div style={{ position: 'relative' }}>
+                                    <UserPlus size={18} style={{ position: 'absolute', left: '1rem', top: '1rem', color: 'var(--text-muted)' }} />
+                                    <input type="text" required className="input-field" style={{ paddingLeft: '2.5rem' }}
+                                        value={recipientEmail} onChange={e => { setRecipientEmail(e.target.value); setShowSuggestions(true); }}
+                                        placeholder="Nombre o Correo" onFocus={() => setShowSuggestions(true)}
+                                        onBlur={() => setTimeout(() => setShowSuggestions(false), 200)} />
+                                    {showSuggestions && contacts.length > 0 && (
+                                        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: '0 0 8px 8px', zIndex: 10 }}>
+                                            {contacts.filter(c => (c.contact_name + c.contact_email).toLowerCase().includes(recipientEmail.toLowerCase())).map(c => (
+                                                <div key={c.id} onClick={() => setRecipientEmail(c.contact_email)} style={{ padding: '0.8rem', cursor: 'pointer', borderBottom: '1px solid var(--border-subtle)' }}>
+                                                    <strong>{c.contact_name}</strong> <br /><small>{c.contact_email}</small>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* 3. Amount (Monto) */}
+                            <div className="form-group">
+                                <label className="text-label">Monto (S/.)</label>
+                                <div style={{ position: 'relative' }}>
+                                    <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontWeight: 'bold', fontSize: '1rem' }}>S/.</span>
+                                    <input type="number" step="0.01" required className="input-field" style={{ paddingLeft: '3rem', fontSize: '1.2rem', fontWeight: 'bold' }}
+                                        value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" />
+                                </div>
+                            </div>
+
+                            {/* 4. Date (Fecha) */}
+                            <div className="form-group">
+                                <label className="text-label">Fecha</label>
+                                <div style={{ position: 'relative' }}>
+                                    <Calendar
+                                        size={18}
+                                        style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', cursor: 'pointer' }}
+                                        onClick={() => document.getElementById('deposit-date-picker').showPicker()}
+                                    />
+                                    <input
+                                        id="deposit-date-picker"
+                                        type="date"
+                                        required
+                                        className="input-field"
+                                        style={{ paddingLeft: '2.5rem' }}
+                                        value={date}
+                                        onChange={e => setDate(e.target.value)}
+                                        onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label className="text-label">Observación</label>
+                                <input type="text" className="input-field" value={observation} onChange={e => setObservation(e.target.value)} placeholder="Opcional..." />
                             </div>
 
                             <button type="submit" className="btn" style={{ width: '100%', marginTop: '1rem', background: '#2563eb', color: 'white', border: 'none' }} disabled={submitting}>
