@@ -255,6 +255,14 @@ const AdminUsers = () => {
                                                         >
                                                             <Trash2 size={18} />
                                                         </button>
+                                                        <button
+                                                            onClick={() => handleResetPassword(profile.email)}
+                                                            className="btn-icon"
+                                                            title="Enviar Correo Reset Clave"
+                                                            style={{ color: 'var(--color-warning, #f59e0b)' }}
+                                                        >
+                                                            <Lock size={18} />
+                                                        </button>
                                                     </div>
                                                 )}
                                             </td>
