@@ -72,16 +72,32 @@ export const AuthProvider = ({ children }) => {
             console.log("Auth State Change:", _event);
 
             if (session?.user) {
-                // Only show loading screen on initial login actions, not silent refreshes
-                const isSilentRefresh = _event === 'TOKEN_REFRESHED';
-                if (!isSilentRefresh) setLoading(true);
+                // If we already have a user, do NOT show loading screen for background refreshes
+                // or random events like SIGNED_IN if we are already seeing data.
+                // We only block UI if we are transitioning from 'no user' to 'user' potentially.
+                const isSilentRefresh = _event === 'TOKEN_REFRESHED' || (_event === 'SIGNED_IN' && user);
+
+                // Also, if 'user' state is already populated with the SAME ID, we can skip blocking UI.
+                // But we still want to fetch fresh profile data in background.
+                const shouldBlockUI = !user && !isSilentRefresh;
+
+                if (shouldBlockUI) setLoading(true);
 
                 const fullUser = await enrichUser(session.user);
-                setUser(fullUser);
 
-                if (!isSilentRefresh) setLoading(false);
+                // Only update state if data actually changed to avoid re-renders (simple check)
+                setUser(prev => {
+                    // If JSON stringify matches, return prev
+                    if (JSON.stringify(prev) === JSON.stringify(fullUser)) return prev;
+                    return fullUser;
+                });
+
+                if (shouldBlockUI) setLoading(false);
             } else {
-                setUser(null);
+                // If session is gone, we must clear user.
+                if (user) {
+                    setUser(null);
+                }
                 setLoading(false);
             }
         });
