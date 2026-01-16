@@ -530,7 +530,80 @@ const SenderDashboard = () => {
 
                 {/* --- TAB 1: NUEVO DEPÓSITO --- */}
                 {activeTab === 'new' && (
-                    <div className="glass-panel" style={{ padding: '1.5rem', animation: 'fadeIn 0.3s' }}>
+                    <div className="glass-panel" style={{ padding: '1.5rem', animation: 'fadeIn 0.3s', position: 'relative', overflow: 'hidden' }}>
+
+                        {/* SUBSCRIPTION BLOCKING LOGIC */}
+                        {(() => {
+                            const isTrial = !user.subscription_status || user.subscription_status === 'trial';
+                            const isExpired = user.subscription_status === 'expired';
+
+                            let daysRemaining = 0;
+                            if (user.trial_end_date) {
+                                const end = new Date(user.trial_end_date);
+                                const now = new Date();
+                                daysRemaining = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+                            }
+
+                            // Force expire if logical check fails even if status says trial
+                            const limitReached = isTrial && daysRemaining <= 0;
+                            const shouldBlock = isExpired || limitReached;
+
+                            if (shouldBlock) {
+                                return (
+                                    <div style={{
+                                        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                                        zIndex: 50, background: 'rgba(15, 23, 42, 0.95)',
+                                        backdropFilter: 'blur(5px)',
+                                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                                        padding: '2rem', textAlign: 'center'
+                                    }}>
+                                        <div style={{ background: '#ef4444', padding: '1rem', borderRadius: '50%', marginBottom: '1.5rem' }}>
+                                            <Lock size={40} color="white" />
+                                        </div>
+                                        <h2 style={{ color: 'white', marginBottom: '0.5rem' }}>Periodo de Prueba Finalizado</h2>
+                                        <p style={{ color: '#cbd5e1', marginBottom: '2rem' }}>
+                                            Tu licencia gratuita de 15 días ha expirado. Para continuar registrando depósitos, por favor activa tu cuenta.
+                                        </p>
+                                        <a
+                                            href={`https://wa.me/51944499069?text=Hola,%20mi%20cuenta%20(${user.email})%20ha%20vencido.%20Quisiera%20activar%20el%20plan%20Premium.`}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="btn btn-primary"
+                                            style={{
+                                                background: '#22c55e', width: '100%', maxWidth: '300px',
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                                                padding: '1rem', fontSize: '1.1rem'
+                                            }}
+                                        >
+                                            <span style={{ fontSize: '1.2rem' }}>💬</span> Contactar Soporte
+                                        </a>
+                                        <p style={{ marginTop: '1.5rem', fontSize: '0.8rem', color: '#64748b' }}>
+                                            Tus datos históricos siguen seguros y accesibles.
+                                        </p>
+                                    </div>
+                                );
+                            }
+
+                            // Warning Banner for Trial Users
+                            if (isTrial && daysRemaining <= 5) {
+                                return (
+                                    <div style={{
+                                        background: 'rgba(234, 179, 8, 0.15)', border: '1px solid rgba(234, 179, 8, 0.3)',
+                                        color: '#fcd34d', padding: '0.75rem', borderRadius: '8px', marginBottom: '1.5rem',
+                                        display: 'flex', alignItems: 'center', gap: '0.75rem'
+                                    }}>
+                                        <div style={{ background: '#ca8a04', borderRadius: '50%', padding: '2px' }}>
+                                            <Activity size={14} color="black" />
+                                        </div>
+                                        <div style={{ fontSize: '0.9rem' }}>
+                                            <strong>Modo Prueba:</strong> Te quedan {daysRemaining} días gratis.
+                                        </div>
+                                    </div>
+                                );
+                            }
+                            return null;
+                        })()}
+
                         <h2 className="text-h2" style={{ marginBottom: '1.5rem' }}>Nuevo Depósito</h2>
                         <form onSubmit={handleSubmit}>
                             {/* 1. Comprobante (Voucher) - Moved to Top for Better UX */}

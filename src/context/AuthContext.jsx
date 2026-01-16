@@ -31,7 +31,9 @@ export const AuthProvider = ({ children }) => {
                     ...authUser,
                     role: profile.role,
                     profile_name: profile.full_name,
-                    status: profile.status || 'active'
+                    status: profile.status || 'active',
+                    subscription_status: profile.subscription_status,
+                    trial_end_date: profile.trial_end_date
                 };
             }
         } catch (e) {

@@ -168,6 +168,18 @@ export const depositService = {
         if (error) throw error;
     },
 
+    updateProfileSubscription: async (profileId, { role, status, subscription_status, trial_end_date }) => {
+        const updates = { role, status, subscription_status };
+        if (trial_end_date) updates.trial_end_date = trial_end_date;
+
+        const { error } = await supabase
+            .from('profiles')
+            .update(updates)
+            .eq('id', profileId);
+
+        if (error) throw error;
+    },
+
     triggerPasswordReset: async (email) => {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
             redirectTo: window.location.origin + '/update-password', // We need a page for this eventually, or just login
