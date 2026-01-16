@@ -72,6 +72,11 @@ const Login = () => {
                     console.error("Error checking admin role on login:", err);
                 }
 
+                // If going to standard dashboard, force "New Deposit" tab by clearing persistence
+                if (targetRoute === '/') {
+                    localStorage.removeItem('last_active_tab');
+                }
+
                 navigate(targetRoute);
             }
         } catch (err) {
