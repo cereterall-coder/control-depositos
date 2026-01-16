@@ -225,7 +225,7 @@ const Login = () => {
                 color: 'var(--text-muted)',
                 marginBottom: '1rem' // Safe space
             }}>
-                <p>Desarrollado por <span className="font-signature" style={{ fontSize: '1.5em' }}>AMALVIVA</span></p>
+                <p>Desarrollado por <span className="font-signature" style={{ fontSize: '1.8em' }}>Amalviva</span></p>
                 <p>E-mail: amalviva@gmail.com | Tel: 944499069</p>
             </footer>
         </div>
