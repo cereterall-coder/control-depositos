@@ -225,7 +225,7 @@ const Login = () => {
                 color: 'var(--text-muted)',
                 marginBottom: '1rem' // Safe space
             }}>
-                <p>Desarrollado por Ing. Amaro A. Vilela V.</p>
+                <p>Desarrollado por amalviva</p>
                 <p>E-mail: amalviva@gmail.com | Tel: 944499069</p>
             </footer>
         </div>
