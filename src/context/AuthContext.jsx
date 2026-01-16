@@ -121,6 +121,58 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
     };
 
+    // --- AUTO-LOGOUT LOGIC ---
+    useEffect(() => {
+        if (!user) return;
+
+        // 5 minutes in milliseconds
+        const INACTIVITY_LIMIT = 5 * 60 * 1000;
+        let logoutTimer;
+
+        const handleLogout = () => {
+            logout();
+            // We use a simple alert or toast. Since toast might not persist after logout redirect/state change,
+            // we'll try to use toast here but it depends on where Toaster is placed.
+            // Assuming Toaster is top-level in App, it should work.
+            // Using a native alert might be too intrusive, but safe.
+            // Let's rely on standard toast.
+            import('react-hot-toast').then(({ toast }) => {
+                toast.error("Sesión cerrada por inactividad (5 min)", { duration: 5000 });
+            });
+        };
+
+        const resetTimer = () => {
+            if (logoutTimer) clearTimeout(logoutTimer);
+            logoutTimer = setTimeout(handleLogout, INACTIVITY_LIMIT);
+        };
+
+        // Events to track activity
+        const events = ['click', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+
+        // Optimize mousemove to not fire too often (simple throttle)
+        let isThrottled = false;
+        const handleActivity = (e) => {
+            if (e.type === 'mousemove') {
+                if (isThrottled) return;
+                isThrottled = true;
+                setTimeout(() => { isThrottled = false; }, 1000); // Only reset timer every 1 sec on mousemove
+            }
+            resetTimer();
+        };
+
+        // Attach listeners
+        events.forEach(event => window.addEventListener(event, handleActivity));
+
+        // Start initial timer
+        resetTimer();
+
+        // Cleanup
+        return () => {
+            if (logoutTimer) clearTimeout(logoutTimer);
+            events.forEach(event => window.removeEventListener(event, handleActivity));
+        };
+    }, [user]);
+
     if (loading) {
         return (
             <div style={{ height: '100vh', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f172a', color: 'white' }}>
