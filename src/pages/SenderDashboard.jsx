@@ -475,7 +475,7 @@ const SenderDashboard = () => {
                             {(user.role === 'admin' || user.user_metadata?.role === 'admin') && (
                                 <button
                                     onClick={() => {
-                                        const newName = prompt("Nombre del Desarrollador:", localStorage.getItem('dev_name') || "amalviva");
+                                        const newName = prompt("Nombre del Desarrollador:", localStorage.getItem('dev_name') || "AMALVIVA");
                                         if (newName !== null) {
                                             localStorage.setItem('dev_name', newName);
                                             const newPhone = prompt("Teléfono:", localStorage.getItem('dev_phone') || "944 499 069");
@@ -496,8 +496,8 @@ const SenderDashboard = () => {
                             )}
 
                             <div style={{ fontWeight: '600', fontSize: '0.8rem', marginBottom: '0.5rem', color: '#cbd5e1' }}>Desarrollado por:</div>
-                            <div style={{ fontSize: '1.2rem', color: 'white', fontWeight: 'bold', background: 'linear-gradient(90deg, #fff, #cbd5e1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                                {localStorage.getItem('dev_name') || "amalviva"}
+                            <div className="font-signature" style={{ fontSize: '1.8rem', color: 'white', background: 'linear-gradient(90deg, #fff, #cbd5e1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                                {localStorage.getItem('dev_name') || "AMALVIVA"}
                             </div>
                             <div style={{ fontSize: '0.9rem', color: '#60a5fa', marginTop: '0.3rem', fontWeight: '500' }}>Ingeniero de Software</div>
                         </div>
