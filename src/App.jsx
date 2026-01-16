@@ -14,11 +14,14 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import { Toaster } from 'react-hot-toast';
 
+import LandingPage from './pages/LandingPage';
+
 function AppRoutes() {
     const { user } = useAuth();
 
     return (
         <Routes>
+            <Route path="/landing" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/update-password" element={<UpdatePassword />} />
             <Route path="/test" element={<ConnectionTest />} />
