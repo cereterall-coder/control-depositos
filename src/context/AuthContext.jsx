@@ -83,13 +83,33 @@ export const AuthProvider = ({ children }) => {
 
                 if (shouldBlockUI) setLoading(true);
 
-                const fullUser = await enrichUser(session.user);
+                // Pass current 'user' to enrichUser or handle merge here.
+                // We'll modify logic: try to fetch. If fail, use existing profile data if matches ID.
+                let fullUser = null;
+                try {
+                    fullUser = await enrichUser(session.user);
+                } catch (err) {
+                    console.warn("Background profile fetch failed, using fallback/cache if available", err);
+                }
 
-                // Only update state if data actually changed to avoid re-renders (simple check)
                 setUser(prev => {
-                    // If JSON stringify matches, return prev
-                    if (JSON.stringify(prev) === JSON.stringify(fullUser)) return prev;
-                    return fullUser;
+                    // If fetch succeded (has profile_name or at least role), use it
+                    // We check profile_name because enrichUser adds it only on success
+                    if (fullUser && fullUser.profile_name) {
+                        if (JSON.stringify(prev) === JSON.stringify(fullUser)) return prev;
+                        return fullUser;
+                    }
+
+                    // If fetch failed (returned raw authUser or null) AND we have previous valid data for THIS user
+                    // We check if prev.id matches the current session user id to avoid keeping data from a different user
+                    if (prev && prev.id === session.user.id && prev.subscription_status) {
+                        console.log("Keeping existing profile data due to fetch error/missing profile");
+                        return prev;
+                    }
+
+                    // If check failed and we have no prev data, we might have to settle for raw user 
+                    // The enrichUser function ALREADY returns raw authUser on error. 
+                    return fullUser || session.user;
                 });
 
                 if (shouldBlockUI) setLoading(false);
