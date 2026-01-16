@@ -16,6 +16,26 @@ const Login = () => {
     const [alias, setAlias] = useState('');
     const [phone, setPhone] = useState('');
 
+    const [isRecovering, setIsRecovering] = useState(false);
+
+    const handleRecovery = async (e) => {
+        e.preventDefault();
+        if (!email) return toast.error("Ingresa tu correo para recuperar la clave");
+        setLoading(true);
+        try {
+            const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.origin + '/update-password',
+            });
+            if (error) throw error;
+            toast.success("Te hemos enviado un correo para restablecer tu contraseña");
+            setIsRecovering(false);
+        } catch (err) {
+            toast.error("Error al enviar correo: " + err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleAuth = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -56,86 +76,133 @@ const Login = () => {
                     </h1>
                     <p className="text-label" style={{ marginBottom: '1.5rem', textTransform: 'none' }}>Control de Depósitos v2.0</p>
 
-                    <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                        {isRegistering && (
-                            <>
-                                <div style={{ position: 'relative' }} className="animate-fade-in">
-                                    <User size={18} style={{ position: 'absolute', left: '1rem', top: '0.85rem', color: 'var(--text-muted)' }} />
-                                    <input
-                                        type="text"
-                                        placeholder="Nombre Completo"
-                                        required={isRegistering}
-                                        className="input-field"
-                                        style={{ paddingLeft: '2.8rem' }}
-                                        value={fullName}
-                                        onChange={e => setFullName(e.target.value)}
-                                    />
+                    {isRecovering ? (
+                        <form onSubmit={handleRecovery} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                            <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
+                                Ingresa tu correo y te enviaremos un enlace mágico para restablecer tu contraseña.
+                            </p>
+                            <div style={{ position: 'relative' }}>
+                                <Mail size={18} style={{ position: 'absolute', left: '1rem', top: '0.85rem', color: 'var(--text-muted)' }} />
+                                <input
+                                    type="email"
+                                    placeholder="Correo Electrónico"
+                                    required
+                                    className="input-field"
+                                    style={{ paddingLeft: '2.8rem' }}
+                                    value={email}
+                                    onChange={e => setEmail(e.target.value)}
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                className="btn btn-primary"
+                                disabled={loading}
+                                style={{ marginTop: '0.5rem', width: '100%' }}
+                            >
+                                {loading ? 'Enviando...' : 'Enviar Enlace de Recuperación'}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setIsRecovering(false)}
+                                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', marginTop: '0.5rem' }}
+                            >
+                                Cancelar
+                            </button>
+                        </form>
+                    ) : (
+                        <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                            {isRegistering && (
+                                <>
+                                    <div style={{ position: 'relative' }} className="animate-fade-in">
+                                        <User size={18} style={{ position: 'absolute', left: '1rem', top: '0.85rem', color: 'var(--text-muted)' }} />
+                                        <input
+                                            type="text"
+                                            placeholder="Nombre Completo"
+                                            required={isRegistering}
+                                            className="input-field"
+                                            style={{ paddingLeft: '2.8rem' }}
+                                            value={fullName}
+                                            onChange={e => setFullName(e.target.value)}
+                                        />
+                                    </div>
+
+                                    <div style={{ position: 'relative' }} className="animate-fade-in">
+                                        <User size={18} style={{ position: 'absolute', left: '1rem', top: '0.85rem', color: 'var(--text-muted)' }} />
+                                        <input
+                                            type="text"
+                                            placeholder="Alias (Corto)"
+                                            required={isRegistering}
+                                            className="input-field"
+                                            style={{ paddingLeft: '2.8rem' }}
+                                            value={alias}
+                                            onChange={e => setAlias(e.target.value)}
+                                        />
+                                    </div>
+
+                                    <div style={{ position: 'relative' }} className="animate-fade-in">
+                                        <User size={18} style={{ position: 'absolute', left: '1rem', top: '0.85rem', color: 'var(--text-muted)' }} />
+                                        <input
+                                            type="tel"
+                                            placeholder="Teléfono"
+                                            required={isRegistering}
+                                            className="input-field"
+                                            style={{ paddingLeft: '2.8rem' }}
+                                            value={phone}
+                                            onChange={e => setPhone(e.target.value)}
+                                        />
+                                    </div>
+                                </>
+                            )}
+
+                            <div style={{ position: 'relative' }}>
+                                <Mail size={18} style={{ position: 'absolute', left: '1rem', top: '0.85rem', color: 'var(--text-muted)' }} />
+                                <input
+                                    type="email"
+                                    placeholder="Correo Electrónico"
+                                    required
+                                    className="input-field"
+                                    style={{ paddingLeft: '2.8rem' }}
+                                    value={email}
+                                    onChange={e => setEmail(e.target.value)}
+                                />
+                            </div>
+
+                            <div style={{ position: 'relative' }}>
+                                <Lock size={18} style={{ position: 'absolute', left: '1rem', top: '0.85rem', color: 'var(--text-muted)' }} />
+                                <input
+                                    type="password"
+                                    placeholder="Contraseña"
+                                    required
+                                    className="input-field"
+                                    style={{ paddingLeft: '2.8rem' }}
+                                    value={password}
+                                    onChange={e => setPassword(e.target.value)}
+                                />
+                            </div>
+
+                            <button
+                                type="submit"
+                                className="btn btn-primary"
+                                disabled={loading}
+                                style={{ marginTop: '0.5rem', width: '100%' }}
+                            >
+                                {loading ? 'Procesando...' : isRegistering ? 'REGISTRARSE' : 'INGRESAR'}
+                                {!loading && <ArrowRight size={18} />}
+                            </button>
+
+                            {!isRegistering && (
+                                <div style={{ marginTop: '0.5rem', textAlign: 'right' }}>
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsRecovering(true)}
+                                        style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.8rem', cursor: 'pointer', textDecoration: 'underline' }}
+                                    >
+                                        ¿Olvidaste tu contraseña?
+                                    </button>
                                 </div>
-
-                                <div style={{ position: 'relative' }} className="animate-fade-in">
-                                    <User size={18} style={{ position: 'absolute', left: '1rem', top: '0.85rem', color: 'var(--text-muted)' }} />
-                                    <input
-                                        type="text"
-                                        placeholder="Alias (Corto)"
-                                        required={isRegistering}
-                                        className="input-field"
-                                        style={{ paddingLeft: '2.8rem' }}
-                                        value={alias}
-                                        onChange={e => setAlias(e.target.value)}
-                                    />
-                                </div>
-
-                                <div style={{ position: 'relative' }} className="animate-fade-in">
-                                    <User size={18} style={{ position: 'absolute', left: '1rem', top: '0.85rem', color: 'var(--text-muted)' }} />
-                                    <input
-                                        type="tel"
-                                        placeholder="Teléfono"
-                                        required={isRegistering}
-                                        className="input-field"
-                                        style={{ paddingLeft: '2.8rem' }}
-                                        value={phone}
-                                        onChange={e => setPhone(e.target.value)}
-                                    />
-                                </div>
-                            </>
-                        )}
-
-                        <div style={{ position: 'relative' }}>
-                            <Mail size={18} style={{ position: 'absolute', left: '1rem', top: '0.85rem', color: 'var(--text-muted)' }} />
-                            <input
-                                type="email"
-                                placeholder="Correo Electrónico"
-                                required
-                                className="input-field"
-                                style={{ paddingLeft: '2.8rem' }}
-                                value={email}
-                                onChange={e => setEmail(e.target.value)}
-                            />
-                        </div>
-
-                        <div style={{ position: 'relative' }}>
-                            <Lock size={18} style={{ position: 'absolute', left: '1rem', top: '0.85rem', color: 'var(--text-muted)' }} />
-                            <input
-                                type="password"
-                                placeholder="Contraseña"
-                                required
-                                className="input-field"
-                                style={{ paddingLeft: '2.8rem' }}
-                                value={password}
-                                onChange={e => setPassword(e.target.value)}
-                            />
-                        </div>
-
-                        <button
-                            type="submit"
-                            className="btn btn-primary"
-                            disabled={loading}
-                            style={{ marginTop: '0.5rem', width: '100%' }}
-                        >
-                            {loading ? 'Procesando...' : isRegistering ? 'REGISTRARSE' : 'INGRESAR'}
-                            {!loading && <ArrowRight size={18} />}
-                        </button>
-                    </form>
+                            )}
+                        </form>
+                    )}
 
                     <div style={{ marginTop: '1.5rem', borderTop: '1px solid var(--border-subtle)', paddingTop: '1rem' }}>
                         <button

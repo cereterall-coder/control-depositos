@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
-import { User, Phone, Tag, Save, ArrowLeft } from 'lucide-react';
+import { User, Phone, Tag, Save, ArrowLeft, Lock, Eye, EyeOff } from 'lucide-react';
+
 import toast from 'react-hot-toast';
 
 // DiceBear API Base (Latest v9.x)
@@ -82,6 +83,11 @@ const ProfileSettings = () => {
         setFormData(prev => ({ ...prev, avatar_url: url }));
     };
 
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [updatingPassword, setUpdatingPassword] = useState(false);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -134,6 +140,25 @@ const ProfileSettings = () => {
             toast.error('Error: ' + error.message);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handlePasswordUpdate = async (e) => {
+        e.preventDefault();
+        if (password.length < 6) return toast.error("La contraseña debe tener al menos 6 caracteres");
+        if (password !== confirmPassword) return toast.error("Las contraseñas no coinciden");
+
+        setUpdatingPassword(true);
+        try {
+            const { error } = await supabase.auth.updateUser({ password: password });
+            if (error) throw error;
+            toast.success("Contraseña actualizada con éxito");
+            setPassword('');
+            setConfirmPassword('');
+        } catch (error) {
+            toast.error("Error al actualizar contraseña: " + error.message);
+        } finally {
+            setUpdatingPassword(false);
         }
     };
 
@@ -267,6 +292,63 @@ const ProfileSettings = () => {
                         </button>
                     </div>
                 </form>
+
+                <hr style={{ border: 'none', borderTop: '1px solid var(--border-subtle)', margin: '2rem 0' }} />
+
+                {/* Password Change Section */}
+                <div>
+                    <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-primary)' }}>
+                        <Lock size={20} color="var(--color-primary)" />
+                        Seguridad
+                    </h3>
+                    <form onSubmit={handlePasswordUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', background: 'rgba(0,0,0,0.2)', padding: '1.5rem', borderRadius: '12px' }}>
+                        <div className="form-group">
+                            <label className="text-label">Nueva Contraseña</label>
+                            <div style={{ position: 'relative' }}>
+                                <Lock size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    className="input-field"
+                                    style={{ paddingLeft: '2.8rem', paddingRight: '2.8rem' }}
+                                    placeholder="Mínimo 6 caracteres"
+                                    value={password}
+                                    onChange={e => setPassword(e.target.value)}
+                                    minLength={6}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}
+                                >
+                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                            </div>
+                        </div>
+                        <div className="form-group">
+                            <label className="text-label">Confirmar Contraseña</label>
+                            <div style={{ position: 'relative' }}>
+                                <Lock size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    className="input-field"
+                                    style={{ paddingLeft: '2.8rem' }}
+                                    placeholder="Repite la contraseña"
+                                    value={confirmPassword}
+                                    onChange={e => setConfirmPassword(e.target.value)}
+                                    minLength={6}
+                                />
+                            </div>
+                        </div>
+                        <button
+                            type="submit"
+                            className="btn"
+                            style={{ background: 'var(--color-primary)', color: 'white', border: 'none', marginTop: '0.5rem' }}
+                            disabled={!password || updatingPassword}
+                        >
+                            {updatingPassword ? 'Actualizando...' : 'Actualizar Contraseña'}
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     );
