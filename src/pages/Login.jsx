@@ -54,31 +54,25 @@ const Login = () => {
                 const data = await signIn(email, password);
                 toast.success('Bienvenido de vuelta');
 
-                // Check if admin and redirect directly to Users Panel
-                // data.user might not be enriched yet if we rely on AuthContext doing it async,
-                // but signIn returns the raw session user. We might need to check role from metadata if available immediately
-                // or wait for the global user state. 
-                // However, AuthContext.jsx calls enrichUser.
-                // A better approach is usually to let a ProtectedRoute handle it, but here we can try:
-                // Note: user object from signIn might just be auth user.
+                // Directly fetch profile to verify role, ignoring potentially stale user_metadata
+                let targetRoute = '/';
+                try {
+                    if (data.user) {
+                        const { data: profile } = await supabase
+                            .from('profiles')
+                            .select('role')
+                            .eq('id', data.user.id)
+                            .single();
 
-                // Let's rely on navigating to '/' and letting the Dashboard decide or just check simplified metadata if available.
-                // Or better, we query the profile quickly or check metadata.
-                // Assuming metadata has role (we set it on signup, but existing admins might differ).
-
-                // Safest bet: Navigate to root, BUT if we want direct admin access:
-                // We'll rely on the user having 'role' in app_metadata or user_metadata if we put it there.
-                // But our architecture puts it in 'profiles' table.
-                // The most robust way without extra roundtrip here is to rely on the side effect in AuthContext or just go to / and let SenderDashboard link to Admin.
-
-                // BUT USER REQUESTED DIRECT ACCESS.
-                // Let's try to check the returned data.
-                // data.user exists.
-                if (data.user?.user_metadata?.role === 'admin') {
-                    navigate('/admin/users');
-                } else {
-                    navigate('/');
+                        if (profile && profile.role === 'admin') {
+                            targetRoute = '/admin/users';
+                        }
+                    }
+                } catch (err) {
+                    console.error("Error checking admin role on login:", err);
                 }
+
+                navigate(targetRoute);
             }
         } catch (err) {
             toast.error(err.message);
