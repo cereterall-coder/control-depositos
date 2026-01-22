@@ -409,8 +409,6 @@ const SenderDashboard = () => {
 
                 <div
                     style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', position: 'relative' }}
-                    onMouseEnter={() => setShowUserTooltip(true)}
-                    onMouseLeave={() => setShowUserTooltip(false)}
                 >
                     <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>v3.1</span>
 
@@ -428,37 +426,43 @@ const SenderDashboard = () => {
 
                     {/* Popover */}
                     {showUserTooltip && (
-                        <div style={{
-                            position: 'absolute', top: '120%', right: 0,
-                            background: 'rgba(15, 23, 42, 0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px',
-                            padding: '1rem', boxShadow: '0 10px 25px rgba(0,0,0,0.2)', backdropFilter: 'blur(10px)',
-                            width: 'max-content', zIndex: 60, animation: 'fadeIn 0.2s', minWidth: '180px', color: 'white'
-                        }}>
-                            <div style={{ position: 'absolute', top: '-6px', right: '10px', width: '12px', height: '12px', background: 'rgba(15, 23, 42, 0.95)', transform: 'rotate(45deg)', borderLeft: '1px solid rgba(255,255,255,0.1)', borderTop: '1px solid rgba(255,255,255,0.1)' }}></div>
+                        <>
+                            <div
+                                style={{ position: 'fixed', inset: 0, zIndex: 55, cursor: 'default' }}
+                                onClick={() => setShowUserTooltip(false)}
+                            />
+                            <div style={{
+                                position: 'absolute', top: '120%', right: 0,
+                                background: 'rgba(15, 23, 42, 0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px',
+                                padding: '1rem', boxShadow: '0 10px 25px rgba(0,0,0,0.2)', backdropFilter: 'blur(10px)',
+                                width: 'max-content', zIndex: 60, animation: 'fadeIn 0.2s', minWidth: '180px', color: 'white'
+                            }}>
+                                <div style={{ position: 'absolute', top: '-6px', right: '10px', width: '12px', height: '12px', background: 'rgba(15, 23, 42, 0.95)', transform: 'rotate(45deg)', borderLeft: '1px solid rgba(255,255,255,0.1)', borderTop: '1px solid rgba(255,255,255,0.1)' }}></div>
 
-                            <div style={{ fontSize: '0.9rem', fontWeight: 'bold', marginBottom: '0.3rem', wordBreak: 'break-all' }}>{user.email}</div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                                <span style={{ fontWeight: 'bold', color: '#3b82f6' }}>ROL:</span>
-                                {(user.role === 'admin' || user.user_metadata?.role === 'admin') ? 'Administrador' : 'Usuario'}
+                                <div style={{ fontSize: '0.9rem', fontWeight: 'bold', marginBottom: '0.3rem', wordBreak: 'break-all' }}>{user.email}</div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                    <span style={{ fontWeight: 'bold', color: '#3b82f6' }}>ROL:</span>
+                                    {(user.role === 'admin' || user.user_metadata?.role === 'admin') ? 'Administrador' : 'Usuario'}
+                                </div>
+
+                                <div style={{ marginTop: '0.8rem', paddingTop: '0.8rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                                    <button
+                                        onClick={logout}
+                                        style={{
+                                            background: '#2563eb', color: 'white', border: 'none',
+                                            borderRadius: '6px', padding: '0.5rem 1rem', width: '100%',
+                                            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                                            fontSize: '0.8rem', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(37, 99, 235, 0.3)'
+                                        }}
+                                    >
+                                        <LogOut size={14} />
+                                        Cerrar Sesión
+                                    </button>
+                                </div>
+
+
                             </div>
-
-                            <div style={{ marginTop: '0.8rem', paddingTop: '0.8rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-                                <button
-                                    onClick={logout}
-                                    style={{
-                                        background: '#2563eb', color: 'white', border: 'none',
-                                        borderRadius: '6px', padding: '0.5rem 1rem', width: '100%',
-                                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-                                        fontSize: '0.8rem', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(37, 99, 235, 0.3)'
-                                    }}
-                                >
-                                    <LogOut size={14} />
-                                    Cerrar Sesión
-                                </button>
-                            </div>
-
-
-                        </div>
+                        </>
                     )}
                 </div>
             </div>
